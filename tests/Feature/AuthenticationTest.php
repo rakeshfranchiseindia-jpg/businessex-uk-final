@@ -847,6 +847,10 @@ class AuthenticationTest extends TestCase
 
         $this->get(route('login'))
             ->assertOk()
+            ->assertSee('New to BusinessX?')
+            ->assertSee('Create a free account')
+            ->assertDontSee("Didn't receive the verification email?")
+            ->assertDontSee('id="verification-email"', false)
             ->assertSee('data-quick-register="business"', false)
             ->assertSee('data-quick-register="investor"', false)
             ->assertSee('data-quick-register="startup"', false)

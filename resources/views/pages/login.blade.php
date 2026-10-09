@@ -528,22 +528,6 @@ BusinessX connects businesses, startups, investors and mentors.
 
           <p class="register-cta">New to BusinessX? <a href="{{ route('registration') }}">Create a free account <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a></p>
         </form>
-        <form method="post" action="{{ route('verification.resend') }}" style="margin-top:20px;padding-top:16px;border-top:1px solid var(--gray-200);">
-          @csrf
-          <label for="verification-email" style="display:block;margin-bottom:8px;color:var(--gray-700);font-size:13px;">Didn't receive the verification email?</label>
-          <div class="field">
-            <input id="verification-email" type="email" name="email" value="{{ old('email') }}" autocomplete="email" placeholder="Enter your account email" required>
-          </div>
-          @error('verification_email')
-            <p role="alert" style="margin:8px 0;color:#991b1b;font-size:12px;">{{ $message }}</p>
-          @enderror
-          @error('email')
-            @if (old('_verification_resend'))
-              <p role="alert" style="margin:8px 0;color:#991b1b;font-size:12px;">{{ $message }}</p>
-            @endif
-          @enderror
-          <button type="submit" class="btn-primary-gold" style="margin-top:8px;">Resend verification email</button>
-        </form>
         </section>
 
         <section class="auth-panel" id="register-panel" role="tabpanel" aria-labelledby="register-tab" hidden>

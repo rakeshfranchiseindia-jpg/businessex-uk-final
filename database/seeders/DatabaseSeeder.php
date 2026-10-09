@@ -23,8 +23,8 @@ class DatabaseSeeder extends Seeder
         $this->call([BusinessexContactusTableSeeder::class]);
         $this->call([BusinessexNewsletterTableSeeder::class]);
         $this->call([BusinessexRiseconferenceTableSeeder::class]);
-        $this->call([BxArticlesTableSeeder::class]);
         $this->call([BxAuthorTableSeeder::class]);
+        $this->call([BxArticlesTableSeeder::class]);
         $this->call([BxCitiesTableSeeder::class]);
         $this->call([BxCouponTableSeeder::class]);
         $this->call([BxDfpBannerTableSeeder::class]);
