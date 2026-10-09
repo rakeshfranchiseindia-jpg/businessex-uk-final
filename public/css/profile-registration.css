@@ -1,0 +1,30 @@
+.registration-step-panel[hidden] { display: none; }
+.registration-step-heading { margin-bottom: 24px; }
+.registration-step-heading > span { color: var(--gold-600); font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+.registration-step-heading h3 { margin: 5px 0 4px; color: var(--navy-800); font-size: 18px; }
+.registration-step-heading p { color: var(--gray-500); font-size: 13px; line-height: 1.5; }
+.profile-fields-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px 20px; }
+.profile-fields-grid .form-field { min-width: 0; }
+.profile-fields-grid .form-field input,
+.profile-fields-grid .form-field select,
+.profile-fields-grid .form-field textarea { min-width: 0; }
+.profile-fields-grid .form-field input[type="file"] { height: auto; min-height: 44px; padding: 9px; }
+.profile-field-full { grid-column: 1 / -1; }
+.profile-checkbox-field { min-width: 0; padding: 0; border: 0; }
+.profile-checkbox-field legend { margin-bottom: 10px; color: var(--gray-700); font-size: 13px; font-weight: 600; }
+.profile-checkbox-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px 18px; }
+.profile-checkbox-item { display: flex; align-items: center; gap: 8px; min-width: 0; color: var(--gray-700); font-size: 13px; }
+.profile-checkbox-item input { width: 16px; height: 16px; flex: 0 0 16px; accent-color: var(--gold-500); }
+.profile-step-actions { gap: 12px; }
+.wizard-step-status { margin-left: auto; color: var(--gray-500); font-size: 12px; }
+.profile-step-actions [hidden] { display: none; }
+.step-dots .dot.current { outline: 2px solid var(--gold-500); outline-offset: 2px; }
+.reg-step.done .num { background: var(--navy-500); color: var(--gold-500); border-color: var(--gold-500); }
+
+@media (max-width: 720px) {
+  .profile-fields-grid { grid-template-columns: minmax(0, 1fr); gap: 15px; }
+  .profile-field-full { grid-column: auto; }
+  .profile-step-actions { flex-wrap: wrap; }
+  .wizard-step-status { order: 3; flex-basis: 100%; text-align: center; }
+  .profile-checkbox-list { grid-template-columns: minmax(0, 1fr); }
+}

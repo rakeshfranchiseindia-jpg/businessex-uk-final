@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 140" fill="none" role="img" aria-labelledby="title">
+  <title id="title">Business growth chart</title>
+  <rect x="14" y="12" width="152" height="116" rx="18" fill="#F1F6FB"/>
+  <path d="M39 103V82h22v21M70 103V68h22v35M101 103V54h22v49M132 103V39h15v64" fill="#DDEAF6" stroke="#244B75" stroke-width="3" stroke-linejoin="round"/>
+  <path d="m37 69 28-17 23 7 38-31" stroke="#E5A623" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M117 28h10v10" stroke="#E5A623" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M34 108h116" stroke="#244B75" stroke-width="3" stroke-linecap="round"/>
+</svg>

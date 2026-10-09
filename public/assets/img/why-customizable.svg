@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 140" fill="none" role="img" aria-labelledby="title">
+  <title id="title">Customizable business profile</title>
+  <rect x="14" y="12" width="152" height="116" rx="18" fill="#F1F6FB"/>
+  <rect x="43" y="29" width="94" height="82" rx="10" fill="#fff" stroke="#244B75" stroke-width="3"/>
+  <path d="M59 51h60M59 70h60M59 89h38" stroke="#9BB4CE" stroke-width="4" stroke-linecap="round"/>
+  <circle cx="79" cy="51" r="7" fill="#E5A623" stroke="#fff" stroke-width="3"/>
+  <circle cx="105" cy="70" r="7" fill="#3B82F6" stroke="#fff" stroke-width="3"/>
+  <circle cx="86" cy="89" r="7" fill="#E5A623" stroke="#fff" stroke-width="3"/>
+  <path d="m119 93 20-20 9 9-20 20-12 3 3-12Z" fill="#E5A623" stroke="#244B75" stroke-width="3" stroke-linejoin="round"/>
+</svg>

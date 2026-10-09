@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 140" fill="none" role="img" aria-labelledby="title">
+  <title id="title">Business portfolio management</title>
+  <rect x="14" y="12" width="152" height="116" rx="18" fill="#F1F6FB"/>
+  <rect x="41" y="42" width="98" height="65" rx="9" fill="#fff" stroke="#244B75" stroke-width="3"/>
+  <path d="M68 42v-8a8 8 0 0 1 8-8h28a8 8 0 0 1 8 8v8" stroke="#244B75" stroke-width="4"/>
+  <path d="M42 68h96M83 67v10h14V67" stroke="#244B75" stroke-width="3" stroke-linejoin="round"/>
+  <path d="M57 91h15m8 0h17m8 0h19" stroke="#9BB4CE" stroke-width="4" stroke-linecap="round"/>
+  <circle cx="125" cy="37" r="17" fill="#E5A623" stroke="#fff" stroke-width="4"/>
+  <path d="m118 37 5 5 9-10" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

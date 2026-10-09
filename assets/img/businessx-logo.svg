@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 96" role="img" aria-labelledby="title desc">
+  <title id="title">BusinessX</title>
+  <desc id="desc">BusinessX wordmark with a connected gold and blue X symbol</desc>
+  <defs>
+    <linearGradient id="xBlue" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#4B8EF7"/>
+      <stop offset="1" stop-color="#2563EB"/>
+    </linearGradient>
+  </defs>
+  <g transform="translate(8 12)">
+    <path d="M8 8h24l20 24L32 56H8l20-24L8 8Z" fill="#E5A623"/>
+    <path d="M52 8h24L56 32l20 24H52L32 32 52 8Z" fill="url(#xBlue)"/>
+    <circle cx="32" cy="32" r="5" fill="#0A1628"/>
+  </g>
+  <text x="104" y="60" fill="#0A1628" font-family="Inter, Arial, sans-serif" font-size="48" font-weight="800" letter-spacing="-1.8">Business</text>
+  <text x="320" y="60" fill="#E5A623" font-family="Inter, Arial, sans-serif" font-size="48" font-weight="800" letter-spacing="-1.8">X</text>
+</svg>

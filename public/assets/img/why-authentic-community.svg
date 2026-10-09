@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 140" fill="none" role="img" aria-labelledby="title">
+  <title id="title">Business community</title>
+  <rect x="14" y="12" width="152" height="116" rx="18" fill="#F1F6FB"/>
+  <path d="M48 103c0-16 10-27 24-27s24 11 24 27v5H48v-5Z" fill="#3B82F6"/>
+  <path d="M84 100c1-18 12-30 27-30s25 12 26 30v8H84v-8Z" fill="#E5A623"/>
+  <path d="M60 52a13 13 0 1 0 26 0 13 13 0 0 0-26 0ZM99 45a13 13 0 1 0 26 0 13 13 0 0 0-26 0Z" fill="#fff" stroke="#244B75" stroke-width="4"/>
+  <path d="m81 91 10 8 18-19" stroke="#fff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

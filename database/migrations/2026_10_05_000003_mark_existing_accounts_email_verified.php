@@ -1,0 +1,19 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Support\Facades\DB;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        DB::table('user_account')
+            ->whereNull('email_verified_at')
+            ->update(['email_verified_at' => now()]);
+    }
+
+    public function down(): void
+    {
+        // Existing account verification timestamps cannot be safely distinguished from new verifications.
+    }
+};
