@@ -307,7 +307,7 @@ BusinessX - The UK's leading business exchange network. Buy or sell a business, 
       font-weight: 700;
       transition: all 0.2s;
     }
-    .btn-card:hover { background: var(--gold-500); border-color: var(--gold-500); color: var(--navy-900); }
+    .btn-card:hover { background: var(--gold-500); border-color: var(--gold-500); color: white; }
 
     /* ============ Investor / Mentor cards ============ */
     .person-card {
@@ -393,7 +393,7 @@ BusinessX - The UK's leading business exchange network. Buy or sell a business, 
       border: 1px solid var(--gold-200);
       transition: all 0.2s;
     }
-    .chip:hover { background: var(--gold-500); border-color: var(--gold-500); color: var(--navy-900); transform: translateY(-2px); }
+    .chip:hover { background: var(--gold-500); border-color: var(--gold-500); color: white; transform: translateY(-2px); }
 
     /* ============ Bx Insights ============ */
     .art-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; }
@@ -880,7 +880,7 @@ BusinessX - The UK's leading business exchange network. Buy or sell a business, 
                 <option value="investor">Investor | Looking To Invest/Buy</option>
                 <option value="mentor">Mentor | Looking To Guide/Coach</option>
               </select>
-              <button type="submit" class="btn-create">Create Profile</button>
+              <button type="submit" class="btn-create" style="color:#ffffff">Create Profile</button>
             </form>
           </div>
           <div class="hero-trust">
@@ -891,7 +891,7 @@ BusinessX - The UK's leading business exchange network. Buy or sell a business, 
         <form class="reg-card" id="heroRegCard" method="post" action="{{ route('registration.quick-store') }}">
           @csrf
           <input type="hidden" name="_quick_registration" value="1">
-          <div class="reg-card-head">Quick register</div>
+          <div class="reg-card-head" style="color:#ffffff">Quick register</div>
           <div class="reg-card-body">
             @if (session('verification_notice'))
               <p role="status" style="margin-bottom:16px;padding:12px;border-radius:6px;background:#ecfdf5;color:#166534;">{{ session('verification_notice') }}</p>
@@ -1222,7 +1222,7 @@ BusinessX - The UK's leading business exchange network. Buy or sell a business, 
       <div class="cards-row" id="invRow">
         @forelse ($featuredInvestors as $investor)
           <article class="person-card" data-featured-investor>
-            <span class="plan-ribbon">Verified</span>
+            <span class="plan-ribbon" style="color:#ffffff">Verified</span>
             <div class="avatar-wrap"><img src="{{ $investor->image_url }}" alt="{{ $investor->display_name }}"></div>
             <h3>{{ $investor->display_name }}</h3>
             <div class="company">{{ $investor->display_company }}</div>
@@ -1396,7 +1396,7 @@ BusinessX - The UK's leading business exchange network. Buy or sell a business, 
       <div class="cards-row" id="menRow">
         @forelse ($worldClassMentors as $mentor)
           <article class="person-card" data-world-class-mentor>
-            <span class="plan-ribbon">Mentor</span>
+            <span class="plan-ribbon" style="color:#ffffff">Mentor</span>
             <div class="avatar-wrap"><img src="{{ $mentor->image_url }}" alt="{{ $mentor->mentor_name ?: 'Mentor profile' }}"></div>
             <h3>{{ $mentor->mentor_name ?: 'Mentor' }}</h3>
             <div class="company">{{ $mentor->display_company }}</div>
@@ -1488,7 +1488,7 @@ BusinessX - The UK's leading business exchange network. Buy or sell a business, 
           <article class="art-card">
             <a class="thumb" href="{{ route('articles.show', $article->article_id) }}">
               <img src="{{ $article->image_url }}" alt="{{ $article->article_title }}">
-              <span class="date">{{ $article->published_at_label }}</span>
+              <span class="date" style="color:#ffffff">{{ $article->published_at_label }}</span>
             </a>
             <div class="body">
               <h3><a href="{{ route('articles.show', $article->article_id) }}">{{ $article->article_title }}</a></h3>
@@ -1530,7 +1530,7 @@ BusinessX - The UK's leading business exchange network. Buy or sell a business, 
           <a href="{{ route('pricing') }}" class="btn-card">Select Plan</a>
         </div>
         <div class="planx-card featured">
-          <div class="planx-badge">★ Most Popular</div>
+          <div class="planx-badge" style="color:#ffffff">★ Most Popular</div>
           <div class="p-name">Premium</div>
           <div class="p-sub">Grow your business with premium tools</div>
           <div class="p-price"><span class="amt">£299</span> <span class="per">/ Year</span></div>
@@ -1577,7 +1577,7 @@ BusinessX - The UK's leading business exchange network. Buy or sell a business, 
             <option value="investor">Investor | Looking To Invest/Buy</option>
             <option value="mentor">Mentor | Looking To Guide/Coach</option>
           </select>
-          <button type="submit">Create Profile</button>
+          <button type="submit" style="color:#ffffff">Create Profile</button>
         </form>
       </div>
     </div>
@@ -1652,7 +1652,7 @@ BusinessX - The UK's leading business exchange network. Buy or sell a business, 
             <input id="home-newsletter-city" name="city" type="text" aria-label="City" placeholder="City" value="{{ old('city') }}" maxlength="100" autocomplete="address-level2" required>
             @error('city') <span class="news-field-error" role="alert">{{ $message }}</span> @enderror
           </div>
-          <button type="submit" class="btn-sub">Subscribe Now</button>
+          <button type="submit" class="btn-sub" style="color:#ffffff">Subscribe Now</button>
         </form>
         @if (session('newsletter_status'))
           <p class="news-feedback news-feedback-success" role="status">{{ session('newsletter_status') }}</p>

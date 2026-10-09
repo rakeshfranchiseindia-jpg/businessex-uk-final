@@ -102,13 +102,9 @@ BusinessX connects businesses, startups, investors and mentors.
           </div>
           <div class="plan-note">No credit card required</div>
           <ul class="plan-features">
-            <li><span class="ic ic-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"><polyline points="20 6 9 17 4 12"/></svg></span> Create Business Profile</li>
-            <li><span class="ic ic-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"><polyline points="20 6 9 17 4 12"/></svg></span> Basic Directory Listing</li>
-            <li><span class="ic ic-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"><polyline points="20 6 9 17 4 12"/></svg></span> Connect with Members</li>
-            <li class="disabled"><span class="ic ic-x"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></span> Verified Member Badge</li>
-            <li class="disabled"><span class="ic ic-x"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></span> Leads & Inquiries</li>
-            <li class="disabled"><span class="ic ic-x"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></span> Featured Listing</li>
-            <li class="disabled"><span class="ic ic-x"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></span> Priority Support</li>
+            <li><span class="ic ic-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"><polyline points="20 6 9 17 4 12"/></svg></span>Profile Activation</li>
+            <li><span class="ic ic-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"><polyline points="20 6 9 17 4 12"/></svg></span> 5 Business Proposals</li>
+            <li><span class="ic ic-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"><polyline points="20 6 9 17 4 12"/></svg></span>  Receive Unlimited Investment Proposals</li>
           </ul>
           <a href="{{ route('registration') }}" class="plan-btn plan-btn-outline">Select Plan</a>
         </div>
@@ -124,14 +120,12 @@ BusinessX connects businesses, startups, investors and mentors.
           </div>
           <div class="plan-note">Billed annually</div>
           <ul class="plan-features">
-            <li><span class="ic ic-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"><polyline points="20 6 9 17 4 12"/></svg></span> Everything in Trial Plan</li>
-            <li><span class="ic ic-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"><polyline points="20 6 9 17 4 12"/></svg></span> Verified Member Badge</li>
-            <li><span class="ic ic-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"><polyline points="20 6 9 17 4 12"/></svg></span> Receive Leads & Inquiries</li>
-            <li><span class="ic ic-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"><polyline points="20 6 9 17 4 12"/></svg></span> Featured Listing in Directory</li>
-            <li><span class="ic ic-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"><polyline points="20 6 9 17 4 12"/></svg></span> Access to Trade Opportunities</li>
-            <li><span class="ic ic-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"><polyline points="20 6 9 17 4 12"/></svg></span> Business Matchmaking</li>
-            <li><span class="ic ic-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"><polyline points="20 6 9 17 4 12"/></svg></span> Event Invitations & Discounts</li>
-            <li><span class="ic ic-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"><polyline points="20 6 9 17 4 12"/></svg></span> Email Support</li>
+            <li><span class="ic ic-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"><polyline points="20 6 9 17 4 12"/></svg></span>Speedy Profile Activation</li>
+            <li><span class="ic ic-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"><polyline points="20 6 9 17 4 12"/></svg></span>Send 50 Business Proposals</li>
+            <li><span class="ic ic-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"><polyline points="20 6 9 17 4 12"/></svg></span>Receive Unlimited Investment Proposals</li>
+            <li><span class="ic ic-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"><polyline points="20 6 9 17 4 12"/></svg></span>Continuous Email Support</li>
+            <li><span class="ic ic-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"><polyline points="20 6 9 17 4 12"/></svg></span>10 Website Visitor Queries</li>
+            <li><span class="ic ic-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"><polyline points="20 6 9 17 4 12"/></svg></span>Profile Views</li>
           </ul>
           <a href="{{ route('registration') }}" class="plan-btn plan-btn-gold">Get Started</a>
         </div>
@@ -146,14 +140,13 @@ BusinessX connects businesses, startups, investors and mentors.
           </div>
           <div class="plan-note">Billed annually</div>
           <ul class="plan-features">
-            <li><span class="ic ic-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"><polyline points="20 6 9 17 4 12"/></svg></span> Everything in Premium Plan</li>
-            <li><span class="ic ic-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"><polyline points="20 6 9 17 4 12"/></svg></span> Top Placement in Directory</li>
-            <li><span class="ic ic-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"><polyline points="20 6 9 17 4 12"/></svg></span> Homepage Featured Listing</li>
-            <li><span class="ic ic-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"><polyline points="20 6 9 17 4 12"/></svg></span> Priority Leads & Inquiries</li>
-            <li><span class="ic ic-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"><polyline points="20 6 9 17 4 12"/></svg></span> Global Exposure & Promotion</li>
-            <li><span class="ic ic-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"><polyline points="20 6 9 17 4 12"/></svg></span> Custom Business Page</li>
-            <li><span class="ic ic-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"><polyline points="20 6 9 17 4 12"/></svg></span> Dedicated Account Manager</li>
-            <li><span class="ic ic-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"><polyline points="20 6 9 17 4 12"/></svg></span> Priority Support (24/7)</li>
+            <li><span class="ic ic-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"><polyline points="20 6 9 17 4 12"/></svg></span>Speedy Profile Activation</li>
+            <li><span class="ic ic-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"><polyline points="20 6 9 17 4 12"/></svg></span>100 Business Proposals</li>
+            <li><span class="ic ic-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"><polyline points="20 6 9 17 4 12"/></svg></span>Receive Unlimited Investment Proposals</li>
+            <li><span class="ic ic-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"><polyline points="20 6 9 17 4 12"/></svg></span>Continuous Email Support</li>
+            <li><span class="ic ic-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"><polyline points="20 6 9 17 4 12"/></svg></span>20 Website Visitor Queries</li>
+            <li><span class="ic ic-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"><polyline points="20 6 9 17 4 12"/></svg></span>Profile Views</li>
+            <li><span class="ic ic-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"><polyline points="20 6 9 17 4 12"/></svg></span>Profile Promotion</li>
           </ul>
           <a href="{{ route('registration') }}" class="plan-btn plan-btn-gold-outline">Choose Gold</a>
         </div>
@@ -168,23 +161,11 @@ BusinessX connects businesses, startups, investors and mentors.
           </div>
           <div class="plan-note">Contact us for pricing</div>
           <ul class="plan-features">
-            <li><span class="ic ic-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"><polyline points="20 6 9 17 4 12"/></svg></span> Create Business Profile</li>
-            <li><span class="ic ic-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"><polyline points="20 6 9 17 4 12"/></svg></span> Basic Directory Listing</li>
-            <li><span class="ic ic-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"><polyline points="20 6 9 17 4 12"/></svg></span> Connect with Members</li>
-            <li><span class="ic ic-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"><polyline points="20 6 9 17 4 12"/></svg></span> Verified Member Badge</li>
-            <li><span class="ic ic-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"><polyline points="20 6 9 17 4 12"/></svg></span> Leads &amp; Inquiries</li>
-            <li><span class="ic ic-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"><polyline points="20 6 9 17 4 12"/></svg></span> Featured Listing in Directory</li>
-            <li><span class="ic ic-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"><polyline points="20 6 9 17 4 12"/></svg></span> Access to Trade Opportunities</li>
-            <li><span class="ic ic-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"><polyline points="20 6 9 17 4 12"/></svg></span> Business Matchmaking</li>
-            <li><span class="ic ic-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"><polyline points="20 6 9 17 4 12"/></svg></span> Event Invitations &amp; Discounts</li>
-            <li><span class="ic ic-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"><polyline points="20 6 9 17 4 12"/></svg></span> Email Support</li>
-            <li><span class="ic ic-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"><polyline points="20 6 9 17 4 12"/></svg></span> Top Placement in Directory</li>
-            <li><span class="ic ic-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"><polyline points="20 6 9 17 4 12"/></svg></span> Homepage Featured Listing</li>
-            <li><span class="ic ic-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"><polyline points="20 6 9 17 4 12"/></svg></span> Priority Leads &amp; Inquiries</li>
-            <li><span class="ic ic-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"><polyline points="20 6 9 17 4 12"/></svg></span> Global Exposure &amp; Promotion</li>
-            <li><span class="ic ic-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"><polyline points="20 6 9 17 4 12"/></svg></span> Custom Business Page</li>
-            <li><span class="ic ic-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"><polyline points="20 6 9 17 4 12"/></svg></span> Dedicated Account Manager</li>
-            <li><span class="ic ic-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"><polyline points="20 6 9 17 4 12"/></svg></span> Priority Support (24/7)</li>
+            <li><span class="ic ic-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"><polyline points="20 6 9 17 4 12"/></svg></span>Everything in Gold Plan</li>
+            <li><span class="ic ic-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"><polyline points="20 6 9 17 4 12"/></svg></span>Key Account Manager</li>
+            <li><span class="ic ic-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"><polyline points="20 6 9 17 4 12"/></svg></span>Top Bussinesses/Startups</li>
+            <li><span class="ic ic-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"><polyline points="20 6 9 17 4 12"/></svg></span>Acceleration Marketing</li>
+            <li><span class="ic ic-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"><polyline points="20 6 9 17 4 12"/></svg></span>Businesses Valution</li>
           </ul>
           <a href="{{ route('registration') }}" class="plan-btn plan-btn-gold">Choose Platinum</a>
         </div>
@@ -357,7 +338,7 @@ BusinessX connects businesses, startups, investors and mentors.
     <div class="container">
       <h2>Ready To Grow Your Business Globally?</h2>
       <p>Join thousands of businesses already expanding their global reach with BusinessX.</p>
-      <a href="{{ route('registration') }}" class="cta-btn">
+      <a href="{{ route('registration') }}" class="cta-btn" style="color:#ffffff">
         Become A Member Today
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
       </a>

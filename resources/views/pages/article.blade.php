@@ -19,7 +19,7 @@ BusinessX articles, news and international trade insights.
     .hero-search { display: flex; width: 100%; max-width: 760px; overflow: hidden; border-radius: 8px; background: var(--white); box-shadow: 0 4px 20px rgba(0,0,0,.2); }
     .hero-search input { flex: 1; min-width: 0; height: 52px; padding: 0 18px; border: 0; background: transparent; font: inherit; font-size: 14px; }
     .hero-search select { width: 180px; height: 52px; padding: 0 12px; border: 0; border-left: 1px solid var(--gray-200); background: var(--white); font: inherit; font-size: 13px; }
-    .hero-search .search-btn { min-width: 96px; background: var(--gold-500); color: var(--navy-900); font-weight: 700; }
+    .hero-search .search-btn { min-width: 96px; background: var(--gold-500); color: white; font-weight: 700; }
     .hero-stats { display: flex; flex-wrap: wrap; gap: 28px; max-width: 760px; margin-top: 28px; padding-top: 24px; border-top: 1px solid rgba(255,255,255,.2); }
     .hero-stat { display: flex; align-items: center; gap: 10px; }
     .hero-stat .ic { width: 24px; height: 24px; color: var(--gold-500); }
@@ -746,7 +746,7 @@ BusinessX articles, news and international trade insights.
             <form action="{{ route('newsletter.subscribe') }}" method="POST">
               @csrf
               <input id="article-newsletter-email" name="email" type="email" aria-label="Email address" placeholder="Enter your email" value="{{ old('email') }}" maxlength="255" required>
-              <button type="submit">Subscribe</button>
+              <button type="submit" style="color:#ffffff">Subscribe</button>
             </form>
             @if (session('newsletter_status'))
               <p role="status">{{ session('newsletter_status') }}</p>
