@@ -63,7 +63,7 @@
   </div>
 </footer>
 
-<script src="{{ asset('js/common.js') }}"></script>
+<script src="{{ asset('js/common.js') }}?v=20261010"></script>
 <script>
   const footerCategoryTabs = [...document.querySelectorAll('.footer-category-tabs [role="tab"]')];
   function showFooterCategories(tab, focus = false) {

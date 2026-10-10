@@ -523,6 +523,8 @@ select.form-control { appearance: none; background-image: url("data:image/svg+xm
 .city-suggestion-option:hover,
 .city-suggestion-option[aria-selected="true"] { background: var(--gray-100); }
 .city-suggestion-status { color: var(--gray-500); }
+.city-suggestion-error { margin-top: 5px; color: #dc2626; font-size: 12px; }
+.city-suggestion-error[hidden] { display: none; }
 
 /* Sections */
 .section { padding: 80px 0; }

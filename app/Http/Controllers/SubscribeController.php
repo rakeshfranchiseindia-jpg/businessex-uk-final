@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 use Throwable;
 
 class SubscribeController extends Controller
@@ -20,7 +21,9 @@ class SubscribeController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'email', 'max:255'],
             'phone' => ['required', 'string', 'max:32'],
-            'city' => ['required', 'string', 'max:100'],
+            'city' => ['required', 'string', 'max:100', Rule::exists('bx_cities', 'city')],
+        ], [
+            'city.exists' => 'Please select a valid UK city from the list.',
         ]);
 
         $email = Str::lower(trim($validated['email']));

@@ -43,7 +43,7 @@ return [
         ['name' => 'contact_email', 'label' => 'Email', 'type' => 'email', 'placeholder' => 'Enter Email ID'],
         ['name' => 'ofc_address', 'label' => 'Address', 'type' => 'textarea', 'placeholder' => 'Enter Office Address', 'wide' => true],
         ['name' => 'ofc_city', 'label' => 'City', 'placeholder' => 'Enter Your Location'],
-        ['name' => 'ofc_country', 'label' => 'Country', 'type' => 'select', 'placeholder' => 'Select Country', 'options' => ['United Kingdom', 'United States', 'Germany', 'France', 'Spain', 'Italy', 'Netherlands', 'India', 'China', 'Japan', 'Australia'], 'required' => true],
+        ['name' => 'ofc_country', 'label' => 'Country', 'type' => 'select', 'placeholder' => 'Select Country', 'options' => ['United Kingdom'], 'required' => true],
         ['name' => 'ofc_pincode', 'label' => 'Pin Code', 'placeholder' => 'Enter Pin Code'],
       ]],
       ['title' => 'Requirements & Attachments', 'description' => 'Tell members what you need and add supporting documents.', 'fields' => [

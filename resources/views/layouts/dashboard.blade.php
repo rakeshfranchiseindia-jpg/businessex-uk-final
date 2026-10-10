@@ -49,7 +49,7 @@
       <span aria-hidden="true">●</span> Live Chat <span class="dashboard-live-chat-count" data-chat-count hidden></span>
     </button>
   </section>
-  <script src="{{ asset('js/common.js') }}"></script>
+  <script src="{{ asset('js/common.js') }}?v=20261010"></script>
   @vite('resources/js/app.js')
   @stack('scripts')
 </body>

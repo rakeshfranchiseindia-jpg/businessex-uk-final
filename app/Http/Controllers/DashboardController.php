@@ -326,6 +326,8 @@ class DashboardController extends Controller
 
                 if (($field['type'] ?? null) === 'select' && isset($field['options'])) {
                     $fieldRules[] = Rule::in(array_keys($field['option_values']));
+                } elseif (str_ends_with($name, '_city') || $name === 'city') {
+                    $fieldRules[] = Rule::exists('bx_cities', 'city');
                 }
 
                 $rules[$name] = $fieldRules;

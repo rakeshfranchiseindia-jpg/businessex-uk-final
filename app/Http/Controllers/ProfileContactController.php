@@ -19,12 +19,17 @@ class ProfileContactController extends Controller
             'table' => 'profile_business',
             'id' => 'business_id',
             'status' => 'business_profile_status',
-            'title' => ['advmt_headline', 'seller_company', 'seller_name'],
+            'title' => ['advmt_headline', 'seller_company'],
             'summary' => ['company_summary', 'seller_intro', 'business_pitch'],
             'location' => ['ofc_city', 'ofc_state', 'ofc_country'],
             'image' => 'seller_prof_pic',
             'fallback' => 'assets/img/default-business-profile.png',
             'label' => 'Business',
+            'locked_fields' => [
+                'seller_name', 'seller_email', 'seller_mobile',
+                'director_name', 'director_designation', 'director_email', 'business_website',
+            ],
+            'hidden_fields' => ['ofc_address'],
         ],
         'investor' => [
             'table' => 'profile_investor',
@@ -36,6 +41,7 @@ class ProfileContactController extends Controller
             'image' => 'inv_profile_pic_path',
             'fallback' => 'assets/img/default-investor-profile.png',
             'label' => 'Investor',
+            'locked_fields' => ['inv_mobile', 'inv_email', 'linkedin_profile'],
         ],
         'mentor' => [
             'table' => 'profile_mentors',
@@ -47,6 +53,7 @@ class ProfileContactController extends Controller
             'image' => 'mentor_profile_pic',
             'fallback' => 'assets/img/default-mentor-profile.png',
             'label' => 'Mentor',
+            'locked_fields' => ['mentor_mobile', 'mentor_email', 'mentor_linkedin'],
         ],
         'startup' => [
             'table' => 'profile_startups',
@@ -58,20 +65,37 @@ class ProfileContactController extends Controller
             'image' => 'startup_prof_pic',
             'fallback' => 'assets/img/default-startup-profile.png',
             'label' => 'Startup',
+            'locked_fields' => [
+                'startup_name', 'startup_email', 'startup_mobile',
+                'director_name', 'director_designation', 'director_email',
+            ],
+            'hidden_fields' => ['ofc_address'],
         ],
     ];
 
     public function show(string $type, int $id): View
     {
         [$definition, $profile] = $this->activeProfile($type, $id);
+        $registrationSteps = config("registration_profiles.{$type}.steps", []);
         $fieldLabels = [];
-        foreach (config("registration_profiles.{$type}.steps", []) as $step) {
+        $fieldToStep = [];
+        foreach ($registrationSteps as $stepIndex => $step) {
             foreach ($step['fields'] as $field) {
                 if (isset($field['name'], $field['label'])) {
                     $fieldLabels[$field['name']] = $field['label'];
+                    $fieldToStep[$field['name']] = $stepIndex;
                 }
             }
         }
+        $groupedStepCount = 3;
+        $sections = [];
+        for ($i = 0; $i < min($groupedStepCount, count($registrationSteps)); $i++) {
+            $sections[$i] = ['title' => $registrationSteps[$i]['title'], 'items' => []];
+        }
+
+        $isOwner = Auth::check() && (int) Auth::id() === (int) $profile->user_id;
+        $isUnlocked = $isOwner || $this->viewerHasReply($type, $id, (int) $profile->user_id);
+        $lockedFields = $definition['locked_fields'] ?? [];
 
         $excludedFields = [
             $definition['id'], 'user_id', $definition['status'], 'created_at', 'updated_at',
@@ -79,11 +103,13 @@ class ProfileContactController extends Controller
             'startup_profile_str', 'password', 'email_verified_at', 'membership_paid',
             'membership_plan', 'mailer_campaign', 'activated_by', 'activated_at', 'last_login_at',
             'trackid', 'utm_source', 'utm_medium', 'utm_campaign',
+            ...($definition['hidden_fields'] ?? []),
         ];
         $items = [];
         foreach ((array) $profile as $name => $value) {
+            $isLockedField = in_array($name, $lockedFields, true);
             if (in_array($name, $excludedFields, true) || $value === null || $value === ''
-                || preg_match('/(?:email|mobile|phone|document|attachment|password|token|_pic|_path|membership|mailer|activated|utm_|trackid|contact_)/i', $name)) {
+                || (!$isLockedField && preg_match('/(?:email|mobile|phone|document|attachment|password|token|_pic|_path|membership|mailer|activated|utm_|trackid|contact_)/i', $name))) {
                 continue;
             }
             if (is_numeric($value) && $name === 'industry_sector'
@@ -91,16 +117,31 @@ class ProfileContactController extends Controller
                 && Schema::hasColumns('industry_categories', ['cat_id', 'category_name'])) {
                 $value = DB::table('industry_categories')->where('cat_id', $value)->value('category_name') ?: $value;
             }
-            $items[] = [
+            $locked = $isLockedField && !$isUnlocked;
+            $item = [
                 'label' => $fieldLabels[$name] ?? Str::headline($name),
-                'value' => (string) $value,
-                'is_url' => (bool) preg_match('#^https?://#i', (string) $value),
+                'value' => $locked ? '' : (string) $value,
+                'is_url' => !$locked && (bool) preg_match('#^https?://#i', (string) $value),
+                'locked' => $locked,
             ];
-        }
 
-        $profile->display_title = $this->firstValue($profile, $definition['title']) ?: $definition['label'] . ' profile';
-        $profile->display_summary = $this->firstValue($profile, $definition['summary']);
-        $profile->display_location = collect($definition['location'])
+            $stepIndex = $fieldToStep[$name] ?? null;
+            if ($stepIndex !== null && $stepIndex < $groupedStepCount) {
+                $sections[$stepIndex]['items'][] = $item;
+            } else {
+                $items[] = $item;
+            }
+        }
+        $sections = array_values(array_filter($sections, fn (array $section): bool => $section['items'] !== []));
+
+        $visibleColumns = fn (array $columns): array => $isUnlocked
+            ? $columns
+            : array_values(array_diff($columns, $lockedFields));
+
+        $profile->display_title = $this->firstValue($profile, $visibleColumns($definition['title']))
+            ?: $definition['label'] . ' profile';
+        $profile->display_summary = $this->firstValue($profile, $visibleColumns($definition['summary']));
+        $profile->display_location = collect($visibleColumns($definition['location']))
             ->map(fn (string $column): ?string => $profile->{$column} ?? null)
             ->filter(fn (?string $value): bool => $value !== null && $value !== '')
             ->unique()
@@ -120,13 +161,44 @@ class ProfileContactController extends Controller
             'profile' => $profile,
             'profileId' => $id,
             'profileItems' => $items,
+            'profileSections' => $sections,
             'canContact' => $owner !== null && (!Auth::check() || (int) Auth::id() !== (int) $profile->user_id),
+            'isUnlocked' => $isUnlocked,
+            'isOwner' => $isOwner,
             'contactDefaults' => Auth::user() ? [
                 'name' => Auth::user()->name,
                 'email' => Auth::user()->email,
                 'phone' => Auth::user()->mobile,
             ] : ['name' => '', 'email' => '', 'phone' => ''],
         ]);
+    }
+
+    /**
+     * The viewer unlocks an owner's locked contact fields once the owner has
+     * replied at least once inside their shared conversation about this
+     * profile.
+     */
+    private function viewerHasReply(string $type, int $profileId, int $ownerUserId): bool
+    {
+        if (!Auth::check() || !Schema::hasTable('profile_contact_conversations') || !Schema::hasTable('profile_contact_messages')) {
+            return false;
+        }
+
+        $conversationIds = DB::table('profile_contact_conversations')
+            ->where('profile_type', $type)
+            ->where('profile_id', $profileId)
+            ->where('owner_user_id', $ownerUserId)
+            ->where('sender_user_id', Auth::id())
+            ->pluck('id');
+
+        if ($conversationIds->isEmpty()) {
+            return false;
+        }
+
+        return DB::table('profile_contact_messages')
+            ->whereIn('conversation_id', $conversationIds)
+            ->where('sender_user_id', $ownerUserId)
+            ->exists();
     }
 
     public function store(Request $request, string $type, int $id): RedirectResponse

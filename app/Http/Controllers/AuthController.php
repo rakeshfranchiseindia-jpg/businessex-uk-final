@@ -535,6 +535,8 @@ class AuthController extends Controller
                     $fieldRules[] = 'regex:/^07[0-9]{9}$/';
                 } elseif (str_contains($fieldName, 'pincode') || str_contains($fieldName, 'postcode')) {
                     $fieldRules[] = 'regex:/^[A-Za-z]{1,2}[0-9][A-Za-z0-9]? ?[0-9][A-Za-z]{2}$/';
+                } elseif (str_ends_with($fieldName, '_city') || $fieldName === 'city') {
+                    $fieldRules[] = Rule::exists('bx_cities', 'city');
                 }
 
                 $rules[$fieldName] = $fieldRules;

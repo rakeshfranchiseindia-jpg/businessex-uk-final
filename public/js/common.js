@@ -34,6 +34,25 @@ document.addEventListener('DOMContentLoaded', () => {
     input.setAttribute('aria-controls', listbox.id);
     input.setAttribute('aria-expanded', 'false');
 
+    const errorMessage = document.createElement('div');
+    errorMessage.className = 'city-suggestion-error';
+    errorMessage.hidden = true;
+    errorMessage.setAttribute('role', 'alert');
+    errorMessage.textContent = 'Please select a valid UK city from the list.';
+    wrapper.appendChild(errorMessage);
+
+    let lastConfirmedValue = input.value.trim();
+    let knownCities = [];
+
+    const showError = () => {
+      errorMessage.hidden = false;
+      input.setCustomValidity('Please select a valid UK city from the list.');
+    };
+    const clearError = () => {
+      errorMessage.hidden = true;
+      input.setCustomValidity('');
+    };
+
     let debounceTimer;
     let requestController;
     let activeIndex = -1;
@@ -58,17 +77,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const selectOption = option => {
       input.value = option.textContent;
+      lastConfirmedValue = option.textContent;
+      clearError();
       hideSuggestions();
       input.dispatchEvent(new Event('change', { bubbles: true }));
     };
 
     input.addEventListener('input', () => {
+      clearError();
       clearTimeout(debounceTimer);
       if (requestController) requestController.abort();
 
       const query = input.value.trim();
       if (query.length < 2) {
         hideSuggestions();
+        knownCities = [];
         return;
       }
 
@@ -83,6 +106,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
           const result = await response.json();
           if (input.value.trim() !== query) return;
+          knownCities = result.cities;
 
           listbox.replaceChildren();
           result.cities.forEach((city, cityIndex) => {
@@ -136,6 +160,46 @@ document.addEventListener('DOMContentLoaded', () => {
 
     input.addEventListener('blur', () => {
       window.setTimeout(hideSuggestions, 120);
+
+      window.setTimeout(async () => {
+        const value = input.value.trim();
+        if (value === '') {
+          lastConfirmedValue = '';
+          clearError();
+          return;
+        }
+
+        const matchesKnown = known => known.some(city => city.toLowerCase() === value.toLowerCase());
+        if (matchesKnown(knownCities)) {
+          lastConfirmedValue = value;
+          clearError();
+          return;
+        }
+
+        try {
+          const response = await fetch(`/uk-cities/suggest?q=${encodeURIComponent(value)}`, {
+            headers: { Accept: 'application/json' },
+          });
+          const result = response.ok ? await response.json() : { cities: [] };
+          const match = (result.cities || []).find(city => city.toLowerCase() === value.toLowerCase());
+          if (match) {
+            input.value = match;
+            lastConfirmedValue = match;
+            clearError();
+            return;
+          }
+        } catch (error) {
+          console.error(error);
+        }
+
+        const hadInvalidEntry = value !== lastConfirmedValue;
+        input.value = lastConfirmedValue;
+        if (hadInvalidEntry) {
+          showError();
+        } else {
+          clearError();
+        }
+      }, 150);
     });
   });
 
