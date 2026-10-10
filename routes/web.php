@@ -20,6 +20,7 @@ use App\Http\Controllers\ProfileMediaController;
 use App\Http\Controllers\StartupListingController;
 use App\Http\Controllers\StartupProfileController;
 use App\Http\Controllers\StaticPageController;
+use App\Http\Controllers\NewsletterVerificationController;
 use App\Http\Controllers\SubscribeController;
 use Illuminate\Support\Facades\Route;
 
@@ -103,6 +104,10 @@ Route::get('/profile-media/{media}/download', [ProfileMediaController::class, 'd
 Route::post('/newsletter/subscribe', [SubscribeController::class, 'store'])
     ->middleware('throttle:5,1')
     ->name('newsletter.subscribe');
+Route::get('/newsletter/verify/{id}/{hash}', [NewsletterVerificationController::class, 'verify'])
+    ->whereNumber('id')
+    ->middleware('signed')
+    ->name('newsletter.verify');
 Route::post('/register/{type}', [AuthController::class, 'register'])
     ->whereIn('type', ['business', 'investor', 'mentor', 'startup'])
     ->middleware('throttle:5,1')

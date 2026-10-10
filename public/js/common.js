@@ -249,36 +249,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // === Form steps (registration) ===
-  const stepForms = document.querySelectorAll('[data-step]');
-  if (stepForms.length) {
-    const totalSteps = stepForms.length;
-    const showStep = (n) => {
-      stepForms.forEach((s, i) => {
-        s.style.display = (i + 1 === n) ? 'block' : 'none';
-      });
-      const progress = document.querySelector('[data-step-progress]');
-      if (progress) progress.style.width = `${(n/totalSteps)*100}%`;
-      document.querySelectorAll('[data-step-dot]').forEach((d, i) => {
-        d.classList.toggle('active', i < n);
-        d.classList.toggle('current', i === n - 1);
-      });
-    };
-    showStep(1);
-    document.querySelectorAll('[data-next-step]').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const current = parseInt(btn.closest('[data-step]').dataset.step);
-        if (current < totalSteps) showStep(current + 1);
-      });
-    });
-    document.querySelectorAll('[data-prev-step]').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const current = parseInt(btn.closest('[data-step]').dataset.step);
-        if (current > 1) showStep(current - 1);
-      });
-    });
-  }
-
   // === Password show toggle ===
   document.querySelectorAll('[data-toggle-password]').forEach(btn => {
     btn.addEventListener('click', () => {

@@ -41,6 +41,7 @@ class InvestorListingController extends AbstractListingController
             });
         }
 
+        $this->applyMembershipPriority($query, 'profile_investor');
         $this->applySort(
             $query,
             $request,

@@ -17,17 +17,23 @@ class PageController extends Controller
 
     public function show(Request $request): View|RedirectResponse
     {
-        if (Auth::check() && in_array($request->route()->getName(), [
+        $routeName = $request->route()->getName();
+
+        if (Auth::check() && in_array($routeName, [
             'login',
             'business-registration',
             'investor-registration',
             'mentor-registration',
             'startup-registration',
         ], true)) {
-            return redirect()->route('dashboard.index');
-        }
+            if ($routeName === 'login') {
+                return redirect()->route('dashboard.index');
+            }
 
-        $routeName = $request->route()->getName();
+            $type = str_replace('-registration', '', $routeName);
+
+            return redirect()->route('dashboard.profiles.create.form', ['type' => $type]);
+        }
 
         if (in_array($routeName, ['business-registration', 'investor-registration', 'mentor-registration', 'startup-registration'], true)) {
             $type = str_replace('-registration', '', $routeName);
@@ -54,12 +60,12 @@ class PageController extends Controller
 
     public function registrationRedirect(Request $request): RedirectResponse
     {
-        if (Auth::check()) {
-            return redirect()->route('dashboard.index');
-        }
-
         $type = $request->query('type', 'business');
         abort_unless(in_array($type, ['business', 'investor', 'mentor', 'startup'], true), 404);
+
+        if (Auth::check()) {
+            return redirect()->route('dashboard.profiles.create.form', ['type' => $type]);
+        }
 
         return redirect()->route("{$type}-registration");
     }

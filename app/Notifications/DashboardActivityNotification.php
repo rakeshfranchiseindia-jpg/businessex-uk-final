@@ -3,9 +3,11 @@
 namespace App\Notifications;
 
 use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class DashboardActivityNotification extends Notification
+class DashboardActivityNotification extends Notification implements ShouldQueue
 {
     use Queueable;
 
@@ -19,7 +21,7 @@ class DashboardActivityNotification extends Notification
 
     public function via(object $notifiable): array
     {
-        return ['database'];
+        return ['database', 'mail'];
     }
 
     public function toDatabase(object $notifiable): array
@@ -31,5 +33,19 @@ class DashboardActivityNotification extends Notification
             'url' => $this->url,
             'conversation_id' => $this->conversationId,
         ];
+    }
+
+    public function toMail(object $notifiable): MailMessage
+    {
+        $data = [
+            'title' => $this->title,
+            'name' => $notifiable->name ?? 'there',
+            'bodyText' => $this->message,
+            'actionUrl' => url($this->url),
+        ];
+
+        return (new MailMessage())
+            ->subject($this->title)
+            ->view(['html' => 'emails.dashboard.activity', 'text' => 'emails.dashboard.activity-text'], $data);
     }
 }

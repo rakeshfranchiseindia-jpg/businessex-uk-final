@@ -38,17 +38,21 @@ class DashboardController extends Controller
             'business_document_1' => ['seller_doc_path'],
             'business_document_2' => ['seller_doc_path1'],
             'business_document_3' => ['seller_doc_path2'],
-            'business_document_image' => ['seller_doc_path3'],
+            'business_document_4' => ['seller_doc_path3'],
         ],
         'investor' => [
-            'company_logo' => ['company_logo_path'],
-            'profile_pictures' => ['inv_profile_pic_path'],
+            'investor_photo' => ['inv_profile_pic_path'],
+            'investor_document' => ['inv_doc_path'],
         ],
         'mentor' => [
             'mentor_profile_image' => ['mentor_profile_pic'],
+            'mentor_document' => ['mentor_doc_path'],
         ],
         'startup' => [
             'incorporation_certificate' => ['startup_doc_path'],
+            'startup_document_1' => ['startup_doc_path1'],
+            'startup_document_2' => ['startup_doc_path2'],
+            'startup_document_3' => ['startup_doc_path3'],
             'startup_photo_1' => ['startup_prof_pic'],
             'startup_photo_2' => ['startup_prof_pic1'],
             'startup_photo_3' => ['startup_prof_thumb_pic'],
@@ -279,13 +283,18 @@ class DashboardController extends Controller
                     continue;
                 }
                 if (($field['type'] ?? null) === 'file') {
-                    $fileRules = ['nullable', 'file', 'max:10240'];
+                    $fileRules = ['nullable', 'file', 'max:1024'];
+                    $isImageField = false;
                     if (isset($field['accept'])) {
                         $extensions = array_map(
                             static fn (string $extension): string => ltrim($extension, '.'),
                             explode(',', $field['accept'])
                         );
                         $fileRules[] = 'mimes:'.implode(',', $extensions);
+                        $isImageField = array_diff($extensions, ['png', 'jpg', 'jpeg']) === [];
+                    }
+                    if ($isImageField) {
+                        $fileRules[] = 'dimensions:max_width=1800,max_height=1200';
                     }
                     if (! empty($field['multiple'])) {
                         $rules[$name] = ['nullable', 'array', 'max:10'];
@@ -447,9 +456,25 @@ class DashboardController extends Controller
             });
         } catch (Throwable $exception) {
             foreach ($storedPaths as $path) {
-                Storage::disk('s3')->delete($path);
+                try {
+                    Storage::disk('s3')->delete($path);
+                } catch (Throwable $cleanupException) {
+                    Log::error('Unable to remove a profile attachment after profile update failed.', [
+                        'path' => $path,
+                        'exception' => $cleanupException->getMessage(),
+                    ]);
+                }
             }
-            throw $exception;
+
+            if ($exception instanceof ValidationException) {
+                throw $exception;
+            }
+
+            Log::error('Profile update failed.', ['type' => $type, 'id' => $id, 'exception' => $exception]);
+
+            throw ValidationException::withMessages([
+                ($uploads[0]['field_name'] ?? 'profile') => 'We could not upload your images or documents right now. Please try again later or submit without attachments.',
+            ]);
         }
 
         return redirect()->route('dashboard.profiles.show', ['type' => $type, 'id' => $id])

@@ -59,7 +59,11 @@
                 <select id="<?= $fieldId ?>" name="<?= htmlspecialchars($field['name'], ENT_QUOTES, 'UTF-8') ?>" <?= $required ? 'required' : '' ?>>
                   <option value=""><?= htmlspecialchars($field['placeholder'] ?? 'Select an option', ENT_QUOTES, 'UTF-8') ?></option>
                   <?php foreach ($field['options'] as $option): ?>
-                    <option value="<?= htmlspecialchars((string) $option, ENT_QUOTES, 'UTF-8') ?>" @selected((string) old($field['name'], $profileDefaults[$field['name']] ?? '') === (string) $option)><?= htmlspecialchars((string) $option, ENT_QUOTES, 'UTF-8') ?></option>
+                    <?php
+                      $fieldDefault = $profileDefaults[$field['name']]
+                          ?? (str_ends_with($field['name'], 'country') ? 'United Kingdom' : '');
+                    ?>
+                    <option value="<?= htmlspecialchars((string) $option, ENT_QUOTES, 'UTF-8') ?>" @selected((string) old($field['name'], $fieldDefault) === (string) $option)><?= htmlspecialchars((string) $option, ENT_QUOTES, 'UTF-8') ?></option>
                   <?php endforeach; ?>
                 </select>
               <?php elseif ($fieldType === 'textarea'): ?>

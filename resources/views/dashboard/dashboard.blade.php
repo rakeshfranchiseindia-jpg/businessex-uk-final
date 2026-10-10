@@ -463,7 +463,7 @@ BusinessX connects businesses, startups, investors and mentors.
 
           <section class="manage-tab-panel" id="manage-panel-headquarters" role="tabpanel" aria-labelledby="manage-tab-headquarters" data-manage-panel="headquarters" hidden>
             <div class="manage-field-grid">
-              <div class="manage-field"><label for="manage-country">Country <span>*</span></label><input id="manage-country" name="country" autocomplete="country-name" placeholder="Country" required></div>
+              <div class="manage-field"><label for="manage-country">Country <span>*</span></label><input id="manage-country" name="country" autocomplete="country-name" placeholder="Country" value="United Kingdom" required></div>
               <div class="manage-field"><label for="manage-city">City <span>*</span></label><input id="manage-city" name="city" autocomplete="address-level2" placeholder="City" required></div>
               <div class="manage-field manage-field-full"><label for="manage-address">Street Address</label><input id="manage-address" name="address" autocomplete="street-address" placeholder="Street address"></div>
               <div class="manage-field"><label for="manage-postcode">Postcode</label><input id="manage-postcode" name="postcode" autocomplete="postal-code" placeholder="Postcode"></div>

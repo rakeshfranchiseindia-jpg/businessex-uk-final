@@ -45,6 +45,7 @@ class StartupListingController extends AbstractListingController
         );
         $this->applyAmountRange($query, $request, 'inv_asking_price');
         $this->applyIntent($query, $request);
+        $this->applyMembershipPriority($query, 'profile_startups');
         $this->applySort(
             $query,
             $request,

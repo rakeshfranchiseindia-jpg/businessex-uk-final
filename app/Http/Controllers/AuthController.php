@@ -79,17 +79,21 @@ class AuthController extends Controller
             'business_document_1' => ['seller_doc_path'],
             'business_document_2' => ['seller_doc_path1'],
             'business_document_3' => ['seller_doc_path2'],
-            'business_document_image' => ['seller_doc_path3'],
+            'business_document_4' => ['seller_doc_path3'],
         ],
         'investor' => [
-            'company_logo' => ['company_logo_path'],
-            'profile_pictures' => ['inv_profile_pic_path'],
+            'investor_photo' => ['inv_profile_pic_path'],
+            'investor_document' => ['inv_doc_path'],
         ],
         'mentor' => [
             'mentor_profile_image' => ['mentor_profile_pic'],
+            'mentor_document' => ['mentor_doc_path'],
         ],
         'startup' => [
             'incorporation_certificate' => ['startup_doc_path'],
+            'startup_document_1' => ['startup_doc_path1'],
+            'startup_document_2' => ['startup_doc_path2'],
+            'startup_document_3' => ['startup_doc_path3'],
             'startup_photo_1' => ['startup_prof_pic'],
             'startup_photo_2' => ['startup_prof_pic1'],
             'startup_photo_3' => ['startup_prof_thumb_pic'],
@@ -148,7 +152,7 @@ class AuthController extends Controller
         $profile = self::PROFILE_TYPES[$type];
         $profileFields = config("registration_profiles.{$type}.steps", []);
         $authenticatedAccount = $request->user();
-        $emailRules = ['required', 'email', 'max:255'];
+        $emailRules = ['required', 'email', 'max:255', 'not_regex:/@(sample\.com|example\.com|test\.com)$/i'];
         if (! $authenticatedAccount) {
             $emailRules[] = Rule::unique('user_account', 'email');
         }
@@ -161,7 +165,7 @@ class AuthController extends Controller
         $rules = array_merge(
             $this->profileRules($profileFields),
             [
-                $profile['name'] => ['required', 'string', 'max:100'],
+                $profile['name'] => ['required', 'string', 'max:100', "regex:/^[A-Za-z][A-Za-z .'-]*$/"],
                 $profile['email'] => $emailRules,
             ]
         );
@@ -174,7 +178,31 @@ class AuthController extends Controller
             }
         }
         $attributes[$profile['email']] = 'email';
-        $validated = $request->validate($rules, [], $attributes);
+        $messages = [
+            $profile['name'] . '.regex' => 'Please enter a valid name using letters only.',
+            $profile['email'] . '.not_regex' => 'Please use a real email address.',
+        ];
+        if (isset($profile['mobile'])) {
+            $messages[$profile['mobile'] . '.regex'] = 'Please enter a valid UK mobile number starting with 07 (11 digits).';
+        }
+        $validated = $request->validate($rules, $messages, $attributes);
+
+        $uploadedFieldName = null;
+        foreach ($profileFields as $step) {
+            foreach ($step['fields'] as $field) {
+                if (($field['type'] ?? null) === 'file' && !empty($validated[$field['name'] ?? ''] ?? null)) {
+                    $uploadedFieldName = $field['name'];
+                    break 2;
+                }
+            }
+        }
+        if ($uploadedFieldName !== null
+            && (blank(config('filesystems.disks.s3.key')) || blank(config('filesystems.disks.s3.secret')))) {
+            throw ValidationException::withMessages([
+                $uploadedFieldName => 'Images and documents cannot be uploaded right now because S3 storage is not configured. Please try again later or submit without attachments.',
+            ]);
+        }
+
         $storedFiles = [];
         $uploadedMedia = [];
 
@@ -276,10 +304,26 @@ class AuthController extends Controller
             });
         } catch (Throwable $exception) {
             if ($storedFiles !== []) {
-                Storage::disk('s3')->delete($storedFiles);
+                try {
+                    Storage::disk('s3')->delete($storedFiles);
+                } catch (Throwable $cleanupException) {
+                    Log::error('Unable to remove a profile upload after registration failed.', [
+                        'exception' => $cleanupException->getMessage(),
+                    ]);
+                }
             }
 
-            throw $exception;
+            if ($exception instanceof ValidationException) {
+                throw $exception;
+            }
+
+            Log::error('Profile registration failed.', ['type' => $type, 'exception' => $exception]);
+
+            throw ValidationException::withMessages([
+                ($uploadedFieldName ?? $profile['name']) => $uploadedFieldName !== null
+                    ? 'We could not upload your images or documents right now. Please try again later or submit without attachments.'
+                    : 'Something went wrong while creating your profile. Please try again.',
+            ]);
         }
 
         if ($authenticatedAccount) {
@@ -448,13 +492,18 @@ class AuthController extends Controller
                 }
 
                 if (($field['type'] ?? null) === 'file') {
-                    $fileRules = ['file', 'max:10240'];
+                    $fileRules = ['file', 'max:1024'];
+                    $isImageField = false;
                     if (isset($field['accept'])) {
                         $extensions = array_map(
                             static fn (string $extension): string => ltrim($extension, '.'),
                             explode(',', $field['accept'])
                         );
                         $fileRules[] = 'mimes:' . implode(',', $extensions);
+                        $isImageField = array_diff($extensions, ['png', 'jpg', 'jpeg']) === [];
+                    }
+                    if ($isImageField) {
+                        $fileRules[] = 'dimensions:max_width=1800,max_height=1200';
                     }
                     if (!empty($field['multiple'])) {
                         $rules[$fieldName] = ['nullable', 'array', 'max:10'];
@@ -482,6 +531,10 @@ class AuthController extends Controller
                     $fieldRules[] = 'url';
                 } elseif (($field['type'] ?? null) === 'select' && isset($field['options'])) {
                     $fieldRules[] = Rule::in(array_map('strval', $field['options']));
+                } elseif (($field['type'] ?? null) === 'tel') {
+                    $fieldRules[] = 'regex:/^07[0-9]{9}$/';
+                } elseif (str_contains($fieldName, 'pincode') || str_contains($fieldName, 'postcode')) {
+                    $fieldRules[] = 'regex:/^[A-Za-z]{1,2}[0-9][A-Za-z0-9]? ?[0-9][A-Za-z]{2}$/';
                 }
 
                 $rules[$fieldName] = $fieldRules;

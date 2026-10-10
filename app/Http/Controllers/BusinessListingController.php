@@ -39,6 +39,7 @@ class BusinessListingController extends AbstractListingController
             'investment_max_exclusive'
         );
         $this->applyIntent($query, $request);
+        $this->applyMembershipPriority($query, 'profile_business');
         $this->applySort($query, $request, 'profile_business', 'business_id', 'advmt_headline', 'annual_sales');
 
         $listings = $query->paginate(12)->withQueryString();

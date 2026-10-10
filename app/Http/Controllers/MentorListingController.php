@@ -36,6 +36,7 @@ class MentorListingController extends AbstractListingController
             'mentor_intro',
             'mentor_profile_summary',
         ]);
+        $this->applyMembershipPriority($query, 'profile_mentors');
         $this->applySort($query, $request, 'profile_mentors', 'mentor_id', 'mentor_name');
 
         $listings = $query->paginate(12)->withQueryString();

@@ -179,6 +179,23 @@ abstract class AbstractListingController extends Controller
         ];
     }
 
+    /**
+     * Paid members sort above free ones, higher plans first. Matches the
+     * legacy businessex-uk investor/mentor listing order: Platinum(3),
+     * Gold(2), Premium(1), Basic(5), Free(0), anything else last.
+     */
+    protected function applyMembershipPriority(Builder $query, string $table): void
+    {
+        if (! Schema::hasColumns($table, ['membership_paid', 'membership_plan'])) {
+            return;
+        }
+
+        $query->orderByDesc("{$table}.membership_paid")
+            ->orderByRaw(
+                "CASE {$table}.membership_plan WHEN 3 THEN 1 WHEN 2 THEN 2 WHEN 1 THEN 3 WHEN 5 THEN 4 WHEN 0 THEN 5 ELSE 6 END"
+            );
+    }
+
     protected function applySort(
         Builder $query,
         Request $request,
