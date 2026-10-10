@@ -458,7 +458,7 @@
           <form class="hero-search" onsubmit="event.preventDefault();">
             <input type="search" placeholder="Search articles, news, topics..." aria-label="Search articles">
             <select aria-label="Article category"><option>All Categories</option><option>Business Growth</option><option>Global Trade</option><option>Finance &amp; Investment</option><option>Technology &amp; Innovation</option></select>
-            <button class="search-btn" type="submit">Search</button>
+            <button class="search-btn" type="submit" style="color:#ffffff !important">Search</button>
           </form>
           <div class="hero-stats">
             <div class="hero-stat"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M8 13h8M8 17h8"/></svg><div><div class="num">2,500+</div><div class="lbl">Articles</div></div></div>
