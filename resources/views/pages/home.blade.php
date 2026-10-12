@@ -865,10 +865,9 @@ BusinessX - The UK's leading business exchange network. Buy or sell a business, 
       <div class="hero-grid">
         <div>
           <span class="hero-eyebrow">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
             BusinessX - Exit, Exchange, Excel
           </span>
-          <h1>Leading <span class="hl">Business</span> Exchange Network</h1>
+          <h1>World’s <span class="hl">Fastest Growing</span> Intelligent Deal Platform</h1>
           <p class="hero-sub"><strong>1500+ Businesses, 1400+ Startups, 1800+ Investors, 200+ Mentors and 50+ Incubators</strong> are registered in our community so far!</p>
           <div class="hero-create">
             <h3>Why wait, create your profile now</h3>
@@ -948,23 +947,23 @@ BusinessX - The UK's leading business exchange network. Buy or sell a business, 
       <div class="stat-grid">
         <div class="stat-item">
           <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18M5 21V7l8-4v18M19 21V11l-6-4"/></svg></span>
-          <div><div class="num">1,500+</div><div class="lbl">Businesses</div></div>
+          <div><div class="num" style="color:white">1,500+</div><div class="lbl">Businesses</div></div>
         </div>
         <div class="stat-item">
           <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 19V5M5 12l7-7 7 7"/></svg></span>
-          <div><div class="num">1,400+</div><div class="lbl">Startups</div></div>
+          <div><div class="num" style="color:white">1,400+</div><div class="lbl">Startups</div></div>
         </div>
         <div class="stat-item">
           <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v12M8 10h8M8 14h8"/></svg></span>
-          <div><div class="num">1,800+</div><div class="lbl">Investors</div></div>
+          <div><div class="num" style="color:white">1,800+</div><div class="lbl">Investors</div></div>
         </div>
         <div class="stat-item">
           <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>
-          <div><div class="num">200+</div><div class="lbl">Mentors</div></div>
+          <div><div class="num" style="color:white">200+</div><div class="lbl">Mentors</div></div>
         </div>
         <div class="stat-item">
           <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></span>
-          <div><div class="num">120+</div><div class="lbl">Countries</div></div>
+          <div><div class="num" style="color:white">120+</div><div class="lbl">Countries</div></div>
         </div>
       </div>
     </div>
@@ -1026,12 +1025,12 @@ BusinessX - The UK's leading business exchange network. Buy or sell a business, 
       </div>
       <div class="why-grid">
         <div class="why-card">
-          <div class="pic"><img src="{{ asset('assets/img/business-ex.jpg') }}" alt="Single Platform For Entire Ecosystem"></div>
+          <div class="pic"><img src="{{ asset('assets/img/single-platformnew.svg') }}" alt="Single Platform For Entire Ecosystem"></div>
           <h4>Single Platform For Entire Ecosystem</h4>
           <p>An online interactive platform connecting Businesses, Startups, Investors, Mentors, Lenders, Incubators and Brokers, across industries and geographies.</p>
         </div>
         <div class="why-card">
-          <div class="pic"><img src="{{ asset('assets/img/why-scale-up.svg') }}" alt="Help Companies Scale Up"></div>
+          <div class="pic"><img src="{{ asset('assets/img/help-companies-scale-upnew.svg') }}" alt="Help Companies Scale Up"></div>
           <h4>Help Companies Scale Up</h4>
           <p>BusinessX offers a platform for high-growth potential companies to promote their investment opportunities to investors or to gain expertise from renowned mentors, in a secure environment.</p>
         </div>
@@ -1041,17 +1040,17 @@ BusinessX - The UK's leading business exchange network. Buy or sell a business, 
           <p>Provides an opportunity to connect to a broader network to share deals and grow your connections, while keeping your important details confidential.</p>
         </div>
         <div class="why-card">
-          <div class="pic"><img src="{{ asset('assets/img/why-customizable.svg') }}" alt="Put Your Mark On It"></div>
+          <div class="pic"><img src="{{ asset('assets/img/fully-customizable-platformnew.svg') }}" alt="Put Your Mark On It"></div>
           <h4>Put Your Mark On It</h4>
           <p>Our platform is fully customizable. You decide the information you want to share. Automatically receive recommendations based on your profile and preferences.</p>
         </div>
         <div class="why-card">
-          <div class="pic"><img src="{{ asset('assets/img/why-authentic-community.svg') }}" alt="Authentic Community"></div>
+          <div class="pic"><img src="{{ asset('assets/img/authentic-communitynew.svg') }}" alt="Authentic Community"></div>
           <h4>Authentic Community</h4>
           <p>Meet and interact with genuine and interested customers registered with BusinessX, and deepen relationships that help your business grow.</p>
         </div>
         <div class="why-card">
-          <div class="pic"><img src="{{ asset('assets/img/why-portfolio.svg') }}" alt="Portfolio Management Made Easy"></div>
+          <div class="pic"><img src="{{ asset('assets/img/portfolio-managementnew.svg') }}" alt="Portfolio Management Made Easy"></div>
           <h4>Portfolio Management Made Easy</h4>
           <p>Keep track of all your conversations and proposals in one place. Track user preferences (location, industry, investment) and receive curated opportunities.</p>
         </div>
@@ -1518,8 +1517,8 @@ BusinessX - The UK's leading business exchange network. Buy or sell a business, 
       </div>
       <div class="plans-grid">
         <div class="planx-card">
-          <div class="p-name">Free</div>
-          <div class="p-sub">Get started with basic features</div>
+          <div class="p-name">Premium</div>
+          <div class="p-sub">Get started with basic features (3 Months)</div>
           <div class="p-price"><span class="amt">£0</span></div>
           <div class="p-note">Forever free</div>
           <ul>
@@ -1531,8 +1530,8 @@ BusinessX - The UK's leading business exchange network. Buy or sell a business, 
         </div>
         <div class="planx-card featured">
           <div class="planx-badge" style="color:#ffffff">★ Most Popular</div>
-          <div class="p-name">Premium</div>
-          <div class="p-sub">Grow your business with premium tools</div>
+          <div class="p-name">Gold</div>
+          <div class="p-sub">Grow your business with premium tools (12 Months)</div>
           <div class="p-price"><span class="amt">£299</span> <span class="per">/ Year</span></div>
           <div class="p-note">Billed annually</div>
           <ul>
@@ -1542,11 +1541,11 @@ BusinessX - The UK's leading business exchange network. Buy or sell a business, 
             <li><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"><polyline points="20 6 9 17 4 12"/></svg></span>Featured Listing in Directory</li>
             <li><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"><polyline points="20 6 9 17 4 12"/></svg></span>Business Matchmaking</li>
           </ul>
-          <a href="{{ route('pricing') }}" class="btn-card">Get Started</a>
+          <a href="{{ route('pricing') }}" class="btn-card" style="color: #ffffff;">Get Started</a>
         </div>
         <div class="planx-card">
-          <div class="p-name">Elite</div>
-          <div class="p-sub">Maximum visibility. Global impact.</div>
+          <div class="p-name">Platinum</div>
+          <div class="p-sub">Maximum visibility. Global impact. (12 Months)</div>
           <div class="p-price"><span class="amt">£999</span> <span class="per">/ Year</span></div>
           <div class="p-note">Billed annually</div>
           <ul>
@@ -1566,8 +1565,8 @@ BusinessX - The UK's leading business exchange network. Buy or sell a business, 
     <div class="container">
       <div class="cta-inner">
         <div>
-          <h2>Did You Find Anything Interested?</h2>
-          <p class="cta-sub">Why wait, create your profile now and start connecting with verified buyers, investors and mentors.</p>
+          <h2 style="color:white">Did You Find Anything Interested?</h2>
+          <p class="cta-sub" style="color:white">Why wait, create your profile now and start connecting with verified buyers, investors and mentors.</p>
         </div>
         <form class="cta-form" id="ctaProfileForm">
           <select id="ctaProfile" aria-label="Select a profile" required>
