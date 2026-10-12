@@ -70,7 +70,7 @@ Manage your BusinessX interactions.
     <div class="workspace-main">
       <header class="workspace-topbar">
         <strong>My Account / My Interaction / <?= htmlspecialchars($interactionPage['title'], ENT_QUOTES, 'UTF-8') ?></strong>
-        <form method="post" action="{{ route('logout') }}">
+        <form class="logout-form" method="post" action="{{ route('logout') }}">
           @csrf
           <button type="submit" class="workspace-signout">Sign Out</button>
         </form>

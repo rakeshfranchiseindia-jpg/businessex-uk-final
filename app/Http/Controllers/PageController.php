@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -15,7 +16,7 @@ class PageController extends Controller
         'profile-details' => ['pages.profile-details', 'dashboard', false],
     ];
 
-    public function show(Request $request): View|RedirectResponse
+    public function show(Request $request): View|RedirectResponse|Response
     {
         $routeName = $request->route()->getName();
 
@@ -51,8 +52,20 @@ class PageController extends Controller
 
         if (isset(self::PAGES[$routeName])) {
             [$view, $activePage, $showHeader] = self::PAGES[$routeName];
+            $response = $this->render($view, $activePage, $showHeader);
 
-            return $this->render($view, $activePage, $showHeader);
+            if ($routeName === 'login') {
+                // A browser's back/forward cache can replay this exact page
+                // after the user has since logged in elsewhere, so a stale
+                // "logged out" login form stays on screen while every link
+                // on it (the registration CTA included) hits the server as
+                // the now-authenticated user and redirects to the
+                // dashboard — looking like "it skipped login". no-store
+                // keeps the page out of that cache.
+                return response($response)->header('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0');
+            }
+
+            return $response;
         }
 
         abort(404);

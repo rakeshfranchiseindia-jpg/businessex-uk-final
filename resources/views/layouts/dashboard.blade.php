@@ -12,7 +12,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="{{ asset('css/common-style.css?v=20261009') }}">
+  <link rel="stylesheet" href="{{ asset('css/common-style.css?v=20261014') }}">
   <link rel="stylesheet" href="{{ asset('css/account-dashboard.css') }}">
   @yield('head')
 </head>
@@ -49,7 +49,45 @@
       <span aria-hidden="true">●</span> Live Chat <span class="dashboard-live-chat-count" data-chat-count hidden></span>
     </button>
   </section>
-  <script src="{{ asset('js/common.js') }}?v=20261010"></script>
+  <dialog class="confirm-dialog" id="logout-confirm-dialog" aria-labelledby="logout-confirm-title">
+    <div class="confirm-dialog-body">
+      <div class="confirm-dialog-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      </div>
+      <h2 id="logout-confirm-title">Sign out of BusinessX?</h2>
+      <p>You'll need to sign in again to access your dashboard and messages.</p>
+      <div class="confirm-dialog-actions">
+        <button type="button" class="confirm-dialog-cancel" data-confirm-cancel>Cancel</button>
+        <button type="button" class="confirm-dialog-confirm" data-confirm-ok>Sign Out</button>
+      </div>
+    </div>
+  </dialog>
+  <script>
+    (function () {
+      const dialog = document.getElementById('logout-confirm-dialog');
+      if (!dialog) return;
+      let pendingForm = null;
+
+      document.querySelectorAll('form.logout-form').forEach(form => {
+        form.addEventListener('submit', event => {
+          event.preventDefault();
+          pendingForm = form;
+          dialog.showModal();
+        });
+      });
+
+      dialog.querySelector('[data-confirm-cancel]').addEventListener('click', () => {
+        pendingForm = null;
+        dialog.close();
+      });
+      dialog.querySelector('[data-confirm-ok]').addEventListener('click', () => {
+        dialog.close();
+        if (pendingForm) HTMLFormElement.prototype.submit.call(pendingForm);
+        pendingForm = null;
+      });
+    })();
+  </script>
+  <script src="{{ asset('js/common.js') }}?v=20261013"></script>
   @vite('resources/js/app.js')
   @stack('scripts')
 </body>

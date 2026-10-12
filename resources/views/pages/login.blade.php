@@ -14,7 +14,8 @@ BusinessX connects businesses, startups, investors and mentors.
     .login-shell {
       width: min(calc(100% - 48px), 1280px);
       max-width: 1280px;
-      height: min(820px, 92vh);
+      height: auto;
+      max-height: min(820px, 92vh);
       display: grid;
       grid-template-columns: 55% 45%;
       background: var(--white);
@@ -209,21 +210,67 @@ BusinessX connects businesses, startups, investors and mentors.
     .login-right .register-signin button { color: var(--gold-600); font-weight: 700; }
     .login-right .register-signin button:hover { text-decoration: underline; }
     .quick-register-modal {
-      width: min(500px, calc(100% - 32px)); max-height: min(90vh, 760px); padding: 0;
-      border: 0; border-radius: 14px; color: var(--navy-800); box-shadow: 0 24px 80px rgba(0,0,0,.35);
+      position: fixed; top: 50%; left: 50%; margin: 0;
+      width: min(480px, calc(100% - 32px)); max-height: min(92vh, 780px); padding: 0;
+      border: 0; border-radius: 20px; color: var(--navy-800); box-shadow: 0 30px 90px rgba(10,24,48,.45);
+      overflow: hidden; opacity: 0; transform: translate(-50%, -46%) scale(.97);
+      transition: opacity .22s ease, transform .22s ease;
     }
-    .quick-register-modal::backdrop { background: rgba(6,16,32,.72); backdrop-filter: blur(3px); }
-    .quick-register-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; padding: 22px 24px; background: var(--gold-500); }
-    .quick-register-head h2 { margin: 0; font-size: 22px; color: var(--navy-900); }
-    .quick-register-head p { margin: 5px 0 0; color: var(--navy-800); font-size: 13px; }
-    .quick-register-close { color: var(--navy-800); font-size: 25px; line-height: 1; }
-    .quick-register-body { padding: 22px 24px 24px; }
-    .quick-register-body .field { margin-bottom: 14px; }
-    .quick-register-body .field input { width: 100%; padding: 12px 14px; border: 1px solid var(--gray-300); border-radius: 8px; }
-    .quick-register-body .field input:focus { outline: 2px solid rgba(19,141,227,.35); border-color: var(--gold-500); }
-    .quick-register-error { margin: 6px 0 0; color: #991b1b; font-size: 12px; }
-    .quick-register-submit { width: 100%; padding: 13px; border-radius: 8px; background: var(--navy-800); color: white; font-weight: 700; }
-    .quick-register-submit:hover { background: var(--navy-700); }
+    .quick-register-modal[open] { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+    .quick-register-modal::backdrop { background: rgba(6,16,32,.72); backdrop-filter: blur(4px); }
+    .quick-register-head {
+      position: relative; display: flex; align-items: flex-start; justify-content: space-between; gap: 16px;
+      padding: 28px 26px 24px; background: linear-gradient(135deg, var(--navy-900) 0%, var(--gold-500) 130%);
+      overflow: hidden;
+    }
+    .quick-register-head::before {
+      content: ""; position: absolute; inset: 0;
+      background: radial-gradient(120px 120px at 92% -10%, rgba(255,255,255,.18), transparent 70%);
+    }
+    .quick-register-icon {
+      position: relative; width: 42px; height: 42px; margin-bottom: 12px; border-radius: 12px;
+      background: rgba(255,255,255,.16); display: flex; align-items: center; justify-content: center;
+    }
+    .quick-register-icon svg { width: 22px; height: 22px; stroke: #fff; }
+    #quick-register-modal .quick-register-head h2 { position: relative; margin: 0; font-size: 21px; font-weight: 700; color: #fff; }
+    #quick-register-modal .quick-register-head p { position: relative; margin: 6px 0 0; color: rgba(255,255,255,.82); font-size: 13px; }
+    .quick-register-close {
+      position: relative; flex-shrink: 0; width: 32px; height: 32px; border-radius: 50%;
+      background: rgba(255,255,255,.14); color: #fff; font-size: 20px; line-height: 1;
+      display: flex; align-items: center; justify-content: center; transition: background .18s ease, transform .18s ease;
+    }
+    .quick-register-close:hover { background: rgba(255,255,255,.26); transform: rotate(90deg); }
+    .quick-register-body { padding: 26px 26px 28px; max-height: calc(92vh - 140px); overflow-y: auto; }
+    .quick-register-body .field { margin-bottom: 16px; }
+    .quick-register-body .field label {
+      display: block; margin-bottom: 6px; font-size: 12px; font-weight: 700; letter-spacing: .3px;
+      text-transform: uppercase; color: var(--gray-600);
+    }
+    .quick-register-body .field input {
+      width: 100%; padding: 13px 15px; border: 1.5px solid var(--gray-200); border-radius: 10px;
+      font-size: 14px; color: var(--navy-900); background: var(--gray-50, #f9fafb);
+      transition: border-color .18s ease, box-shadow .18s ease, background .18s ease;
+    }
+    .quick-register-body .field input:hover { border-color: var(--gray-300); }
+    .quick-register-body .field input:focus {
+      outline: none; border-color: var(--gold-400); background: #fff;
+      box-shadow: 0 0 0 4px var(--gold-200);
+    }
+    .quick-register-body .phone-input-group { display: flex; gap: 8px; }
+    .quick-register-body .phone-input-group .phone-country-code {
+      width: 92px; flex-shrink: 0; padding: 13px 10px; border: 1.5px solid var(--gray-200); border-radius: 10px;
+      font-size: 13px; background: var(--gray-50, #f9fafb); color: var(--navy-900);
+    }
+    .quick-register-error {
+      display: flex; align-items: center; gap: 6px; margin: 7px 0 0; color: #b91c1c; font-size: 12px; font-weight: 600;
+    }
+    .quick-register-submit {
+      width: 100%; margin-top: 4px; padding: 14px; border-radius: 10px;
+      background: linear-gradient(135deg, var(--navy-800), var(--gold-500)); color: white; font-weight: 700; font-size: 14px;
+      letter-spacing: .2px; box-shadow: 0 10px 24px rgba(23,105,210,.3); transition: transform .18s ease, box-shadow .18s ease;
+    }
+    .quick-register-submit:hover { transform: translateY(-1px); box-shadow: 0 14px 30px rgba(23,105,210,.4); }
+    .quick-register-submit:active { transform: translateY(0); }
 
     .login-right .form-wrap {
       padding: 32px 40px;
@@ -546,6 +593,9 @@ BusinessX connects businesses, startups, investors and mentors.
       <dialog class="quick-register-modal" id="quick-register-modal" aria-labelledby="quick-register-title">
         <div class="quick-register-head">
           <div>
+            <div class="quick-register-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 2 7l10 5 10-5-10-5Z"/><path d="m2 17 10 5 10-5"/><path d="m2 12 10 5 10-5"/></svg>
+            </div>
             <h2 id="quick-register-title">Create your <span data-quick-register-title>Business</span> account</h2>
             <p>We’ll send a verification link to your email address.</p>
           </div>
@@ -585,44 +635,6 @@ BusinessX connects businesses, startups, investors and mentors.
         </form>
       </dialog>
 
-      <div class="feature-footer">
-        <div class="feature-item">
-          <span class="feature-icon-circle">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>
-          </span>
-          <div class="feature-text">
-            <div class="t">Verified & Trusted</div>
-            <div class="d">All members are verified</div>
-          </div>
-        </div>
-        <div class="feature-item">
-          <span class="feature-icon-circle">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
-          </span>
-          <div class="feature-text">
-            <div class="t">Global Reach</div>
-            <div class="d">Connect in 120+ countries</div>
-          </div>
-        </div>
-        <div class="feature-item">
-          <span class="feature-icon-circle">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
-          </span>
-          <div class="feature-text">
-            <div class="t">Business Growth</div>
-            <div class="d">Discover new opportunities</div>
-          </div>
-        </div>
-        <div class="feature-item">
-          <span class="feature-icon-circle">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-          </span>
-          <div class="feature-text">
-            <div class="t">Secure & Private</div>
-            <div class="d">Top-level data protection</div>
-          </div>
-        </div>
-      </div>
     </section>
   </div>
 

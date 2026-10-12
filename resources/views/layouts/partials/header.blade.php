@@ -79,9 +79,9 @@ $registrationRoutes = auth()->check()
       {{--<a href="{{ route('registration') }}" class="btn-join">Register Free</a> --}}
       @else
       <a href="{{ route('dashboard.index') }}" class="btn-login">Dashboard</a>
-      <form class="header-logout-form" method="post" action="{{ route('logout') }}">
+      <form class="logout-form" method="post" action="{{ route('logout') }}">
         @csrf
-        <button type="submit" class="btn-join">Sign Out</button>
+        <button type="submit" class="btn-join" style="background-color:#1769d2; color:white;">Sign Out</button>
       </form>
       @endguest
     </div>
@@ -129,9 +129,9 @@ $registrationRoutes = auth()->check()
     <a class="btn-join" href="{{ route('registration') }}">Register Free</a>
     @else
     <a class="btn-login" href="{{ route('dashboard.index') }}">Dashboard</a>
-    <form class="header-logout-form" method="post" action="{{ route('logout') }}">
+    <form class="logout-form" method="post" action="{{ route('logout') }}">
       @csrf
-      <button type="submit" class="btn-join">Sign Out</button>
+      <button type="submit" class="btn-join" style="background-color:#1769d2; color:white;">Sign Out</button>
     </form>
     @endguest
     </div>

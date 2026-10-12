@@ -65,6 +65,7 @@ class DashboardController extends Controller
             'table' => 'profile_business',
             'id' => 'business_id',
             'key' => 'business_profile_str',
+            'legacy_type' => 1,
             'status' => 'business_profile_status',
             'label' => 'Business',
             'title' => ['advmt_headline', 'seller_company', 'seller_name'],
@@ -78,6 +79,7 @@ class DashboardController extends Controller
             'table' => 'profile_investor',
             'id' => 'investor_id',
             'key' => 'inv_profile_str',
+            'legacy_type' => 2,
             'status' => 'inv_profile_status',
             'label' => 'Investor',
             'title' => ['inv_headline', 'company_name', 'inv_name'],
@@ -91,6 +93,7 @@ class DashboardController extends Controller
             'table' => 'profile_mentors',
             'id' => 'mentor_id',
             'key' => 'mentor_profile_str',
+            'legacy_type' => 4,
             'status' => 'mentor_profile_status',
             'label' => 'Mentor',
             'title' => ['mentor_adv_headline', 'mentor_name'],
@@ -104,6 +107,7 @@ class DashboardController extends Controller
             'table' => 'profile_startups',
             'id' => 'startup_id',
             'key' => 'startup_profile_str',
+            'legacy_type' => 7,
             'status' => 'startup_profile_status',
             'label' => 'Startup',
             'title' => ['advmt_headline', 'name_of_entity', 'startup_name'],
@@ -118,15 +122,24 @@ class DashboardController extends Controller
     public function index(): View
     {
         $profiles = collect();
+        $availableProfileTypes = [];
         foreach (self::PROFILE_TYPES as $type => $definition) {
             if (! Schema::hasTable($definition['table'])
                 || ! Schema::hasColumn($definition['table'], 'user_id')) {
                 continue;
             }
 
-            foreach (DB::table($definition['table'])
+            // Only Active profiles are real, selectable listings — a
+            // draft/inactive row isn't shown or offered in the filter, same
+            // as the old project's profile-type dropdown.
+            $activeProfiles = DB::table($definition['table'])
                 ->where('user_id', Auth::id())
-                ->get() as $profile) {
+                ->where($definition['status'], 1)
+                ->get();
+
+            $availableProfileTypes[$type] = $activeProfiles->isNotEmpty();
+
+            foreach ($activeProfiles as $profile) {
                 $profiles->push($this->profileCard($type, $definition, $profile));
             }
         }
@@ -151,6 +164,8 @@ class DashboardController extends Controller
         return $this->page('dashboard', 'Dashboard')->with([
             'myProfiles' => $profiles,
             'selectedProfileType' => $selectedType,
+            'availableProfileTypes' => $availableProfileTypes,
+            'searchHistory' => $this->topSearchHistory(),
         ])->with($this->dashboardActivityData());
     }
 
@@ -165,30 +180,10 @@ class DashboardController extends Controller
     {
         abort_unless(isset(self::PROFILE_TYPES[$type]), 404);
 
-        $user = Auth::user();
-        $defaults = [
-            $this->registrationField($type, 'name') => $user->name,
-            $this->registrationField($type, 'email') => $user->email,
-            $this->registrationField($type, 'mobile') => $user->mobile ?? '',
-            $this->registrationField($type, 'company') => $user->company_name ?? '',
-        ];
-        $locationFields = [
-            'business' => 'ofc_city',
-            'investor' => 'inv_city',
-            'mentor' => 'mentor_city',
-            'startup' => 'ofc_city',
-        ];
-        if (! empty($user->location)) {
-            $defaults[$locationFields[$type]] = $user->location;
-        }
-        $designationFields = [
-            'business' => 'seller_designation',
-            'mentor' => 'mentor_designation',
-            'startup' => 'startup_designation',
-        ];
-        if (isset($designationFields[$type]) && ! empty($user->designation)) {
-            $defaults[$designationFields[$type]] = $user->designation;
-        }
+        // Matches the old project: the profile registration form always
+        // starts blank, even for a logged-in user creating another profile
+        // — it never prefills from the account's own name/email/mobile/etc.
+        $defaults = [];
         if ($type === 'business' || $type === 'startup') {
             $defaults['ofc_country'] = 'United Kingdom';
         } elseif ($type === 'mentor') {
@@ -206,16 +201,6 @@ class DashboardController extends Controller
             'profileDefaults' => $defaults,
             'dashboardCreateProfile' => true,
         ]);
-    }
-
-    private function registrationField(string $type, string $field): string
-    {
-        return match ($type) {
-            'business' => ['name' => 'seller_name', 'email' => 'seller_email', 'mobile' => 'seller_mobile', 'company' => 'seller_company'][$field],
-            'investor' => ['name' => 'inv_name', 'email' => 'inv_email', 'mobile' => 'inv_mobile', 'company' => 'company_name'][$field],
-            'mentor' => ['name' => 'mentor_name', 'email' => 'mentor_email', 'mobile' => 'mentor_mobile', 'company' => 'mentor_company'][$field],
-            'startup' => ['name' => 'startup_name', 'email' => 'startup_email', 'mobile' => 'startup_mobile', 'company' => 'name_of_entity'][$field],
-        };
     }
 
     public function showMyProfile(string $type, int $id): View
@@ -326,7 +311,7 @@ class DashboardController extends Controller
 
                 if (($field['type'] ?? null) === 'select' && isset($field['options'])) {
                     $fieldRules[] = Rule::in(array_keys($field['option_values']));
-                } elseif (str_ends_with($name, '_city') || $name === 'city') {
+                } elseif (preg_match('/\b(city|location|town)\b|_(city|location|town)\b/i', $name)) {
                     $fieldRules[] = Rule::exists('bx_cities', 'city');
                 }
 
@@ -495,6 +480,48 @@ class DashboardController extends Controller
         abort_unless($profile, 404);
 
         return [$definition, $profile];
+    }
+
+    /**
+     * The profiles this user has looked up the most, for the dashboard's
+     * Search History tab — ranked by how many times they opened each one,
+     * not just the most recent.
+     */
+    private function topSearchHistory(int $limit = 10): \Illuminate\Support\Collection
+    {
+        if (! Schema::hasTable('profile_visitors')) {
+            return collect();
+        }
+
+        $rows = DB::table('profile_visitors')
+            ->where('user_id', Auth::id())
+            ->selectRaw('profile_type, profile_id, COUNT(*) as search_count, MAX(created_at) as last_searched_at')
+            ->groupBy('profile_type', 'profile_id')
+            ->orderByDesc('search_count')
+            ->orderByDesc('last_searched_at')
+            ->limit($limit)
+            ->get();
+
+        $typesByLegacyCode = collect(self::PROFILE_TYPES)->mapWithKeys(
+            fn (array $definition, string $type): array => [$definition['legacy_type'] => array_merge($definition, ['type' => $type])]
+        );
+
+        return $rows->map(function (object $row) use ($typesByLegacyCode): ?object {
+            $definition = $typesByLegacyCode->get((int) $row->profile_type);
+            if (! $definition || ! Schema::hasTable($definition['table'])) {
+                return null;
+            }
+
+            $profile = DB::table($definition['table'])->where($definition['id'], $row->profile_id)->first();
+            if (! $profile) {
+                return null;
+            }
+
+            $card = $this->profileCard($definition['type'], $definition, $profile);
+            $card->search_count = (int) $row->search_count;
+
+            return $card;
+        })->filter()->values();
     }
 
     private function profileCard(string $type, array $definition, object $profile): object
@@ -909,11 +936,24 @@ class DashboardController extends Controller
             ]);
         }
 
-        $account->forceFill(['password' => $validated['newPassword']])->save();
+        $account->forceFill([
+            'password' => $validated['newPassword'],
+            'remember_token' => Str::random(60),
+        ])->save();
 
-        return redirect()->route('dashboard.password')->with(
-            'password_status',
-            'Your password was updated successfully.'
+        // Sign the account out everywhere: drop every active session row for
+        // this user (other devices/browsers), then end the current request's
+        // own session too, so this device lands on the login page as well.
+        if (Schema::hasTable('sessions') && Schema::hasColumn('sessions', 'user_id')) {
+            DB::table('sessions')->where('user_id', $account->user_id)->delete();
+        }
+        Auth::guard('web')->logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        return redirect()->route('login')->with(
+            'status',
+            'Your password was updated. Please sign in again with your new password.'
         );
     }
 

@@ -18,6 +18,8 @@ class ProfileContactController extends Controller
         'business' => [
             'table' => 'profile_business',
             'id' => 'business_id',
+            'key' => 'business_profile_str',
+            'legacy_type' => 1,
             'status' => 'business_profile_status',
             'title' => ['advmt_headline', 'seller_company'],
             'summary' => ['company_summary', 'seller_intro', 'business_pitch'],
@@ -34,6 +36,8 @@ class ProfileContactController extends Controller
         'investor' => [
             'table' => 'profile_investor',
             'id' => 'investor_id',
+            'key' => 'inv_profile_str',
+            'legacy_type' => 2,
             'status' => 'inv_profile_status',
             'title' => ['inv_headline', 'company_name', 'inv_name'],
             'summary' => ['company_summary', 'inv_abt_urself', 'inv_intro'],
@@ -46,6 +50,8 @@ class ProfileContactController extends Controller
         'mentor' => [
             'table' => 'profile_mentors',
             'id' => 'mentor_id',
+            'key' => 'mentor_profile_str',
+            'legacy_type' => 4,
             'status' => 'mentor_profile_status',
             'title' => ['mentor_adv_headline', 'mentor_name'],
             'summary' => ['mentor_profile_summary', 'mentor_intro'],
@@ -58,6 +64,8 @@ class ProfileContactController extends Controller
         'startup' => [
             'table' => 'profile_startups',
             'id' => 'startup_id',
+            'key' => 'startup_profile_str',
+            'legacy_type' => 7,
             'status' => 'startup_profile_status',
             'title' => ['advmt_headline', 'name_of_entity', 'startup_name'],
             'summary' => ['company_summary', 'startup_intro', 'business_pitch'],
@@ -76,6 +84,7 @@ class ProfileContactController extends Controller
     public function show(string $type, int $id): View
     {
         [$definition, $profile] = $this->activeProfile($type, $id);
+        $this->recordSearchHistory($definition, $profile);
         $registrationSteps = config("registration_profiles.{$type}.steps", []);
         $fieldLabels = [];
         $fieldToStep = [];
@@ -170,6 +179,34 @@ class ProfileContactController extends Controller
                 'email' => Auth::user()->email,
                 'phone' => Auth::user()->mobile,
             ] : ['name' => '', 'email' => '', 'phone' => ''],
+        ]);
+    }
+
+    /**
+     * Log this view into the existing profile_visitors table (ported from
+     * the legacy project) so the dashboard's Search History tab can count,
+     * per viewer, which profiles they've looked up the most.
+     */
+    private function recordSearchHistory(array $definition, object $profile): void
+    {
+        if (!Auth::check() || !Schema::hasTable('profile_visitors') || !isset($definition['legacy_type'])) {
+            return;
+        }
+
+        $viewerId = (int) Auth::id();
+        if ($viewerId === (int) $profile->user_id) {
+            return;
+        }
+
+        $now = now();
+        DB::table('profile_visitors')->insert([
+            'visitor_ip' => request()->ip() ?? '0.0.0.0',
+            'profile_id' => (int) $profile->{$definition['id']},
+            'user_id' => $viewerId,
+            'profile_type' => $definition['legacy_type'],
+            'profile_str' => $profile->{$definition['key']} ?? '',
+            'created_at' => $now,
+            'updated_at' => $now,
         ]);
     }
 

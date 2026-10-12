@@ -34,8 +34,16 @@
   .public-profile-page .profile-contact-card p { margin-top: 7px; color: var(--gray-600); font-size: 13px; line-height: 1.6; }
   .public-profile-page .profile-contact-button { display: flex; justify-content: center; width: 100%; margin-top: 18px; padding: 13px 16px; border: 1px solid var(--navy-900); border-radius: 7px; background: var(--white); color: var(--navy-900); font: inherit; font-weight: 700; cursor: pointer; }
   .public-profile-page .profile-contact-button:hover { background: var(--navy-900); color: var(--white); }
-  .profile-contact-dialog { width: min(520px, calc(100% - 28px)); max-height: calc(100% - 28px); padding: 0; border: 0; border-radius: 10px; box-shadow: 0 20px 70px rgba(20,45,82,.28); }
-  .profile-contact-dialog::backdrop { background: rgba(20,45,82,.58); }
+  .profile-contact-dialog {
+    position: fixed; top: 50%; left: 50%; margin: 0;
+    width: min(520px, calc(100% - 28px)); max-height: min(90vh, calc(100% - 28px)); padding: 0;
+    border: 0; border-radius: 10px; box-shadow: 0 20px 70px rgba(20,45,82,.28);
+    overflow: hidden; opacity: 0; transform: translate(-50%, -46%) scale(.97);
+    transition: opacity .2s ease, transform .2s ease;
+  }
+  .profile-contact-dialog[open] { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+  .profile-contact-dialog .dialog-body { max-height: min(90vh, calc(100% - 28px)); overflow-y: auto; }
+  .profile-contact-dialog::backdrop { background: rgba(20,45,82,.58); backdrop-filter: blur(3px); }
   .profile-contact-dialog .dialog-body { padding: 24px; }
   .profile-contact-dialog h2 { color: var(--navy-900); font-size: 21px; }
   .profile-contact-dialog .dialog-intro { margin: 6px 0 18px; color: var(--gray-600); font-size: 13px; }

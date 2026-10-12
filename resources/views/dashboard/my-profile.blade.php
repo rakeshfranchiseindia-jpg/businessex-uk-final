@@ -55,7 +55,7 @@ View and manage your {{ strtolower($profileLabel) }} profile.
   <div class="workspace-main">
     <header class="workspace-topbar">
       <strong>My Account / {{ $profileLabel }} Profile</strong>
-      <form method="post" action="{{ route('logout') }}">
+      <form class="logout-form" method="post" action="{{ route('logout') }}">
         @csrf
         <button type="submit" class="workspace-signout">Sign Out</button>
       </form>

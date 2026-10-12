@@ -2,6 +2,26 @@
 
 document.addEventListener('DOMContentLoaded', () => {
 
+  // Exposed so other scripts (e.g. the registration wizard) can force a
+  // city input to confirm against the suggestion list — and show the same
+  // red inline error — before letting the user move past it.
+  const cityValidators = new WeakMap();
+  window.BX = window.BX || {};
+  window.BX.validateCityInputsIn = async (root) => {
+    const inputs = [...root.querySelectorAll('input')].filter(input => cityValidators.has(input));
+    let allValid = true;
+    for (const input of inputs) {
+      // eslint-disable-next-line no-await-in-loop
+      const valid = await cityValidators.get(input)();
+      if (!valid && allValid) {
+        input.reportValidity();
+        input.focus();
+      }
+      allValid = allValid && valid;
+    }
+    return allValid;
+  };
+
   // === UK city and location suggestions ===
   const locationInputs = [...document.querySelectorAll('input:not([type]), input[type="text"]')]
     .filter(input => {
@@ -158,48 +178,56 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
 
+    // Confirms the current value against the suggestion list (or reverts +
+    // shows the red error if it doesn't match) — used on blur, and reused
+    // by validateCityInputsIn() so the registration wizard can't advance
+    // past a step with an unconfirmed city.
+    const checkCityValue = async () => {
+      const value = input.value.trim();
+      if (value === '') {
+        lastConfirmedValue = '';
+        clearError();
+        return true;
+      }
+
+      const matchesKnown = known => known.some(city => city.toLowerCase() === value.toLowerCase());
+      if (matchesKnown(knownCities)) {
+        lastConfirmedValue = value;
+        clearError();
+        return true;
+      }
+
+      try {
+        const response = await fetch(`/uk-cities/suggest?q=${encodeURIComponent(value)}`, {
+          headers: { Accept: 'application/json' },
+        });
+        const result = response.ok ? await response.json() : { cities: [] };
+        const match = (result.cities || []).find(city => city.toLowerCase() === value.toLowerCase());
+        if (match) {
+          input.value = match;
+          lastConfirmedValue = match;
+          clearError();
+          return true;
+        }
+      } catch (error) {
+        console.error(error);
+      }
+
+      const hadInvalidEntry = value !== lastConfirmedValue;
+      input.value = lastConfirmedValue;
+      if (hadInvalidEntry) {
+        showError();
+      } else {
+        clearError();
+      }
+      return false;
+    };
+
+    cityValidators.set(input, checkCityValue);
+
     input.addEventListener('blur', () => {
       window.setTimeout(hideSuggestions, 120);
-
-      window.setTimeout(async () => {
-        const value = input.value.trim();
-        if (value === '') {
-          lastConfirmedValue = '';
-          clearError();
-          return;
-        }
-
-        const matchesKnown = known => known.some(city => city.toLowerCase() === value.toLowerCase());
-        if (matchesKnown(knownCities)) {
-          lastConfirmedValue = value;
-          clearError();
-          return;
-        }
-
-        try {
-          const response = await fetch(`/uk-cities/suggest?q=${encodeURIComponent(value)}`, {
-            headers: { Accept: 'application/json' },
-          });
-          const result = response.ok ? await response.json() : { cities: [] };
-          const match = (result.cities || []).find(city => city.toLowerCase() === value.toLowerCase());
-          if (match) {
-            input.value = match;
-            lastConfirmedValue = match;
-            clearError();
-            return;
-          }
-        } catch (error) {
-          console.error(error);
-        }
-
-        const hadInvalidEntry = value !== lastConfirmedValue;
-        input.value = lastConfirmedValue;
-        if (hadInvalidEntry) {
-          showError();
-        } else {
-          clearError();
-        }
-      }, 150);
+      window.setTimeout(checkCityValue, 150);
     });
   });
 
@@ -224,6 +252,12 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   document.querySelectorAll('form').forEach(form => {
+    // The registration wizard stores and validates the mobile number in
+    // plain UK local format (07xxxxxxxxx) end to end — rewriting it to
+    // international format here would corrupt it right before the
+    // wizard's own pattern check runs, failing it for no reason.
+    if (form.hasAttribute('data-registration-wizard')) return;
+
     form.addEventListener('submit', () => {
       form.querySelectorAll('.phone-input-group').forEach(group => {
         const codeSelect = group.querySelector('[data-phone-country-code]');

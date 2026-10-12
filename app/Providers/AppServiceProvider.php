@@ -2,7 +2,9 @@
 
 namespace App\Providers;
 
+use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\View;
@@ -22,6 +24,15 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        // A multi-step registration wizard naturally takes more than a
+        // handful of submit attempts while fixing validation errors
+        // (city, mobile format, etc). The old project's "auth" limiter
+        // allows 10/min keyed by email+ip for exactly this reason, rather
+        // than the framework default of 5/min by ip alone.
+        RateLimiter::for('registration', function ($request) {
+            return Limit::perMinute(10)->by($request->ip());
+        });
+
         $industryCategoryTree = null;
 
         View::composer([

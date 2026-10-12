@@ -774,6 +774,6 @@ BusinessX connects businesses, startups, investors and mentors.
       }
     })();
   </script>
-  <script src="{{ asset('js/profile-registration.js') }}"></script>
+  <script src="{{ asset('js/profile-registration.js') }}?v=20261014"></script>
 
 @endsection

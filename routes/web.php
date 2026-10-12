@@ -110,22 +110,22 @@ Route::get('/newsletter/verify/{id}/{hash}', [NewsletterVerificationController::
     ->name('newsletter.verify');
 Route::post('/register/{type}', [AuthController::class, 'register'])
     ->whereIn('type', ['business', 'investor', 'mentor', 'startup'])
-    ->middleware('throttle:5,1')
+    ->middleware('throttle:registration')
     ->name('registration.store');
 Route::post('/register/quick', [AuthController::class, 'quickRegister'])
-    ->middleware('throttle:5,1')
+    ->middleware('throttle:registration')
     ->name('registration.quick-store');
 Route::post('/business-profile/register', [BusinessProfileController::class, 'store'])
-    ->middleware('throttle:5,1')
+    ->middleware('throttle:registration')
     ->name('business-profile.store');
 Route::post('/startup-profile/register', [StartupProfileController::class, 'store'])
-    ->middleware('throttle:5,1')
+    ->middleware('throttle:registration')
     ->name('startup-profile.store');
 Route::post('/mentor-profile/register', [MentorProfileController::class, 'store'])
-    ->middleware('throttle:5,1')
+    ->middleware('throttle:registration')
     ->name('mentor-profile.store');
 Route::post('/investor-profile/register', [InvestorProfileController::class, 'store'])
-    ->middleware('throttle:5,1')
+    ->middleware('throttle:registration')
     ->name('investor-profile.store');
 
 Route::get('/article', [ArticleController::class, 'index'])->name('article');

@@ -28,6 +28,19 @@
         <p><?= htmlspecialchars($step['description'], ENT_QUOTES, 'UTF-8') ?></p>
       </div>
 
+      <?php
+        // Build a checkbox-name => checked map for this step up front, so a
+        // field with a 'group' key (added after the checkbox in the array)
+        // can know its initial visibility before we ever render the checkbox.
+        $stepGroupChecked = [];
+        foreach ($step['fields'] as $field) {
+          if (($field['type'] ?? null) === 'checkboxes') {
+            foreach ($field['options'] as $option) {
+              $stepGroupChecked[$option['name']] = (bool) old($option['name'], $profileDefaults[$option['name']] ?? false);
+            }
+          }
+        }
+      ?>
       <div class="profile-fields-grid">
         <?php foreach ($step['fields'] as $fieldIndex => $field): ?>
           <?php
@@ -36,27 +49,31 @@
             $fieldInputName = !empty($field['multiple']) ? $field['name'] . '[]' : ($field['name'] ?? '');
             $fieldClass = !empty($field['wide']) || $fieldType === 'checkboxes' ? ' profile-field-full' : '';
             $required = !empty($field['required']);
+            $fieldGroup = $field['group'] ?? null;
+            $fieldGroupAttr = $fieldGroup ? ' data-requirement-group="' . htmlspecialchars($fieldGroup, ENT_QUOTES, 'UTF-8') . '"' : '';
+            $fieldGroupStyle = $fieldGroup && empty($stepGroupChecked[$fieldGroup]) ? ' style="display:none"' : '';
           ?>
           <?php if ($fieldType === 'checkboxes'): ?>
-            <fieldset class="profile-checkbox-field profile-field-full">
+            <fieldset class="profile-checkbox-field profile-field-full" <?= !empty($field['exclusive']) ? 'data-exclusive-group' : '' ?>>
               <legend><?= htmlspecialchars($field['label'], ENT_QUOTES, 'UTF-8') ?></legend>
               <div class="profile-checkbox-list">
                 <?php foreach ($field['options'] as $option): ?>
                   <label class="profile-checkbox-item">
-                    <input type="checkbox" name="<?= htmlspecialchars($option['name'], ENT_QUOTES, 'UTF-8') ?>" value="1" @checked(old($option['name'], $profileDefaults[$option['name']] ?? false))>
+                    <input type="checkbox" name="<?= htmlspecialchars($option['name'], ENT_QUOTES, 'UTF-8') ?>" value="1" class="requirement-checkbox" data-requirement-target="<?= htmlspecialchars($option['name'], ENT_QUOTES, 'UTF-8') ?>" @checked(old($option['name'], $profileDefaults[$option['name']] ?? false))>
                     <span><?= htmlspecialchars($option['label'], ENT_QUOTES, 'UTF-8') ?></span>
                   </label>
                 <?php endforeach; ?>
               </div>
             </fieldset>
           <?php else: ?>
-            <div class="form-field<?= $fieldClass ?>">
+            <div class="form-field<?= $fieldClass ?>"<?= $fieldGroupAttr ?><?= $fieldGroupStyle ?>>
               <label for="<?= $fieldId ?>">
                 <?= htmlspecialchars($field['label'], ENT_QUOTES, 'UTF-8') ?>
                 <?php if ($required): ?><span class="req">*</span><?php endif; ?>
               </label>
+              <?php $errorClass = $errors->has($field['name'] ?? '') ? ' has-error' : ''; ?>
               <?php if ($fieldType === 'select'): ?>
-                <select id="<?= $fieldId ?>" name="<?= htmlspecialchars($field['name'], ENT_QUOTES, 'UTF-8') ?>" <?= $required ? 'required' : '' ?>>
+                <select id="<?= $fieldId ?>" class="<?= $errorClass ?>" name="<?= htmlspecialchars($field['name'], ENT_QUOTES, 'UTF-8') ?>" <?= $required ? 'required' : '' ?>>
                   <option value=""><?= htmlspecialchars($field['placeholder'] ?? 'Select an option', ENT_QUOTES, 'UTF-8') ?></option>
                   <?php foreach ($field['options'] as $option): ?>
                     <?php
@@ -67,13 +84,13 @@
                   <?php endforeach; ?>
                 </select>
               <?php elseif ($fieldType === 'textarea'): ?>
-                <textarea id="<?= $fieldId ?>" name="<?= htmlspecialchars($field['name'], ENT_QUOTES, 'UTF-8') ?>" rows="4" placeholder="<?= htmlspecialchars($field['placeholder'] ?? '', ENT_QUOTES, 'UTF-8') ?>" <?= $required ? 'required' : '' ?>>{{ old($field['name'], $profileDefaults[$field['name']] ?? '') }}</textarea>
+                <textarea id="<?= $fieldId ?>" class="<?= $errorClass ?>" name="<?= htmlspecialchars($field['name'], ENT_QUOTES, 'UTF-8') ?>" rows="4" placeholder="<?= htmlspecialchars($field['placeholder'] ?? '', ENT_QUOTES, 'UTF-8') ?>" <?= $required ? 'required' : '' ?>>{{ old($field['name'], $profileDefaults[$field['name']] ?? '') }}</textarea>
               <?php else: ?>
                 <?php if ($fieldType === 'tel'): ?>
                   <div class="phone-input-group">
                     @include('components.phone-country-code')
                 <?php endif; ?>
-                <input id="<?= $fieldId ?>" name="<?= htmlspecialchars($fieldInputName, ENT_QUOTES, 'UTF-8') ?>" type="<?= htmlspecialchars($fieldType, ENT_QUOTES, 'UTF-8') ?>" value="<?= in_array($fieldType, ['file', 'password'], true) ? '' : e(old($field['name'], $profileDefaults[$field['name']] ?? '')) ?>" placeholder="<?= htmlspecialchars($field['placeholder'] ?? '', ENT_QUOTES, 'UTF-8') ?>" <?= isset($field['accept']) ? 'accept="' . htmlspecialchars($field['accept'], ENT_QUOTES, 'UTF-8') . '"' : '' ?> <?= $fieldType === 'number' ? 'min="0" step="any"' : '' ?> <?= ($field['name'] ?? '') === 'inv_stake' ? 'max="100"' : '' ?> <?= !empty($field['multiple']) ? 'multiple' : '' ?> <?= $required ? 'required' : '' ?>>
+                <input id="<?= $fieldId ?>" class="<?= $errorClass ?>" name="<?= htmlspecialchars($fieldInputName, ENT_QUOTES, 'UTF-8') ?>" type="<?= htmlspecialchars($fieldType, ENT_QUOTES, 'UTF-8') ?>" value="<?= in_array($fieldType, ['file', 'password'], true) ? '' : e(old($field['name'], $profileDefaults[$field['name']] ?? '')) ?>" placeholder="<?= htmlspecialchars($field['placeholder'] ?? '', ENT_QUOTES, 'UTF-8') ?>" <?= isset($field['accept']) ? 'accept="' . htmlspecialchars($field['accept'], ENT_QUOTES, 'UTF-8') . '"' : '' ?> <?= $fieldType === 'number' ? 'min="0" step="any"' : '' ?> <?= ($field['name'] ?? '') === 'inv_stake' ? 'max="100"' : '' ?> <?= $fieldType === 'tel' ? 'pattern="07[0-9]{9}" title="Enter a valid UK mobile number starting with 07 (11 digits)."' : '' ?> <?= !empty($field['multiple']) ? 'multiple' : '' ?> <?= $required ? 'required' : '' ?>>
                 <?php if ($fieldType === 'tel'): ?>
                   </div>
                 <?php endif; ?>
