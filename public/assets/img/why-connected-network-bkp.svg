@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 140" fill="none" role="img" aria-labelledby="title">
+  <title id="title">Connected business network</title>
+  <rect x="14" y="12" width="152" height="116" rx="18" fill="#F1F6FB"/>
+  <path d="m55 46 34 21m36-25L95 67m-7 18-27 19m39-18 26 19M54 48l7 55m62-61 5 61" stroke="#9BB4CE" stroke-width="4" stroke-linecap="round"/>
+  <circle cx="52" cy="43" r="15" fill="#fff" stroke="#244B75" stroke-width="4"/>
+  <circle cx="129" cy="39" r="15" fill="#fff" stroke="#244B75" stroke-width="4"/>
+  <circle cx="91" cy="76" r="19" fill="#E5A623" stroke="#fff" stroke-width="5"/>
+  <circle cx="60" cy="108" r="14" fill="#fff" stroke="#3B82F6" stroke-width="4"/>
+  <circle cx="130" cy="108" r="14" fill="#fff" stroke="#3B82F6" stroke-width="4"/>
+</svg>
