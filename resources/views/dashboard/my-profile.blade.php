@@ -129,7 +129,8 @@ View and manage your {{ strtolower($profileLabel) }} profile.
                   @elseif ($fieldType === 'file')
                     <div class="workspace-field {{ $wide ? 'full' : '' }}">
                       <label for="{{ $fieldId }}">{{ $field['label'] }}</label>
-                      <input id="{{ $fieldId }}" name="{{ $fieldName }}{{ !empty($field['multiple']) ? '[]' : '' }}" type="file" accept="{{ $field['accept'] ?? '' }}" @if (!empty($field['multiple'])) multiple @endif>
+                      <input id="{{ $fieldId }}" name="{{ $fieldName }}{{ !empty($field['multiple']) ? '[]' : '' }}" type="file" accept="{{ $field['accept'] ?? '' }}" data-max-size-mb="1" @if (!empty($field['multiple'])) multiple @endif>
+                      <p class="upload-hint">Max 1MB · {{ strtoupper(str_replace(['.', ','], ['', ', '], $field['accept'] ?? '')) }}</p>
                       @if ($profileMedia->has($fieldName))
                         <div class="owned-profile-existing-media">
                           <span>Current files:</span>
@@ -243,6 +244,20 @@ View and manage your {{ strtolower($profileLabel) }} profile.
     const tab = panel && ownedProfileTabs.find(item => item.dataset.ownedProfileTab === panel.dataset.ownedProfilePanel);
     if (tab) activateOwnedProfileTab(tab);
     invalidField.reportValidity();
+  });
+
+  ownedProfileForm?.querySelectorAll('input[type="file"][data-max-size-mb]').forEach(input => {
+    input.addEventListener('change', () => {
+      const maxBytes = Number(input.dataset.maxSizeMb) * 1024 * 1024;
+      const oversized = [...input.files].find(file => file.size > maxBytes);
+      if (oversized) {
+        input.setCustomValidity(`"${oversized.name}" is ${(oversized.size / 1024 / 1024).toFixed(2)}MB — files must be ${input.dataset.maxSizeMb}MB or smaller.`);
+        input.reportValidity();
+        input.value = '';
+      } else {
+        input.setCustomValidity('');
+      }
+    });
   });
 </script>
 @endpush

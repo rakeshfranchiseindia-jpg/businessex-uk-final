@@ -14,6 +14,9 @@
 @endif
 <form class="reg-form profile-registration-form" data-registration-wizard method="post" action="{{ $registrationAction }}" data-cancel-url="{{ $registrationCancelUrl }}" enctype="multipart/form-data" novalidate>
   @csrf
+  @if (request()->filled('payment_order_no'))
+    <input type="hidden" name="payment_order_no" value="{{ request()->query('payment_order_no') }}">
+  @endif
   @if ($errors->any())
     <div role="alert" class="field-error">
       Please correct the highlighted fields before submitting your profile. Each error is shown below its field.
@@ -90,7 +93,10 @@
                   <div class="phone-input-group">
                     @include('components.phone-country-code')
                 <?php endif; ?>
-                <input id="<?= $fieldId ?>" class="<?= $errorClass ?>" name="<?= htmlspecialchars($fieldInputName, ENT_QUOTES, 'UTF-8') ?>" type="<?= htmlspecialchars($fieldType, ENT_QUOTES, 'UTF-8') ?>" value="<?= in_array($fieldType, ['file', 'password'], true) ? '' : e(old($field['name'], $profileDefaults[$field['name']] ?? '')) ?>" placeholder="<?= htmlspecialchars($field['placeholder'] ?? '', ENT_QUOTES, 'UTF-8') ?>" <?= isset($field['accept']) ? 'accept="' . htmlspecialchars($field['accept'], ENT_QUOTES, 'UTF-8') . '"' : '' ?> <?= $fieldType === 'number' ? 'min="0" step="any"' : '' ?> <?= ($field['name'] ?? '') === 'inv_stake' ? 'max="100"' : '' ?> <?= $fieldType === 'tel' ? 'pattern="07[0-9]{9}" title="Enter a valid UK mobile number starting with 07 (11 digits)."' : '' ?> <?= !empty($field['multiple']) ? 'multiple' : '' ?> <?= $required ? 'required' : '' ?>>
+                <input id="<?= $fieldId ?>" class="<?= $errorClass ?>" name="<?= htmlspecialchars($fieldInputName, ENT_QUOTES, 'UTF-8') ?>" type="<?= htmlspecialchars($fieldType, ENT_QUOTES, 'UTF-8') ?>" value="<?= in_array($fieldType, ['file', 'password'], true) ? '' : e(old($field['name'], $profileDefaults[$field['name']] ?? '')) ?>" placeholder="<?= htmlspecialchars($field['placeholder'] ?? '', ENT_QUOTES, 'UTF-8') ?>" <?= isset($field['accept']) ? 'accept="' . htmlspecialchars($field['accept'], ENT_QUOTES, 'UTF-8') . '"' : '' ?> <?= $fieldType === 'file' ? 'data-max-size-mb="1"' : '' ?> <?= $fieldType === 'number' ? 'min="0" step="any"' : '' ?> <?= ($field['name'] ?? '') === 'inv_stake' ? 'max="100"' : '' ?> <?= $fieldType === 'tel' ? 'pattern="07[0-9]{9}" title="Enter a valid UK mobile number starting with 07 (11 digits)."' : '' ?> <?= !empty($field['multiple']) ? 'multiple' : '' ?> <?= $required ? 'required' : '' ?>>
+                <?php if ($fieldType === 'file'): ?>
+                  <p class="upload-hint">Max 1MB<?= isset($field['accept']) ? ' · ' . htmlspecialchars(strtoupper(str_replace(['.', ','], ['', ', '], $field['accept'])), ENT_QUOTES, 'UTF-8') : '' ?></p>
+                <?php endif; ?>
                 <?php if ($fieldType === 'tel'): ?>
                   </div>
                 <?php endif; ?>

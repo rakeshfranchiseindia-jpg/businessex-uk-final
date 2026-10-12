@@ -29,6 +29,23 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     });
 
+    // File fields carry data-max-size-mb (see registration-profile-wizard.blade.php) —
+    // reject an oversized file client-side via the native validity API, so
+    // validatePanel()'s checkValidity() picks it up like any other field.
+    form.querySelectorAll('input[type="file"][data-max-size-mb]').forEach(input => {
+      input.addEventListener('change', () => {
+        const maxBytes = Number(input.dataset.maxSizeMb) * 1024 * 1024;
+        const oversized = [...input.files].find(file => file.size > maxBytes);
+        if (oversized) {
+          input.setCustomValidity(`"${oversized.name}" is ${(oversized.size / 1024 / 1024).toFixed(2)}MB — files must be ${input.dataset.maxSizeMb}MB or smaller.`);
+          input.reportValidity();
+          input.value = '';
+        } else {
+          input.setCustomValidity('');
+        }
+      });
+    });
+
     function showStep(stepNumber) {
       currentStep = Math.max(1, Math.min(stepNumber, panels.length));
       const activePanel = panels[currentStep - 1];

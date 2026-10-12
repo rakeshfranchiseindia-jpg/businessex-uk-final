@@ -11,6 +11,17 @@ BusinessX connects businesses, startups, investors and mentors.
 <link rel="stylesheet" href="{{ asset('css/pricing.css?v=20261009') }}">
 @endsection
 
+@push('scripts')
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+  window.BX_PRICING = {
+    initiateUrl: @json(route('pricing.payment.initiate')),
+    verifyUrl: @json(route('pricing.payment.verify')),
+  };
+</script>
+<script src="{{ asset('js/pricing-payment.js?v=20261012') }}"></script>
+@endpush
+
 @section('content')
 
 
@@ -81,11 +92,11 @@ BusinessX connects businesses, startups, investors and mentors.
           <select id="pricing-payment-mode" required>
             <option value="">Select Payment Mode</option>
             <option value="online">Online</option>
-            <option value="offline">Offline</option>
             <option value="upi">UPI</option>
           </select>
         </div>
       </div>
+      <p id="pricing-payment-status" role="status" style="display:none;margin-top:12px;padding:10px 14px;border-radius:6px;font-size:13px;"></p>
     </div>
   </section>
 
@@ -127,7 +138,7 @@ BusinessX connects businesses, startups, investors and mentors.
             <li><span class="ic ic-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"><polyline points="20 6 9 17 4 12"/></svg></span>10 Website Visitor Queries</li>
             <li><span class="ic ic-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"><polyline points="20 6 9 17 4 12"/></svg></span>Profile Views</li>
           </ul>
-          <a href="{{ route('registration') }}" class="plan-btn plan-btn-gold">Get Started</a>
+          <button type="button" class="plan-btn plan-btn-gold" data-pay-plan="premium">Get Started</button>
         </div>
 
         <!-- Gold -->
@@ -148,7 +159,7 @@ BusinessX connects businesses, startups, investors and mentors.
             <li><span class="ic ic-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"><polyline points="20 6 9 17 4 12"/></svg></span>Profile Views</li>
             <li><span class="ic ic-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"><polyline points="20 6 9 17 4 12"/></svg></span>Profile Promotion</li>
           </ul>
-          <a href="{{ route('registration') }}" class="plan-btn plan-btn-gold-outline">Choose Gold</a>
+          <button type="button" class="plan-btn plan-btn-gold-outline" data-pay-plan="gold">Choose Gold</button>
         </div>
 
         <!-- Platinum -->

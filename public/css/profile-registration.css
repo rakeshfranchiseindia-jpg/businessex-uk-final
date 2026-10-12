@@ -9,6 +9,7 @@
 .profile-fields-grid .form-field select,
 .profile-fields-grid .form-field textarea { min-width: 0; }
 .profile-fields-grid .form-field input[type="file"] { height: auto; min-height: 44px; padding: 9px; }
+.upload-hint { margin-top: 3px; color: var(--gray-500); font-size: 10px; line-height: 1.3; }
 .profile-field-full { grid-column: 1 / -1; }
 .profile-checkbox-field { min-width: 0; padding: 0; border: 0; }
 .profile-checkbox-field legend { margin-bottom: 10px; color: var(--gray-700); font-size: 13px; font-weight: 600; }

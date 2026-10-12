@@ -15,6 +15,7 @@ use App\Http\Controllers\MentorListingController;
 use App\Http\Controllers\MentorProfileController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\PasswordResetController;
+use App\Http\Controllers\PricingPaymentController;
 use App\Http\Controllers\ProfileContactController;
 use App\Http\Controllers\ProfileMediaController;
 use App\Http\Controllers\StartupListingController;
@@ -143,3 +144,10 @@ foreach (['business', 'investor', 'mentor', 'startup'] as $type) {
 }
 
 Route::get('/registration', [PageController::class, 'registrationRedirect'])->name('registration');
+
+Route::post('/pricing/payment/initiate', [PricingPaymentController::class, 'initiate'])
+    ->middleware('throttle:10,1')
+    ->name('pricing.payment.initiate');
+Route::post('/pricing/payment/verify', [PricingPaymentController::class, 'verify'])
+    ->middleware('throttle:10,1')
+    ->name('pricing.payment.verify');

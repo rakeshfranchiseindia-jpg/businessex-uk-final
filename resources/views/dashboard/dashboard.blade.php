@@ -305,7 +305,6 @@ BusinessX connects businesses, startups, investors and mentors.
           </div>
           <div class="account-tabs" role="tablist" aria-label="My profile activity">
             <button type="button" role="tab" id="my-profiles-tab" aria-controls="my-profiles-panel" aria-selected="true" tabindex="0" data-profile-tab="listings">New Listings</button>
-            <button type="button" role="tab" id="saved-searches-tab" aria-controls="saved-searches-panel" aria-selected="false" tabindex="-1" data-profile-tab="saved">Saved Searches</button>
             <button type="button" role="tab" id="search-history-tab" aria-controls="search-history-panel" aria-selected="false" tabindex="-1" data-profile-tab="history">Search History</button>
           </div>
 
@@ -365,25 +364,17 @@ BusinessX connects businesses, startups, investors and mentors.
             @endif
           </div>
 
-          <div class="account-tab-panel" id="saved-searches-panel" role="tabpanel" aria-labelledby="saved-searches-tab" data-profile-panel="saved" hidden>
-            <div class="account-empty-state">
-              <span class="empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 3h12a2 2 0 0 1 2 2v16l-8-5-8 5V5a2 2 0 0 1 2-2z"/></svg></span>
-              <h2>No saved searches yet</h2>
-              <p>Save a search from the business directory to return to matching opportunities here.</p>
-            </div>
-          </div>
-
           <div class="account-tab-panel" id="search-history-panel" role="tabpanel" aria-labelledby="search-history-tab" data-profile-panel="history" hidden>
-            @if ($searchHistory->isEmpty())
+            @if ($mostSearchedOwnProfiles->isEmpty())
               <div class="account-empty-state">
                 <span class="empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></span>
-                <h2>No profiles viewed yet</h2>
-                <p>Profiles you open from the directory will appear here, with your most looked-up ones at the top.</p>
+                <h2>No active profiles yet</h2>
+                <p>Publish a profile to see how many times other people have searched it.</p>
               </div>
             @else
-              <p class="search-history-hint">Ranked by how many times you've looked each one up.</p>
+              <p class="search-history-hint">Ranked by how many times other people have searched your profiles.</p>
               <div class="account-card-grid">
-                @foreach ($searchHistory as $profile)
+                @foreach ($mostSearchedOwnProfiles as $profile)
                   <article class="account-profile-card">
                     <div class="profile-thumb">
                       <img src="{{ $profile->image && preg_match('#^https?://#i', $profile->image) ? $profile->image : asset($profile->default_image) }}" alt="" loading="lazy">
@@ -398,7 +389,7 @@ BusinessX connects businesses, startups, investors and mentors.
                           · {{ $profile->category }}
                         @endif
                       </p>
-                      <a class="profile-action" href="{{ route('profile-details', ['type' => $profile->type, 'id' => $profile->id]) }}">View Profile</a>
+                      <a class="profile-action" href="{{ route('dashboard.profiles.show', ['type' => $profile->type, 'id' => $profile->id]) }}">View Profile</a>
                     </div>
                   </article>
                 @endforeach

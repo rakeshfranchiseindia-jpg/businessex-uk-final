@@ -260,6 +260,19 @@ class AuthController extends Controller
                         ->update($mediaColumns + ['updated_at' => $now]);
                 }
 
+                $paymentOrderNo = request()->string('payment_order_no')->trim()->toString();
+                if ($paymentOrderNo !== '') {
+                    PricingPaymentController::claimForProfile(
+                        $paymentOrderNo,
+                        $type,
+                        $profile['type'],
+                        $profile['table'],
+                        $profile['id'],
+                        (int) $profileId,
+                        (int) $userId
+                    );
+                }
+
                 if ($type === 'business' && array_filter([
                     $validated['contact_name'] ?? null,
                     $validated['contact_designation'] ?? null,

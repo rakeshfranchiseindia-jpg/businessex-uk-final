@@ -165,7 +165,7 @@ class DashboardController extends Controller
             'myProfiles' => $profiles,
             'selectedProfileType' => $selectedType,
             'availableProfileTypes' => $availableProfileTypes,
-            'searchHistory' => $this->topSearchHistory(),
+            'mostSearchedOwnProfiles' => $this->mostSearchedOwnProfiles(),
         ])->with($this->dashboardActivityData());
     }
 
@@ -483,45 +483,45 @@ class DashboardController extends Controller
     }
 
     /**
-     * The profiles this user has looked up the most, for the dashboard's
-     * Search History tab — ranked by how many times they opened each one,
-     * not just the most recent.
+     * The logged-in user's own published profile(s), each with how many
+     * times OTHER people have searched/viewed it — for the dashboard's
+     * Search History tab.
      */
-    private function topSearchHistory(int $limit = 10): \Illuminate\Support\Collection
+    private function mostSearchedOwnProfiles(int $limit = 10): \Illuminate\Support\Collection
     {
-        if (! Schema::hasTable('profile_visitors')) {
-            return collect();
+        $cards = collect();
+
+        foreach (self::PROFILE_TYPES as $type => $definition) {
+            if (! Schema::hasTable($definition['table']) || ! Schema::hasColumn($definition['table'], 'user_id')) {
+                continue;
+            }
+
+            $ownProfiles = DB::table($definition['table'])
+                ->where('user_id', Auth::id())
+                ->where($definition['status'], 1)
+                ->get();
+
+            if ($ownProfiles->isEmpty()) {
+                continue;
+            }
+
+            $counts = Schema::hasTable('profile_visitors')
+                ? DB::table('profile_visitors')
+                    ->where('profile_type', $definition['legacy_type'])
+                    ->whereIn('profile_id', $ownProfiles->pluck($definition['id']))
+                    ->selectRaw('profile_id, COUNT(*) as search_count')
+                    ->groupBy('profile_id')
+                    ->pluck('search_count', 'profile_id')
+                : collect();
+
+            foreach ($ownProfiles as $profile) {
+                $card = $this->profileCard($type, $definition, $profile);
+                $card->search_count = (int) ($counts[$profile->{$definition['id']}] ?? 0);
+                $cards->push($card);
+            }
         }
 
-        $rows = DB::table('profile_visitors')
-            ->where('user_id', Auth::id())
-            ->selectRaw('profile_type, profile_id, COUNT(*) as search_count, MAX(created_at) as last_searched_at')
-            ->groupBy('profile_type', 'profile_id')
-            ->orderByDesc('search_count')
-            ->orderByDesc('last_searched_at')
-            ->limit($limit)
-            ->get();
-
-        $typesByLegacyCode = collect(self::PROFILE_TYPES)->mapWithKeys(
-            fn (array $definition, string $type): array => [$definition['legacy_type'] => array_merge($definition, ['type' => $type])]
-        );
-
-        return $rows->map(function (object $row) use ($typesByLegacyCode): ?object {
-            $definition = $typesByLegacyCode->get((int) $row->profile_type);
-            if (! $definition || ! Schema::hasTable($definition['table'])) {
-                return null;
-            }
-
-            $profile = DB::table($definition['table'])->where($definition['id'], $row->profile_id)->first();
-            if (! $profile) {
-                return null;
-            }
-
-            $card = $this->profileCard($definition['type'], $definition, $profile);
-            $card->search_count = (int) $row->search_count;
-
-            return $card;
-        })->filter()->values();
+        return $cards->sortByDesc('search_count')->take($limit)->values();
     }
 
     private function profileCard(string $type, array $definition, object $profile): object

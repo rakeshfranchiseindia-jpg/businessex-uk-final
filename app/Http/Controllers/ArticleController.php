@@ -199,8 +199,8 @@ class ArticleController extends Controller
             'popularArticles' => $popular,
             'tagCategories' => array_slice($this->categories(), 0, 16),
             'page' => 'article',
-            'showHeader' => false,
-            'showFooter' => false,
+            'showHeader' => true,
+            'showFooter' => true,
         ]);
     }
 

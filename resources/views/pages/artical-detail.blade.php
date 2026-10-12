@@ -9,15 +9,7 @@
 
 @section('head')
 <style>
-    body { background: var(--gray-50); }
-    .detail-header { background: var(--white); color: var(--navy-900); border-bottom: 1px solid var(--gray-200); }
-    .detail-header .container { min-height: 72px; display: flex; align-items: center; gap: 28px; }
-    .detail-brand { display: inline-flex; align-items: center; }
-    .detail-brand img { display: block; width: 211px; height: auto; }
-    .detail-nav { display: flex; align-items: center; gap: 24px; margin-left: auto; font-size: 13px; font-weight: 600; }
-    .detail-nav a { color: var(--navy-800); }
-    .detail-nav a:hover, .detail-nav a[aria-current="page"] { color: var(--gold-400); }
-    .detail-signin { padding: 8px 13px; border: 1px solid var(--gray-300); border-radius: 5px; font-size: 12px; font-weight: 700; }
+    body { font-family: 'Inter', sans-serif; background: var(--gray-50); }
     .featured-detail { padding: 34px 0 72px; background: var(--gray-50); }
     .breadcrumbs { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin-bottom: 24px; color: var(--gray-500); font-size: 12px; }
     .breadcrumbs a:hover { color: var(--gold-600); }
@@ -71,8 +63,6 @@
     .author-card h4 { color: var(--navy-900); font-size: 15px; }
     .author-card .role { margin: 4px 0 10px; color: var(--gold-600); font-size: 11px; font-weight: 700; }
     .author-card .bio { margin-bottom: 14px; color: var(--gray-600); font-size: 12px; line-height: 1.6; }
-    .follow-btn { width: 100%; padding: 9px 12px; border: 1px solid var(--gold-500); border-radius: 5px; color: var(--gold-600); background: var(--white); font-size: 12px; font-weight: 700; }
-    .follow-btn:hover, .follow-btn[aria-pressed="true"] { color: var(--navy-900); background: var(--gold-100); }
     .popular-item { display: flex; gap: 10px; padding: 10px 0; counter-increment: popular; border-bottom: 1px solid var(--gray-100); }
     .popular-list { counter-reset: popular; }
     .popular-item::before { color: var(--gold-500); font-size: 20px; font-weight: 800; content: counter(popular); }
@@ -85,9 +75,6 @@
     .tag-cloud { display: flex; flex-wrap: wrap; gap: 6px; }
     .tag-cloud a { padding: 4px 8px; border-radius: 999px; background: var(--gray-100); color: var(--gray-700); font-size: 10px; }
     .tag-cloud a:hover { color: var(--navy-900); background: var(--gold-100); }
-    .detail-footer { padding: 20px 0; border-top: 3px solid var(--gold-500); color: rgba(255,255,255,.7); background: var(--navy-900); font-size: 12px; }
-    .detail-footer .container { display: flex; justify-content: space-between; gap: 12px; }
-    .detail-footer a:hover { color: var(--gold-400); }
     @media (max-width: 980px) {
       .featured-grid { grid-template-columns: 1fr; }
       .detail-sidebar { position: static; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
@@ -95,10 +82,6 @@
       .author-card, .detail-sidebar .side-card:last-child { grid-column: 1 / -1; }
     }
     @media (max-width: 700px) {
-      .detail-header .container { min-height: 64px; gap: 12px; }
-      .detail-brand img { width: 180px; height: auto; }
-      .detail-nav { display: none; }
-      .detail-signin { margin-left: auto; }
       .featured-detail { padding: 24px 0 44px; }
       .article-detail { padding: 22px 18px; }
       .article-detail h1 { font-size: 28px; }
@@ -106,30 +89,11 @@
       .meta-divider { display: none; }
       .detail-sidebar { grid-template-columns: 1fr; }
       .author-card, .detail-sidebar .side-card:last-child { grid-column: auto; }
-      .detail-footer .container { flex-direction: column; align-items: center; text-align: center; }
     }
   </style>
 @endsection
 
 @section('content')
-
-  <header class="detail-header">
-    <div class="container">
-      <a class="detail-brand" href="{{ route('home') }}" aria-label="BusinessX home"><img src="{{ asset('assets/img/businessx-logo.png?v=20261008') }}" alt="BusinessX"></a>
-      <nav class="detail-nav" aria-label="Main navigation">
-        <a href="{{ route('home') }}">Home</a>
-        <a href="{{ route('business-listing') }}">Bx Listing</a>
-        <a href="{{ route('registration') }}">Registration</a>
-        <a href="{{ route('pricing') }}">Pricing</a>
-        <a href="{{ route('article') }}" aria-current="page">Bx Insights</a>
-      </nav>
-      @auth
-        <span class="detail-signin">{{ auth()->user()->name }}</span>
-      @else
-        <a class="detail-signin" href="{{ route('login') }}">Sign In</a>
-      @endauth
-    </div>
-  </header>
 
   <main>
   <section class="featured-detail" id="featured">
@@ -197,14 +161,18 @@
             @endforeach
           </div>
 
+          <?php
+            $shareUrl = route('articles.show', $article->article_id);
+            $shareTitle = $article->article_title;
+          ?>
           <div class="share-row">
             <span class="share-label">Share this article</span>
             <div class="share-icons">
-              <a href="#" aria-label="Share on Twitter"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M22 5.8c-.8.4-1.6.6-2.5.7.9-.5 1.6-1.4 1.9-2.4-.8.5-1.8.9-2.7 1.1-.8-.9-2-1.4-3.2-1.4-2.4 0-4.4 2-4.4 4.4 0 .3 0 .7.1 1-3.7-.2-7-1.9-9.1-4.6-.4.7-.6 1.5-.6 2.3 0 1.5.8 2.9 2 3.7-.7 0-1.4-.2-2-.5v.1c0 2.1 1.5 3.9 3.5 4.3-.4.1-.7.2-1.1.2-.3 0-.5 0-.8-.1.5 1.7 2.2 3 4.1 3-1.5 1.2-3.4 1.9-5.4 1.9h-1c2 1.3 4.4 2 6.9 2 8.3 0 12.8-6.8 12.8-12.8v-.6c.9-.6 1.6-1.4 2.2-2.3z"/></svg></a>
-              <a href="#" aria-label="Share on LinkedIn"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M4.98 3.5c0 1.381-1.119 2.5-2.5 2.5s-2.5-1.119-2.5-2.5 1.119-2.5 2.5-2.5 2.5 1.119 2.5 2.5zm.02 4.5h-5v16h5v-16zm7.982 0h-4.968v16h4.969v-8.399c0-4.6 4.92-4.985 4.92 0v8.399h5.029v-9.965c0-7.879-8.435-7.589-9.95-3.96v-2.075z"/></svg></a>
-              <a href="#" aria-label="Share on Facebook"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M9 8h-3v4h3v12h5v-12h3.642l.358-4h-4v-1.667c0-.955.192-1.333 1.115-1.333h2.885v-5h-3.5c-2.857 0-3.992 1-4.5 3.5v4.5z"/></svg></a>
-              <a href="#" aria-label="Share by email"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></a>
-              <a href="#" aria-label="Copy link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></a>
+              <a href="https://twitter.com/intent/tweet?url={{ urlencode($shareUrl) }}&text={{ urlencode($shareTitle) }}" target="_blank" rel="noopener noreferrer" aria-label="Share on Twitter"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M22 5.8c-.8.4-1.6.6-2.5.7.9-.5 1.6-1.4 1.9-2.4-.8.5-1.8.9-2.7 1.1-.8-.9-2-1.4-3.2-1.4-2.4 0-4.4 2-4.4 4.4 0 .3 0 .7.1 1-3.7-.2-7-1.9-9.1-4.6-.4.7-.6 1.5-.6 2.3 0 1.5.8 2.9 2 3.7-.7 0-1.4-.2-2-.5v.1c0 2.1 1.5 3.9 3.5 4.3-.4.1-.7.2-1.1.2-.3 0-.5 0-.8-.1.5 1.7 2.2 3 4.1 3-1.5 1.2-3.4 1.9-5.4 1.9h-1c2 1.3 4.4 2 6.9 2 8.3 0 12.8-6.8 12.8-12.8v-.6c.9-.6 1.6-1.4 2.2-2.3z"/></svg></a>
+              <a href="https://www.linkedin.com/sharing/share-offsite/?url={{ urlencode($shareUrl) }}" target="_blank" rel="noopener noreferrer" aria-label="Share on LinkedIn"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M4.98 3.5c0 1.381-1.119 2.5-2.5 2.5s-2.5-1.119-2.5-2.5 1.119-2.5 2.5-2.5 2.5 1.119 2.5 2.5zm.02 4.5h-5v16h5v-16zm7.982 0h-4.968v16h4.969v-8.399c0-4.6 4.92-4.985 4.92 0v8.399h5.029v-9.965c0-7.879-8.435-7.589-9.95-3.96v-2.075z"/></svg></a>
+              <a href="https://www.facebook.com/sharer/sharer.php?u={{ urlencode($shareUrl) }}" target="_blank" rel="noopener noreferrer" aria-label="Share on Facebook"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M9 8h-3v4h3v12h5v-12h3.642l.358-4h-4v-1.667c0-.955.192-1.333 1.115-1.333h2.885v-5h-3.5c-2.857 0-3.992 1-4.5 3.5v4.5z"/></svg></a>
+              <a href="mailto:?subject={{ urlencode($shareTitle) }}&body={{ urlencode($shareUrl) }}" aria-label="Share by email"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></a>
+              <a href="#" data-copy-link="{{ $shareUrl }}" aria-label="Copy link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></a>
             </div>
           </div>
 
@@ -254,7 +222,6 @@
             <h4>{{ $article->author_name }}</h4>
             <div class="role">{{ $article->author_role }}</div>
             <p class="bio">More articles and insights from {{ $article->author_name }}.</p>
-            <button class="follow-btn" type="button" aria-pressed="false">+ Follow Author</button>
           </div>
 
           <div class="side-card">
@@ -307,25 +274,16 @@
   
 
   <script>
-    const followButton = document.querySelector('.follow-btn');
-    followButton.addEventListener('click', () => {
-      const following = followButton.getAttribute('aria-pressed') !== 'true';
-      followButton.setAttribute('aria-pressed', String(following));
-      followButton.textContent = following ? 'Following' : '+ Follow Author';
-    });
-
-    document.querySelectorAll('.share-icons a[href="#"]').forEach(link => {
-      link.addEventListener('click', async event => {
-        event.preventDefault();
-        if (link.getAttribute('aria-label') === 'Copy link') {
-          try {
-            await navigator.clipboard.writeText(window.location.href);
-            link.setAttribute('aria-label', 'Link copied');
-          } catch {
-            link.setAttribute('aria-label', 'Copy link unavailable');
-          }
-        }
-      });
+    const copyLinkButton = document.querySelector('.share-icons a[data-copy-link]');
+    copyLinkButton?.addEventListener('click', async event => {
+      event.preventDefault();
+      try {
+        await navigator.clipboard.writeText(copyLinkButton.dataset.copyLink);
+        copyLinkButton.setAttribute('aria-label', 'Link copied');
+        setTimeout(() => copyLinkButton.setAttribute('aria-label', 'Copy link'), 2000);
+      } catch {
+        copyLinkButton.setAttribute('aria-label', 'Copy link unavailable');
+      }
     });
   </script>
 
