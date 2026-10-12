@@ -79,7 +79,7 @@ $registrationRoutes = auth()->check()
       {{--<a href="{{ route('registration') }}" class="btn-join">Register Free</a> --}}
       @else
       <a href="{{ route('dashboard.index') }}" class="btn-login">Dashboard</a>
-      <form class="header-logout-form" method="post" action="{{ route('logout') }}">
+      <form class="header-logout-form" method="post" action="{{ route('logout') }}">inde
         @csrf
         <button type="submit" class="btn-join" style="background-color:#1769d2; color:white;">Sign Out</button>
       </form>
