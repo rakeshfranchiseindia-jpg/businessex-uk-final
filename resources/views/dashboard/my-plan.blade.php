@@ -33,7 +33,7 @@ View your active BusinessX membership or explore available plans.
   <div class="workspace-main">
     <header class="workspace-topbar">
       <strong>My Account / My Plan</strong>
-      <form method="post" action="{{ route('logout') }}">
+      <form class="logout-form" method="post" action="{{ route('logout') }}">
         @csrf
         <button type="submit" class="workspace-signout">Sign Out</button>
       </form>

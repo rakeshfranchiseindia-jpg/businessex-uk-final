@@ -20,7 +20,7 @@ BusinessX connects businesses, startups, investors and mentors.
     <!-- Sidebar -->
     <aside class="dash-sidebar">
       <div class="brand">
-        <span class="logo-pill"><img src="{{ asset('assets/img/businessx-logo.png?v=20261008') }}" alt="BusinessX"></span>
+        <a href="{{ route('home') }}" class="logo-pill"><img src="{{ asset('assets/img/businessx-logo.png?v=20261008') }}" alt="BusinessX"></a>
       </div>
 
       <div class="account-identity">
@@ -268,7 +268,7 @@ BusinessX connects businesses, startups, investors and mentors.
             </summary>
             <div class="account-menu-panel">
               <a href="{{ route('dashboard.profile') }}">Settings</a>
-              <form method="post" action="{{ route('logout') }}">
+              <form class="logout-form" method="post" action="{{ route('logout') }}">
                 @csrf
                 <button type="submit">Sign Out</button>
               </form>
@@ -296,7 +296,9 @@ BusinessX connects businesses, startups, investors and mentors.
               <select id="profile-type-filter" name="type" onchange="this.form.submit()">
                 <option value="all" @selected($selectedProfileType === 'all')>All profile types</option>
                 @foreach (['business' => 'Business', 'investor' => 'Investor', 'mentor' => 'Mentor', 'startup' => 'Startup'] as $type => $label)
-                  <option value="{{ $type }}" @selected($selectedProfileType === $type)>{{ $label }}</option>
+                  @if ($availableProfileTypes[$type] ?? false)
+                    <option value="{{ $type }}" @selected($selectedProfileType === $type)>{{ $label }}</option>
+                  @endif
                 @endforeach
               </select>
             </form>
@@ -372,11 +374,36 @@ BusinessX connects businesses, startups, investors and mentors.
           </div>
 
           <div class="account-tab-panel" id="search-history-panel" role="tabpanel" aria-labelledby="search-history-tab" data-profile-panel="history" hidden>
-            <div class="account-empty-state">
-              <span class="empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></span>
-              <h2>No profiles viewed yet</h2>
-              <p>Profiles you open from the directory will appear in your search history.</p>
-            </div>
+            @if ($searchHistory->isEmpty())
+              <div class="account-empty-state">
+                <span class="empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></span>
+                <h2>No profiles viewed yet</h2>
+                <p>Profiles you open from the directory will appear here, with your most looked-up ones at the top.</p>
+              </div>
+            @else
+              <p class="search-history-hint">Ranked by how many times you've looked each one up.</p>
+              <div class="account-card-grid">
+                @foreach ($searchHistory as $profile)
+                  <article class="account-profile-card">
+                    <div class="profile-thumb">
+                      <img src="{{ $profile->image && preg_match('#^https?://#i', $profile->image) ? $profile->image : asset($profile->default_image) }}" alt="" loading="lazy">
+                    </div>
+                    <div>
+                      <span class="profile-kind">{{ $profile->label }} · {{ $profile->status }}</span>
+                      <span class="search-count-badge">Searched {{ $profile->search_count }} {{ $profile->search_count === 1 ? 'time' : 'times' }}</span>
+                      <h2>{{ $profile->title }}</h2>
+                      <p class="profile-meta">
+                        {{ $profile->location }}
+                        @if ($profile->category)
+                          · {{ $profile->category }}
+                        @endif
+                      </p>
+                      <a class="profile-action" href="{{ route('profile-details', ['type' => $profile->type, 'id' => $profile->id]) }}">View Profile</a>
+                    </div>
+                  </article>
+                @endforeach
+              </div>
+            @endif
           </div>
         </section>
 

@@ -535,7 +535,11 @@ class AuthController extends Controller
                     $fieldRules[] = 'regex:/^07[0-9]{9}$/';
                 } elseif (str_contains($fieldName, 'pincode') || str_contains($fieldName, 'postcode')) {
                     $fieldRules[] = 'regex:/^[A-Za-z]{1,2}[0-9][A-Za-z0-9]? ?[0-9][A-Za-z]{2}$/';
-                } elseif (str_ends_with($fieldName, '_city') || $fieldName === 'city') {
+                } elseif (preg_match('/\b(city|location|town)\b|_(city|location|town)\b/i', $fieldName)) {
+                    // Matches the UK-city autosuggest JS attaches to (common.js):
+                    // any field whose name reads as "city"/"location"/"town" —
+                    // not just one literally ending in "_city" — must resolve
+                    // to a real bx_cities row, never free text.
                     $fieldRules[] = Rule::exists('bx_cities', 'city');
                 }
 
@@ -597,6 +601,17 @@ class AuthController extends Controller
                     && !is_numeric($value)
                     && isset($field['options'])) {
                     $value = array_search($value, array_map('strval', $field['options']), true);
+                }
+
+                // A left-blank optional field comes through as null (the
+                // ConvertEmptyStringsToNull middleware). Several columns —
+                // e.g. profile_business.annual_sales — are NOT NULL with
+                // their own default (0.0000), so inserting an explicit null
+                // violates the constraint. Omitting the key instead lets
+                // the database fall back to its own default, same as if
+                // the column had never been touched.
+                if ($value === null) {
+                    continue;
                 }
 
                 $values[$fieldName] = $value;

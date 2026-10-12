@@ -24,7 +24,7 @@ Route::prefix('dashboard')
             ->name('profiles.create.form');
         Route::post('/profiles/create/{type}', [AuthController::class, 'register'])
             ->whereIn('type', ['business', 'investor', 'mentor', 'startup'])
-            ->middleware('throttle:5,1')
+            ->middleware('throttle:registration')
             ->name('profiles.store');
         Route::get('/profiles/{type}/{id}', 'showMyProfile')->whereNumber('id')->name('profiles.show');
         Route::get('/profiles/{type}/{id}/edit', 'editMyProfile')->whereNumber('id')->name('profiles.edit');

@@ -8,6 +8,27 @@ document.addEventListener('DOMContentLoaded', () => {
     const stepLabel = document.querySelector('[data-step-label]');
     let currentStep = 1;
 
+    // "I am looking for" checkboxes (Requirements step) reveal/hide their
+    // own related fields, same as the old project.
+    form.querySelectorAll('.requirement-checkbox').forEach(checkbox => {
+      checkbox.addEventListener('change', () => {
+        const exclusiveFieldset = checkbox.closest('[data-exclusive-group]');
+        if (exclusiveFieldset && checkbox.checked) {
+          exclusiveFieldset.querySelectorAll('.requirement-checkbox').forEach(sibling => {
+            if (sibling !== checkbox && sibling.checked) {
+              sibling.checked = false;
+              sibling.dispatchEvent(new Event('change', { bubbles: true }));
+            }
+          });
+        }
+
+        const group = checkbox.dataset.requirementTarget;
+        form.querySelectorAll(`[data-requirement-group="${group}"]`).forEach(field => {
+          field.style.display = checkbox.checked ? '' : 'none';
+        });
+      });
+    });
+
     function showStep(stepNumber) {
       currentStep = Math.max(1, Math.min(stepNumber, panels.length));
       const activePanel = panels[currentStep - 1];
@@ -33,18 +54,40 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function validatePanel(panel) {
-      const invalidField = [...panel.querySelectorAll('input, select, textarea')]
-        .find(field => !field.checkValidity());
+      const fields = [...panel.querySelectorAll('input, select, textarea')];
+      fields.forEach(field => field.classList.remove('has-error'));
+
+      const invalidField = fields.find(field => !field.checkValidity());
       if (!invalidField) return true;
+
+      invalidField.classList.add('has-error');
+      invalidField.addEventListener('input', () => invalidField.classList.remove('has-error'), { once: true });
       invalidField.reportValidity();
       invalidField.focus();
       return false;
     }
 
+    let isNavigating = false;
+
     form.querySelectorAll('[data-next-step]').forEach(button => {
-      button.addEventListener('click', () => {
-        const panel = panels[currentStep - 1];
-        if (validatePanel(panel)) showStep(currentStep + 1);
+      button.addEventListener('click', async () => {
+        // Guard against a double-click firing two overlapping checks —
+        // each one hits /uk-cities/suggest, and the button must stay put
+        // (not sneak forward) on the first invalid field either way.
+        if (isNavigating) return;
+        isNavigating = true;
+        button.disabled = true;
+        try {
+          const panel = panels[currentStep - 1];
+          // Required fields first — no need to round-trip to the city
+          // endpoint if a plain required field is already empty.
+          if (!validatePanel(panel)) return;
+          const cityValid = await window.BX?.validateCityInputsIn?.(panel) ?? true;
+          if (cityValid) showStep(currentStep + 1);
+        } finally {
+          isNavigating = false;
+          button.disabled = false;
+        }
       });
     });
 
@@ -58,19 +101,30 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     });
 
-    form.addEventListener('submit', event => {
+    form.addEventListener('submit', async event => {
       event.preventDefault();
-      for (let index = 0; index < panels.length; index += 1) {
-        if (!validatePanel(panels[index])) {
-          showStep(index + 1);
-          const firstInvalid = [...panels[index].querySelectorAll('input, select, textarea')]
-            .find(field => !field.checkValidity());
-          firstInvalid?.reportValidity();
-          firstInvalid?.focus();
-          return;
+      if (isNavigating) return;
+      isNavigating = true;
+      try {
+        for (let index = 0; index < panels.length; index += 1) {
+          if (!validatePanel(panels[index])) {
+            showStep(index + 1);
+            const firstInvalid = [...panels[index].querySelectorAll('input, select, textarea')]
+              .find(field => !field.checkValidity());
+            firstInvalid?.reportValidity();
+            firstInvalid?.focus();
+            return;
+          }
+          const cityValid = await window.BX?.validateCityInputsIn?.(panels[index]) ?? true;
+          if (!cityValid) {
+            showStep(index + 1);
+            return;
+          }
         }
+        HTMLFormElement.prototype.submit.call(form);
+      } finally {
+        isNavigating = false;
       }
-      HTMLFormElement.prototype.submit.call(form);
     });
 
     const invalidStep = panels.findIndex(panel => [...panel.querySelectorAll('input, select, textarea')]
