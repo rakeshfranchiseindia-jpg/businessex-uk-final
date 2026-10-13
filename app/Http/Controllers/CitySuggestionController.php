@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Schema;
+use App\Support\SchemaCache;
 
 class CitySuggestionController extends Controller
 {
@@ -15,7 +15,7 @@ class CitySuggestionController extends Controller
             'q' => ['required', 'string', 'min:2', 'max:55'],
         ]);
 
-        if (!Schema::hasTable('bx_cities')) {
+        if (!SchemaCache::hasTable('bx_cities')) {
             return response()->json(['cities' => []]);
         }
 

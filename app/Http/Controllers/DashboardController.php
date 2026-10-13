@@ -18,7 +18,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\Schema;
+use App\Support\SchemaCache;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
@@ -124,8 +124,8 @@ class DashboardController extends Controller
         $profiles = collect();
         $availableProfileTypes = [];
         foreach (self::PROFILE_TYPES as $type => $definition) {
-            if (! Schema::hasTable($definition['table'])
-                || ! Schema::hasColumn($definition['table'], 'user_id')) {
+            if (! SchemaCache::hasTable($definition['table'])
+                || ! SchemaCache::hasColumn($definition['table'], 'user_id')) {
                 continue;
             }
 
@@ -222,7 +222,7 @@ class DashboardController extends Controller
     public function editMyProfile(string $type, int $id): View
     {
         [$definition, $profile] = $this->ownedProfile($type, $id);
-        $profileMedia = Schema::hasTable('profile_media')
+        $profileMedia = SchemaCache::hasTable('profile_media')
             ? DB::table('profile_media')
                 ->where('user_id', Auth::id())
                 ->where('profile_type', $type)
@@ -372,7 +372,7 @@ class DashboardController extends Controller
                 $uploads[0]['field_name'] => 'Attachments cannot be uploaded because S3 credentials are not configured.',
             ]);
         }
-        if ($uploads !== [] && ! Schema::hasTable('profile_media')) {
+        if ($uploads !== [] && ! SchemaCache::hasTable('profile_media')) {
             throw ValidationException::withMessages([
                 $uploads[0]['field_name'] => 'Attachments cannot be saved because profile media storage is unavailable.',
             ]);
@@ -406,7 +406,7 @@ class DashboardController extends Controller
                     $file = $upload['file'];
                     $fieldName = $upload['field_name'];
                     $mediaId = null;
-                    if (Schema::hasTable('profile_media')) {
+                    if (SchemaCache::hasTable('profile_media')) {
                         $mediaId = DB::table('profile_media')->insertGetId([
                             'user_id' => $request->user()->user_id,
                             'profile_type' => $type,
@@ -428,7 +428,7 @@ class DashboardController extends Controller
 
                     $mappedColumns = self::PROFILE_MEDIA_COLUMNS[$type][$fieldName] ?? [];
                     $column = $mappedColumns[$upload['file_index']] ?? null;
-                    if ($column && Schema::hasColumn($definition['table'], $column)) {
+                    if ($column && SchemaCache::hasColumn($definition['table'], $column)) {
                         $updates[$column] = $upload['url']
                             ?? ($mediaId ? route('profile-media.download', ['media' => $mediaId]) : $upload['path']);
                     }
@@ -472,7 +472,7 @@ class DashboardController extends Controller
     {
         abort_unless(isset(self::PROFILE_TYPES[$type]), 404);
         $definition = self::PROFILE_TYPES[$type];
-        abort_unless(Schema::hasTable($definition['table']), 404);
+        abort_unless(SchemaCache::hasTable($definition['table']), 404);
         $profile = DB::table($definition['table'])
             ->where($definition['id'], $id)
             ->where('user_id', Auth::id())
@@ -492,7 +492,7 @@ class DashboardController extends Controller
         $cards = collect();
 
         foreach (self::PROFILE_TYPES as $type => $definition) {
-            if (! Schema::hasTable($definition['table']) || ! Schema::hasColumn($definition['table'], 'user_id')) {
+            if (! SchemaCache::hasTable($definition['table']) || ! SchemaCache::hasColumn($definition['table'], 'user_id')) {
                 continue;
             }
 
@@ -505,7 +505,7 @@ class DashboardController extends Controller
                 continue;
             }
 
-            $counts = Schema::hasTable('profile_visitors')
+            $counts = SchemaCache::hasTable('profile_visitors')
                 ? DB::table('profile_visitors')
                     ->where('profile_type', $definition['legacy_type'])
                     ->whereIn('profile_id', $ownProfiles->pluck($definition['id']))
@@ -533,8 +533,8 @@ class DashboardController extends Controller
         $location = $this->joinedProfileValues($profile, $definition['location']);
         $category = $this->joinedProfileValues($profile, $definition['category']);
         if ($category !== '' && is_numeric($category)
-            && Schema::hasTable('industry_categories')
-            && Schema::hasColumns('industry_categories', ['cat_id', 'category_name'])) {
+            && SchemaCache::hasTable('industry_categories')
+            && SchemaCache::hasColumns('industry_categories', ['cat_id', 'category_name'])) {
             $category = DB::table('industry_categories')
                 ->where('cat_id', $category)
                 ->value('category_name') ?: $category;
@@ -604,7 +604,7 @@ class DashboardController extends Controller
     private function editableProfileSteps(string $type, array $definition, object $profile): array
     {
         $steps = [];
-        $columns = Schema::getColumnListing($definition['table']);
+        $columns = SchemaCache::getColumnListing($definition['table']);
         foreach (config("registration_profiles.{$type}.steps", []) as $step) {
             $fields = [];
             foreach ($step['fields'] as $field) {
@@ -635,15 +635,15 @@ class DashboardController extends Controller
                 }
 
                 if (($field['type'] ?? null) === 'select' && isset($field['options'])) {
-                    $columnType = Schema::getColumnType($definition['table'], $name);
+                    $columnType = SchemaCache::getColumnType($definition['table'], $name);
                     $numeric = in_array($columnType, ['integer', 'bigint', 'smallint', 'tinyint'], true);
                     $field['option_values'] = [];
                     $field['form_options'] = [];
                     foreach (array_values($field['options']) as $optionIndex => $option) {
                         $optionValue = (string) $option;
                         if ($numeric && $name === 'industry_sector'
-                            && Schema::hasTable('industry_categories')
-                            && Schema::hasColumns('industry_categories', ['cat_id', 'category_name'])) {
+                            && SchemaCache::hasTable('industry_categories')
+                            && SchemaCache::hasColumns('industry_categories', ['cat_id', 'category_name'])) {
                             $storedValue = DB::table('industry_categories')
                                 ->where('category_name', $optionValue)
                                 ->value('cat_id') ?? $optionIndex;
@@ -746,8 +746,8 @@ class DashboardController extends Controller
         // "which profile" choice the registration dropdown uses elsewhere.
         $upgradableProfiles = collect();
         foreach (self::PROFILE_TYPES as $type => $definition) {
-            if (! Schema::hasTable($definition['table'])
-                || ! Schema::hasColumn($definition['table'], 'user_id')) {
+            if (! SchemaCache::hasTable($definition['table'])
+                || ! SchemaCache::hasColumn($definition['table'], 'user_id')) {
                 continue;
             }
 
@@ -774,8 +774,8 @@ class DashboardController extends Controller
 
         $activeMemberships = collect();
 
-        if (Schema::hasTable('profile_memberships')
-            && Schema::hasColumns('profile_memberships', [
+        if (SchemaCache::hasTable('profile_memberships')
+            && SchemaCache::hasColumns('profile_memberships', [
                 'user_id', 'membership_type', 'profile_type', 'profile_id', 'amount',
                 'interaction_credits', 'instant_responses', 'activation_date',
                 'expiry_date', 'is_active', 'created_at',
@@ -788,7 +788,7 @@ class DashboardController extends Controller
                         ->orWhereDate('profile_memberships.expiry_date', '>=', now()->toDateString());
                 });
 
-            if (Schema::hasTable('membership_plans')) {
+            if (SchemaCache::hasTable('membership_plans')) {
                 $memberships->leftJoin(
                     'membership_plans',
                     'membership_plans.plan_id',
@@ -1062,24 +1062,25 @@ class DashboardController extends Controller
                 'conversations.*',
                 'messages.message as last_message',
                 'messages.sender_user_id as last_sender_user_id',
-            ])
-            ->map(function (object $conversation): object {
-                $conversation->profile_label = $this->profileConversationLabel(
-                    $conversation->profile_type,
-                    (int) $conversation->profile_id
-                );
-                if ((int) $conversation->sender_user_id === (int) Auth::id()) {
-                    $conversation->counterpart = DB::table('user_account')
-                        ->where('user_id', $conversation->owner_user_id)
-                        ->value('company_name') ?: 'Profile owner';
-                } else {
-                    $conversation->counterpart = $conversation->sender_name;
-                }
+            ]);
 
-                return $conversation;
-            });
+        $labels = $this->profileConversationLabels($conversations);
+        $ownerCompanies = DB::table('user_account')
+            ->whereIn('user_id', $conversations
+                ->where('sender_user_id', Auth::id())
+                ->pluck('owner_user_id')
+                ->unique()
+                ->values())
+            ->pluck('company_name', 'user_id');
 
-        return $conversations;
+        return $conversations->map(function (object $conversation) use ($labels, $ownerCompanies): object {
+            $conversation->profile_label = $labels[$conversation->profile_type.':'.(int) $conversation->profile_id];
+            $conversation->counterpart = (int) $conversation->sender_user_id === (int) Auth::id()
+                ? (($ownerCompanies[$conversation->owner_user_id] ?? null) ?: 'Profile owner')
+                : $conversation->sender_name;
+
+            return $conversation;
+        });
     }
 
     public function showConversation(int $conversation): View
@@ -1106,8 +1107,8 @@ class DashboardController extends Controller
         $proposals = DB::table('profile_proposals')
             ->where('conversation_id', $thread->id)
             ->orderByDesc('created_at')
-            ->get()
-            ->map(fn (object $proposal): object => $this->attachProposalFiles($proposal));
+            ->get();
+        $this->attachProposalFiles($proposals);
 
         return $this->interaction('inbox', 'BX Inbox')->with([
             'conversation' => $thread,
@@ -1229,8 +1230,8 @@ class DashboardController extends Controller
         [$type, $rawProfileId] = explode(':', $validated['profile'], 2);
         $profileId = (int) $rawProfileId;
         $definition = self::PROFILE_TYPES[$type];
-        abort_unless(Schema::hasTable($definition['table'])
-            && Schema::hasColumns($definition['table'], [
+        abort_unless(SchemaCache::hasTable($definition['table'])
+            && SchemaCache::hasColumns($definition['table'], [
                 $definition['id'],
                 'user_id',
                 $definition['status'],
@@ -1476,17 +1477,38 @@ class DashboardController extends Controller
 
     private function profileConversationLabel(string $type, int $id): string
     {
-        $definition = self::PROFILE_TYPES[$type] ?? null;
-        if (! $definition || ! Schema::hasTable($definition['table'])) {
-            return Str::title($type).' profile #'.$id;
+        return $this->profileConversationLabels([(object) ['profile_type' => $type, 'profile_id' => $id]])[$type.':'.$id];
+    }
+
+    /**
+     * Display labels for many profiles with one query per profile type.
+     *
+     * @param  iterable<object>  $rows  objects with profile_type and profile_id
+     * @return array<string, string> keyed "type:id"
+     */
+    private function profileConversationLabels(iterable $rows): array
+    {
+        $idsByType = [];
+        foreach ($rows as $row) {
+            $idsByType[$row->profile_type][(int) $row->profile_id] = true;
         }
 
-        $profile = DB::table($definition['table'])
-            ->where($definition['id'], $id)
-            ->first();
-        $title = $profile ? $this->firstProfileValue($profile, $definition['title']) : null;
+        $labels = [];
+        foreach ($idsByType as $type => $ids) {
+            $ids = array_keys($ids);
+            $definition = self::PROFILE_TYPES[$type] ?? null;
+            $profiles = $definition && SchemaCache::hasTable($definition['table'])
+                ? DB::table($definition['table'])->whereIn($definition['id'], $ids)->get()->keyBy($definition['id'])
+                : collect();
 
-        return $title ?: Str::title($type).' profile #'.$id;
+            foreach ($ids as $id) {
+                $profile = $profiles->get($id);
+                $title = $profile ? $this->firstProfileValue($profile, $definition['title']) : null;
+                $labels[$type.':'.$id] = $title ?: Str::title($type).' profile #'.$id;
+            }
+        }
+
+        return $labels;
     }
 
     private function proposalList(string $direction, string $title): View
@@ -1505,23 +1527,21 @@ class DashboardController extends Controller
             $query->where('status', $status);
         }
         $proposals = $query->orderByDesc('created_at')->paginate(15)->withQueryString();
-        $proposals->getCollection()->transform(function (object $proposal) use ($direction): object {
-            $otherUserId = $direction === 'sent'
-                ? $proposal->recipient_user_id
-                : $proposal->sender_user_id;
-            $account = DB::table('user_account')->where('user_id', $otherUserId)->first([
-                'name',
-                'company_name',
-            ]);
+        $page = $proposals->getCollection();
+        $counterpartColumn = $direction === 'sent' ? 'recipient_user_id' : 'sender_user_id';
+        $accounts = DB::table('user_account')
+            ->whereIn('user_id', $page->pluck($counterpartColumn)->unique()->values())
+            ->get(['user_id', 'name', 'company_name'])
+            ->keyBy('user_id');
+        $labels = $this->profileConversationLabels($page);
+        $this->attachProposalFiles($page);
+
+        $page->each(function (object $proposal) use ($accounts, $counterpartColumn, $labels): void {
+            $account = $accounts->get($proposal->{$counterpartColumn});
             $proposal->counterpart = $account
                 ? ($account->company_name ?: $account->name)
                 : 'BusinessX member';
-            $proposal->profile_title = $this->profileConversationLabel(
-                $proposal->profile_type,
-                (int) $proposal->profile_id
-            );
-
-            return $this->attachProposalFiles($proposal);
+            $proposal->profile_title = $labels[$proposal->profile_type.':'.(int) $proposal->profile_id];
         });
 
         $viewData = [
@@ -1627,22 +1647,30 @@ class DashboardController extends Controller
         }
     }
 
-    private function attachProposalFiles(object $proposal): object
+    /**
+     * Sets ->attachments on every proposal using a single query.
+     */
+    private function attachProposalFiles(Collection $proposals): void
     {
-        $proposal->attachments = DB::table('profile_proposal_attachments')
-            ->where('proposal_id', $proposal->id)
-            ->orderBy('id')
-            ->get();
+        $attachments = $proposals->isEmpty()
+            ? collect()
+            : DB::table('profile_proposal_attachments')
+                ->whereIn('proposal_id', $proposals->pluck('id'))
+                ->orderBy('id')
+                ->get()
+                ->groupBy('proposal_id');
 
-        return $proposal;
+        $proposals->each(function (object $proposal) use ($attachments): void {
+            $proposal->attachments = $attachments->get($proposal->id, collect());
+        });
     }
 
     private function proposalComposerOptions(): array
     {
         $profiles = collect();
         foreach (self::PROFILE_TYPES as $type => $definition) {
-            if (! Schema::hasTable($definition['table'])
-                || ! Schema::hasColumns($definition['table'], [
+            if (! SchemaCache::hasTable($definition['table'])
+                || ! SchemaCache::hasColumns($definition['table'], [
                     $definition['id'],
                     'user_id',
                     $definition['status'],
@@ -1656,7 +1684,8 @@ class DashboardController extends Controller
                 ->get() as $profile) {
                 $profiles->push((object) [
                     'value' => $type.':'.$profile->{$definition['id']},
-                    'label' => $this->profileConversationLabel($type, (int) $profile->{$definition['id']}),
+                    'label' => $this->firstProfileValue($profile, $definition['title'])
+                        ?: Str::title($type).' profile #'.$profile->{$definition['id']},
                 ]);
             }
         }

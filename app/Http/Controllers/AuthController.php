@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\RateLimiter;
-use Illuminate\Support\Facades\Schema;
+use App\Support\SchemaCache;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
@@ -318,7 +318,7 @@ class AuthController extends Controller
                     'updated_at' => $now,
                 ], 'user_prof_id');
 
-                if (Schema::hasTable('profiles')) {
+                if (SchemaCache::hasTable('profiles')) {
                     DB::table('profiles')->insert([
                         'user_id' => $userId,
                         'profile_type' => $type,
@@ -438,7 +438,7 @@ class AuthController extends Controller
             if ($type === 'business') {
                 $profileValues['ofc_country'] = 'United Kingdom';
             }
-            $profileColumns = Schema::getColumnListing($profile['table']);
+            $profileColumns = SchemaCache::getColumnListing($profile['table']);
             $profileValues = array_intersect_key($profileValues, array_flip($profileColumns));
             $profileId = DB::table($profile['table'])->insertGetId($profileValues, $profile['id']);
 
@@ -452,7 +452,7 @@ class AuthController extends Controller
                 'updated_at' => $now,
             ], 'user_prof_id');
 
-            if (Schema::hasTable('profiles')) {
+            if (SchemaCache::hasTable('profiles')) {
                 DB::table('profiles')->insert([
                     'user_id' => $userId,
                     'profile_type' => $type,
@@ -597,7 +597,7 @@ class AuthController extends Controller
         string $profileKey,
         mixed $now
     ): array {
-        $columns = Schema::getColumnListing($profile['table']);
+        $columns = SchemaCache::getColumnListing($profile['table']);
         $values = [
             $profile['key'] => $profileKey,
             'user_id' => $userId,
@@ -634,7 +634,7 @@ class AuthController extends Controller
                     continue;
                 }
 
-                $columnType = Schema::getColumnType($profile['table'], $fieldName);
+                $columnType = SchemaCache::getColumnType($profile['table'], $fieldName);
                 if (in_array($columnType, ['integer', 'bigint', 'smallint', 'tinyint'], true)
                     && ($field['type'] ?? null) === 'select'
                     && !is_numeric($value)
@@ -690,7 +690,7 @@ class AuthController extends Controller
         }
 
         foreach ($requiredTables as $table) {
-            if (!Schema::hasTable($table)) {
+            if (!SchemaCache::hasTable($table)) {
                 throw new RuntimeException("Registration requires the imported BusinessX table [{$table}]. Import the database schema before creating accounts.");
             }
         }
@@ -759,7 +759,7 @@ class AuthController extends Controller
         array $profile
     ): array {
         $profileValues = [];
-        $columns = Schema::getColumnListing($profile['table']);
+        $columns = SchemaCache::getColumnListing($profile['table']);
 
         foreach ($uploads as $upload) {
             $mediaId = DB::table('profile_media')->insertGetId([

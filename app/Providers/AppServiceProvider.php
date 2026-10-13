@@ -2,15 +2,17 @@
 
 namespace App\Providers;
 
+use App\Http\Controllers\DashboardController;
+use App\Support\SchemaCache;
 use Illuminate\Cache\RateLimiting\Limit;
+use Illuminate\Database\Events\MigrationsEnded;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\RateLimiter;
-use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Validation\Rules\Password;
-use Illuminate\Support\Facades\View;
-use App\Http\Controllers\DashboardController;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -19,7 +21,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        // One instance per request, so schema lookups are memoised in memory
+        // for the rest of the request.
+        $this->app->scoped(SchemaCache::class);
     }
 
     /**
@@ -27,6 +31,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        Event::listen(MigrationsEnded::class, fn () => SchemaCache::flush());
+
         // Matches the hint shown on the reset/set-password forms.
         Password::defaults(fn () => Password::min(8)->max(255)->letters()->numbers());
 
@@ -51,7 +57,7 @@ class AppServiceProvider extends ServiceProvider
             if ($industryCategoryTree === null) {
                 $categories = collect();
 
-                if (Schema::hasTable('industry_categories')) {
+                if (SchemaCache::hasTable('industry_categories')) {
                     $categories = DB::table('industry_categories')
                         ->where('category_status', 1)
                         ->orderBy('cat_id')
@@ -79,7 +85,7 @@ class AppServiceProvider extends ServiceProvider
             $view->with('industryCategoryTree', $industryCategoryTree);
 
             $ukCities = collect();
-            if (Schema::hasTable('bx_cities')) {
+            if (SchemaCache::hasTable('bx_cities')) {
                 $ukCities = DB::table('bx_cities')
                     ->where('country', 5)
                     ->orderBy('city')

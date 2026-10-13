@@ -4,17 +4,17 @@ namespace App\Http\Controllers;
 
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Schema;
+use App\Support\SchemaCache;
 
 class TestimonialController extends Controller
 {
     public function homepageTestimonials(): Collection
     {
-        if (!Schema::hasTable('testimonials')) {
+        if (!SchemaCache::hasTable('testimonials')) {
             return collect();
         }
 
-        $columns = Schema::getColumnListing('testimonials');
+        $columns = SchemaCache::getColumnListing('testimonials');
         $query = DB::table('testimonials')
             ->select(['id', 'text', 'name', 'designation']);
 

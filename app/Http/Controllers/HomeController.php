@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Schema;
+use App\Support\SchemaCache;
 use Illuminate\View\View;
 
 class HomeController extends Controller
@@ -41,9 +41,9 @@ class HomeController extends Controller
         $worldClassMentors = collect();
         $activeMentorCount = 0;
 
-        if (Schema::hasTable('industry_categories')
-            && Schema::hasTable('ind_pref_business')
-            && Schema::hasTable('profile_business')) {
+        if (SchemaCache::hasTable('industry_categories')
+            && SchemaCache::hasTable('ind_pref_business')
+            && SchemaCache::hasTable('profile_business')) {
             $opportunityCounts = DB::table('ind_pref_business as industry')
                 ->join('profile_business as business', 'business.business_id', '=', 'industry.business_profile_id')
                 ->where('industry.profile_status', 1)
@@ -65,7 +65,7 @@ class HomeController extends Controller
                 ]);
         }
 
-        if (Schema::hasTable('bx_cities') && Schema::hasTable('profile_business')) {
+        if (SchemaCache::hasTable('bx_cities') && SchemaCache::hasTable('profile_business')) {
             $cityCounts = DB::table('profile_business')
                 ->where('business_profile_status', 1)
                 ->whereRaw('LOWER(TRIM(ofc_country)) = ?', ['united kingdom'])
@@ -85,8 +85,8 @@ class HomeController extends Controller
                 ]);
         }
 
-        if (Schema::hasTable('profile_business')
-            && Schema::hasColumns('profile_business', ['business_profile_status', 'inv_asking_price'])) {
+        if (SchemaCache::hasTable('profile_business')
+            && SchemaCache::hasColumns('profile_business', ['business_profile_status', 'inv_asking_price'])) {
             $rangeExpressions = [];
             $rangeBindings = [];
 
@@ -108,7 +108,7 @@ class HomeController extends Controller
             unset($range);
         }
 
-        if (Schema::hasTable('bx_articles')) {
+        if (SchemaCache::hasTable('bx_articles')) {
             $articleQuery = DB::table('bx_articles')
                 ->where('bx_articles.article_status', 1)
                 ->select([
@@ -122,7 +122,7 @@ class HomeController extends Controller
                     'bx_articles.updated_at',
                 ]);
 
-            if (Schema::hasTable('bx_author')) {
+            if (SchemaCache::hasTable('bx_author')) {
                 $articleQuery
                     ->leftJoin('bx_author', 'bx_author.author_id', '=', 'bx_articles.author_id')
                     ->addSelect('bx_author.author_name');
@@ -146,7 +146,7 @@ class HomeController extends Controller
                 });
         }
 
-        if (Schema::hasTable('profile_business') && Schema::hasColumns('profile_business', [
+        if (SchemaCache::hasTable('profile_business') && SchemaCache::hasColumns('profile_business', [
             'business_id',
             'business_profile_status',
             'created_at',
@@ -187,7 +187,7 @@ class HomeController extends Controller
                 });
         }
 
-        if (Schema::hasTable('profile_investor') && Schema::hasColumns('profile_investor', [
+        if (SchemaCache::hasTable('profile_investor') && SchemaCache::hasColumns('profile_investor', [
             'investor_id',
             'inv_profile_status',
             'created_at',
@@ -235,7 +235,7 @@ class HomeController extends Controller
                 });
         }
 
-        if (Schema::hasTable('profile_startups') && Schema::hasColumns('profile_startups', [
+        if (SchemaCache::hasTable('profile_startups') && SchemaCache::hasColumns('profile_startups', [
             'startup_id',
             'startup_profile_status',
             'created_at',
@@ -272,7 +272,7 @@ class HomeController extends Controller
                 'profile_startups.business_pitch',
             ];
 
-            if (Schema::hasTable('industry_categories')) {
+            if (SchemaCache::hasTable('industry_categories')) {
                 $startupQuery->leftJoin(
                     'industry_categories as startup_industry',
                     'startup_industry.cat_id',
@@ -303,7 +303,7 @@ class HomeController extends Controller
                 });
         }
 
-        if (Schema::hasTable('profile_mentors') && Schema::hasColumns('profile_mentors', [
+        if (SchemaCache::hasTable('profile_mentors') && SchemaCache::hasColumns('profile_mentors', [
             'mentor_id',
             'mentor_profile_status',
             'created_at',
@@ -319,7 +319,7 @@ class HomeController extends Controller
             $mentorQuery = DB::table('profile_mentors')
                 ->where('mentor_profile_status', 1);
 
-            if (Schema::hasColumn('profile_mentors', 'deleted_at')) {
+            if (SchemaCache::hasColumn('profile_mentors', 'deleted_at')) {
                 $mentorQuery->whereNull('deleted_at');
             }
 

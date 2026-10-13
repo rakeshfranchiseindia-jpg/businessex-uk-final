@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Schema;
+use App\Support\SchemaCache;
 use Illuminate\View\View;
 
 class StartupListingController extends AbstractListingController
@@ -17,7 +17,7 @@ class StartupListingController extends AbstractListingController
             ->where('startup_profile_status', 1)
             ->select('profile_startups.*');
 
-        if (Schema::hasTable('industry_categories')) {
+        if (SchemaCache::hasTable('industry_categories')) {
             $query->leftJoin(
                 'industry_categories as startup_industry',
                 'startup_industry.cat_id',

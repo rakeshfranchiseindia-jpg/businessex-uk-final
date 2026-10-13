@@ -5,13 +5,13 @@ namespace App\Http\Controllers;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Schema;
+use App\Support\SchemaCache;
 
 class ArticleCommentController extends Controller
 {
     public function store(Request $request, int $article): RedirectResponse
     {
-        abort_unless(Schema::hasTable('articles_comments'), 500, 'Article comments are not configured.');
+        abort_unless(SchemaCache::hasTable('articles_comments'), 500, 'Article comments are not configured.');
 
         $record = DB::table('bx_articles')
             ->where('article_id', $article)

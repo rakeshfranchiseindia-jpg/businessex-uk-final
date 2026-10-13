@@ -11,7 +11,7 @@ use Illuminate\Database\Query\Builder;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Schema;
+use App\Support\SchemaCache;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
 
@@ -37,7 +37,7 @@ class ArticleController extends Controller
             'page' => ['nullable', 'integer', 'min:1'],
         ]);
 
-        $available = Schema::hasTable('bx_articles');
+        $available = SchemaCache::hasTable('bx_articles');
         $categories = $available ? $this->categories() : [];
         $categoryMap = collect($categories)->keyBy('slug');
         $selectedCategory = $categoryMap->get($filters['category'] ?? '');
@@ -182,7 +182,7 @@ class ArticleController extends Controller
 
         $comments = collect();
         $commentCount = (int) $record->article_comments;
-        if (Schema::hasTable('articles_comments')) {
+        if (SchemaCache::hasTable('articles_comments')) {
             $comments = DB::table('articles_comments')
                 ->where('article_id', $record->article_id)
                 ->where('comment_status', 1)
@@ -217,7 +217,7 @@ class ArticleController extends Controller
     {
         $query = DB::table('bx_articles')->select('bx_articles.*');
 
-        if (Schema::hasTable('bx_author')) {
+        if (SchemaCache::hasTable('bx_author')) {
             $query->leftJoin('bx_author', 'bx_author.author_id', '=', 'bx_articles.author_id')
                 ->addSelect('bx_author.author_name', 'bx_author.author_desig');
         } else {
@@ -240,7 +240,7 @@ class ArticleController extends Controller
 
     private function categories(): array
     {
-        if (!Schema::hasTable('bx_articles')) {
+        if (!SchemaCache::hasTable('bx_articles')) {
             return [];
         }
 
@@ -376,7 +376,7 @@ class ArticleController extends Controller
 
     private function ensureArticleTableExists(): void
     {
-        if (!Schema::hasTable('bx_articles')) {
+        if (!SchemaCache::hasTable('bx_articles')) {
             abort(503, 'Article content is not available until the BusinessX article database has been configured.');
         }
     }
