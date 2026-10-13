@@ -252,11 +252,14 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   document.querySelectorAll('form').forEach(form => {
-    // The registration wizard stores and validates the mobile number in
-    // plain UK local format (07xxxxxxxxx) end to end — rewriting it to
-    // international format here would corrupt it right before the
-    // wizard's own pattern check runs, failing it for no reason.
-    if (form.hasAttribute('data-registration-wizard')) return;
+    // Some forms (the registration wizard, the dashboard profile editor —
+    // identified by their tel input using the 07xxxxxxxxx pattern) store
+    // and validate the mobile number in plain UK local format end to end.
+    // Rewriting it to international format here would corrupt it right
+    // before that form's own pattern check or backend regex runs, failing
+    // it for no reason.
+    const localFormatPhone = form.querySelector('input[type="tel"][pattern="07[0-9]{9}"]');
+    if (form.hasAttribute('data-registration-wizard') || localFormatPhone) return;
 
     form.addEventListener('submit', () => {
       form.querySelectorAll('.phone-input-group').forEach(group => {

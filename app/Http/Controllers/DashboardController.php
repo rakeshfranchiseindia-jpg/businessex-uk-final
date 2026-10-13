@@ -885,51 +885,25 @@ class DashboardController extends Controller
     public function updateProfile(Request $request): RedirectResponse
     {
         $account = $request->user();
+
+        // Email and mobile are the identity/contact details tied to the
+        // account at registration — locked here (read-only in the UI too)
+        // so they can't drift from what's on file. Validated as "present"
+        // only so a tampered request can't null them out; the submitted
+        // values are never written.
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255', "regex:/^[A-Za-z][A-Za-z .'-]*$/"],
-            'email' => [
-                'required',
-                'email',
-                'max:255',
-                Rule::unique('user_account', 'email')->ignore($account->user_id, 'user_id'),
-            ],
-            'phone' => ['required', 'string', 'max:20'],
             'location' => ['required', 'string', 'max:60'],
             'designation' => ['required', 'string', 'max:60', "regex:/^[A-Za-z][A-Za-z .'-]*$/"],
             'company' => ['required', 'string', 'max:255', "regex:/^[A-Za-z][A-Za-z .'-]*$/"],
         ]);
 
-        $emailChanged = mb_strtolower(trim($validated['email'])) !== mb_strtolower($account->email);
         $account->forceFill([
             'name' => trim($validated['name']),
-            'email' => mb_strtolower(trim($validated['email'])),
-            'mobile' => trim($validated['phone']),
             'location' => trim($validated['location']),
             'designation' => trim($validated['designation']),
             'company_name' => trim($validated['company']),
-            ...($emailChanged ? ['email_verified_at' => null] : []),
         ])->save();
-
-        if ($emailChanged) {
-            try {
-                Mail::to($account->email)->queue(new VerifyAccountEmail($account));
-            } catch (Throwable $exception) {
-                Log::error('BusinessX updated account verification email could not be queued.', [
-                    'user_id' => $account->user_id,
-                    'exception' => $exception,
-                ]);
-
-                return redirect()->route('dashboard.profile')->with(
-                    'profile_error',
-                    'Your profile was updated, but we could not queue verification for your new email. Please request a verification email from the sign-in page.'
-                );
-            }
-
-            return redirect()->route('dashboard.profile')->with(
-                'profile_status',
-                'Your profile was updated. Please verify your new email address before signing in again.'
-            );
-        }
 
         return redirect()->route('dashboard.profile')->with(
             'profile_status',

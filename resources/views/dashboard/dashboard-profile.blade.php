@@ -46,18 +46,18 @@ Edit your BusinessX account profile.
                 <input id="profile-name" name="name" autocomplete="name" pattern="[A-Za-z\s]+" title="Name should only contain letters and spaces" value="{{ old('name', $account->name) }}" required>
                 @error('name') <span role="alert">{{ $message }}</span> @enderror
               </div>
-              <div class="workspace-field">
-                <label for="profile-email">Email *</label>
-                <input id="profile-email" name="email" type="email" autocomplete="email" value="{{ old('email', $account->email) }}" required>
-                @error('email') <span role="alert">{{ $message }}</span> @enderror
+              <div class="workspace-field workspace-field-locked">
+                <label for="profile-email">Email <span class="workspace-lock-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span></label>
+                <input id="profile-email" type="email" value="{{ $account->email }}" readonly disabled aria-describedby="profile-email-locked-hint">
+                <p id="profile-email-locked-hint" class="workspace-locked-hint">Your registered email can't be changed here. Contact support if you need to update it.</p>
               </div>
-              <div class="workspace-field">
-                <label for="profile-phone">Mobile *</label>
+              <div class="workspace-field workspace-field-locked">
+                <label for="profile-phone">Mobile <span class="workspace-lock-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span></label>
                 <div class="phone-input-group">
-                  @include('components.phone-country-code')
-                  <input id="profile-phone" name="phone" type="tel" autocomplete="tel" value="{{ old('phone', $account->mobile) }}" required>
+                  @include('components.phone-country-code', ['disabled' => true])
+                  <input id="profile-phone" type="tel" value="{{ $account->mobile }}" readonly disabled aria-describedby="profile-phone-locked-hint">
                 </div>
-                @error('phone') <span role="alert">{{ $message }}</span> @enderror
+                <p id="profile-phone-locked-hint" class="workspace-locked-hint">Your registered mobile number can't be changed here. Contact support if you need to update it.</p>
               </div>
               <div class="workspace-field">
                 <label for="profile-location">Location *</label>
