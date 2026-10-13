@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Support\SchemaCache;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use App\Support\SchemaCache;
 
 class CitySuggestionController extends Controller
 {
@@ -15,7 +15,7 @@ class CitySuggestionController extends Controller
             'q' => ['required', 'string', 'min:2', 'max:55'],
         ]);
 
-        if (!SchemaCache::hasTable('bx_cities')) {
+        if (! SchemaCache::hasTable('bx_cities')) {
             return response()->json(['cities' => []]);
         }
 
@@ -24,7 +24,7 @@ class CitySuggestionController extends Controller
 
         $cities = DB::table('bx_cities')
             ->where('country', 5)
-            ->whereRaw("LOWER(city) LIKE ? ESCAPE '!'", [$query . '%'])
+            ->whereRaw("LOWER(city) LIKE ? ESCAPE '!'", [$query.'%'])
             ->orderBy('city')
             ->distinct()
             ->limit(10)

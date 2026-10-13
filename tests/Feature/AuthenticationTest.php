@@ -2,18 +2,19 @@
 
 namespace Tests\Feature;
 
+use App\Mail\ResetAccountPasswordEmail;
+use App\Mail\VerifyAccountEmail;
 use App\Models\UserAccount;
 use App\Support\PublicContentCache;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Schema;
-use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
-use App\Mail\VerifyAccountEmail;
-use App\Mail\ResetAccountPasswordEmail;
+use Illuminate\Support\Facades\URL;
 use Tests\TestCase;
 
 class AuthenticationTest extends TestCase
@@ -227,8 +228,7 @@ class AuthenticationTest extends TestCase
         $this->assertSame(1, (int) $account->is_active);
         $this->assertNull($account->email_verified_at);
         $this->assertGuest();
-        Mail::assertQueued(VerifyAccountEmail::class, fn (VerifyAccountEmail $mail): bool =>
-            $mail->hasTo('new.member@example.org')
+        Mail::assertQueued(VerifyAccountEmail::class, fn (VerifyAccountEmail $mail): bool => $mail->hasTo('new.member@example.org')
             && str_contains($mail->verificationUrl, '/email/verify/')
             && str_contains($mail->render(), 'Verify email address')
         );
@@ -258,8 +258,8 @@ class AuthenticationTest extends TestCase
 
         foreach ($profiles as $type => [$table, $nameColumn, $emailColumn, $mobileColumn, $companyColumn, $profileType]) {
             $email = "quick-{$type}@example.org";
-            $name = 'Quick ' . ucfirst($type);
-            $company = 'Quick ' . ucfirst($type) . ' Company';
+            $name = 'Quick '.ucfirst($type);
+            $company = 'Quick '.ucfirst($type).' Company';
 
             $this->post(route('registration.quick-store'), [
                 '_quick_registration' => '1',
@@ -374,7 +374,7 @@ class AuthenticationTest extends TestCase
             'created_at' => now(),
             'updated_at' => now(),
         ]);
-        $url = \Illuminate\Support\Facades\URL::temporarySignedRoute(
+        $url = URL::temporarySignedRoute(
             'verification.verify',
             now()->addMinutes(60),
             ['id' => $accountId, 'hash' => sha1('verify@example.org')]
@@ -384,10 +384,10 @@ class AuthenticationTest extends TestCase
             ->assertRedirect();
 
         $this->assertNotNull(DB::table('user_account')->where('user_id', $accountId)->value('email_verified_at'));
-        $this->get($url . '&extra=invalid')->assertForbidden();
+        $this->get($url.'&extra=invalid')->assertForbidden();
 
         $passwordSetupUrl = $verificationResponse->headers->get('Location');
-        $this->assertStringContainsString('/account/set-password/' . $accountId . '/', $passwordSetupUrl);
+        $this->assertStringContainsString('/account/set-password/'.$accountId.'/', $passwordSetupUrl);
         $this->get($passwordSetupUrl)
             ->assertOk()
             ->assertSee('Set Your Password')
@@ -425,8 +425,7 @@ class AuthenticationTest extends TestCase
             ->assertRedirect(route('login'))
             ->assertSessionHas('verification_notice');
 
-        Mail::assertQueued(VerifyAccountEmail::class, fn (VerifyAccountEmail $mail): bool =>
-            $mail->hasTo('resend@example.org')
+        Mail::assertQueued(VerifyAccountEmail::class, fn (VerifyAccountEmail $mail): bool => $mail->hasTo('resend@example.org')
         );
     }
 
@@ -457,8 +456,7 @@ class AuthenticationTest extends TestCase
             ->assertSessionHas('status', 'If an account exists for that email address, a password reset link will be sent shortly.');
 
         $this->assertDatabaseHas('password_reset_tokens', ['email' => 'password-reset@example.org']);
-        Mail::assertQueued(ResetAccountPasswordEmail::class, fn (ResetAccountPasswordEmail $mail): bool =>
-            $mail->hasTo('password-reset@example.org')
+        Mail::assertQueued(ResetAccountPasswordEmail::class, fn (ResetAccountPasswordEmail $mail): bool => $mail->hasTo('password-reset@example.org')
             && str_contains($mail->render(), '/reset-password/')
         );
         $queuedMail = Mail::queued(ResetAccountPasswordEmail::class)->first();
@@ -559,7 +557,7 @@ class AuthenticationTest extends TestCase
         ];
 
         foreach ($types as $type => $legacyType) {
-            $email = $type . '@example.org';
+            $email = $type.'@example.org';
             $payload = $this->registrationPayload($type, $email);
             Cache::put(PublicContentCache::HOME_KEY, ['stale' => true]);
 
@@ -623,8 +621,7 @@ class AuthenticationTest extends TestCase
             'mgmt_email' => 'avery@example.org',
         ]);
         $this->assertGuest();
-        Mail::assertQueued(VerifyAccountEmail::class, fn (VerifyAccountEmail $mail): bool =>
-            $mail->hasTo('owner@example.org')
+        Mail::assertQueued(VerifyAccountEmail::class, fn (VerifyAccountEmail $mail): bool => $mail->hasTo('owner@example.org')
         );
     }
 
@@ -756,12 +753,12 @@ class AuthenticationTest extends TestCase
             );
             if ($media->media_type === 'image') {
                 $this->assertStringStartsWith(
-                    'https://cdn.example.test/' . $media->object_key,
+                    'https://cdn.example.test/'.$media->object_key,
                     $media->url
                 );
             } else {
                 $this->assertStringContainsString(
-                    '/profile-media/' . $media->id . '/download',
+                    '/profile-media/'.$media->id.'/download',
                     $media->url
                 );
             }
@@ -917,7 +914,7 @@ class AuthenticationTest extends TestCase
 
         foreach ($profile['steps'] as $step) {
             foreach ($step['fields'] as $field) {
-                if (empty($field['required']) || !isset($field['name']) || isset($payload[$field['name']])) {
+                if (empty($field['required']) || ! isset($field['name']) || isset($payload[$field['name']])) {
                     continue;
                 }
 

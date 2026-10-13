@@ -2,7 +2,9 @@
 
 namespace App\Models;
 
-class BxNews extends \Illuminate\Database\Eloquent\Model
+use Illuminate\Database\Eloquent\Model;
+
+class BxNews extends Model
 {
     protected $table = 'bx_news';
 
@@ -25,7 +27,6 @@ class BxNews extends \Illuminate\Database\Eloquent\Model
         'created_by',
     ];
 
-
     public function author()
     {
         return $this->belongsTo(BxAuthor::class, 'author_id', 'author_id');
@@ -45,5 +46,4 @@ class BxNews extends \Illuminate\Database\Eloquent\Model
     {
         return $this->hasMany(ContentTagAssigned::class, 'content_id', 'news_id');
     }
-
 }

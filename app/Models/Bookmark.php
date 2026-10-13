@@ -2,7 +2,9 @@
 
 namespace App\Models;
 
-class Bookmark extends \Illuminate\Database\Eloquent\Model
+use Illuminate\Database\Eloquent\Model;
+
+class Bookmark extends Model
 {
     protected $table = 'bookmarks';
 
@@ -16,10 +18,8 @@ class Bookmark extends \Illuminate\Database\Eloquent\Model
         'bookmark_status',
     ];
 
-
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id', 'user_id');
     }
-
 }

@@ -2,7 +2,9 @@
 
 namespace App\Models;
 
-class MembershipPlan extends \Illuminate\Database\Eloquent\Model
+use Illuminate\Database\Eloquent\Model;
+
+class MembershipPlan extends Model
 {
     protected $table = 'membership_plans';
 
@@ -25,5 +27,4 @@ class MembershipPlan extends \Illuminate\Database\Eloquent\Model
     protected $casts = [
         'deactivated_at' => 'datetime',
     ];
-
 }

@@ -29,7 +29,7 @@ class NewsListTableSeeder extends Seeder
             'totalComment' => 23,
             'totalVotes' => 1,
             'facebook_shared' => 3,
-            'status' => 0
+            'status' => 0,
         ]);
 
         DB::table('news_list')->insert([
@@ -49,7 +49,7 @@ class NewsListTableSeeder extends Seeder
             'totalComment' => 24,
             'totalVotes' => 2,
             'facebook_shared' => 2,
-            'status' => 1
+            'status' => 1,
         ]);
 
         DB::table('news_list')->insert([
@@ -69,7 +69,7 @@ class NewsListTableSeeder extends Seeder
             'totalComment' => 45,
             'totalVotes' => 3,
             'facebook_shared' => 1,
-            'status' => 0
+            'status' => 0,
         ]);
 
     }

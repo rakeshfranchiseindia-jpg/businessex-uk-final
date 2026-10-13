@@ -1,9 +1,10 @@
 <?php
 
 namespace App\Models;
-use App\Models\IndustryCategory;
 
-class ProfileStartup extends \Illuminate\Database\Eloquent\Model
+use Illuminate\Database\Eloquent\Model;
+
+class ProfileStartup extends Model
 {
     protected $table = 'profile_startups';
 
@@ -101,7 +102,6 @@ class ProfileStartup extends \Illuminate\Database\Eloquent\Model
         'last_login_at' => 'datetime',
     ];
 
-
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id', 'user_id');
@@ -131,5 +131,4 @@ class ProfileStartup extends \Illuminate\Database\Eloquent\Model
     {
         return $this->belongsTo(IndustryCategory::class, 'industry_sector', 'cat_id');
     }
-
 }

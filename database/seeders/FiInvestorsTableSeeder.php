@@ -15,19 +15,19 @@ class FiInvestorsTableSeeder extends Seeder
         DB::table('fi_investors')->insert([
             'fi_inv_id' => 1,
             'name' => 'Rajesh Kumar',
-            'email' => 'admin@businessex.com'
+            'email' => 'admin@businessex.com',
         ]);
 
         DB::table('fi_investors')->insert([
             'fi_inv_id' => 2,
             'name' => 'Priya Sharma',
-            'email' => 'john.doe@example.com'
+            'email' => 'john.doe@example.com',
         ]);
 
         DB::table('fi_investors')->insert([
             'fi_inv_id' => 3,
             'name' => 'Amit Patel',
-            'email' => 'priya.sharma@example.com'
+            'email' => 'priya.sharma@example.com',
         ]);
 
     }

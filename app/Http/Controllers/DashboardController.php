@@ -3,9 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Events\ConversationMessageSent;
-use App\Mail\VerifyAccountEmail;
 use App\Models\UserAccount;
 use App\Notifications\DashboardActivityNotification;
+use App\Support\PublicContentCache;
+use App\Support\SchemaCache;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -17,9 +18,6 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Mail;
-use App\Support\PublicContentCache;
-use App\Support\SchemaCache;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
@@ -491,7 +489,7 @@ class DashboardController extends Controller
      * times OTHER people have searched/viewed it — for the dashboard's
      * Search History tab.
      */
-    private function mostSearchedOwnProfiles(int $limit = 10): \Illuminate\Support\Collection
+    private function mostSearchedOwnProfiles(int $limit = 10): Collection
     {
         $cards = collect();
 

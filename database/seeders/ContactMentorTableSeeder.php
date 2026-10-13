@@ -26,7 +26,7 @@ class ContactMentorTableSeeder extends Seeder
             'contact_viewed' => 1,
             'contact_response' => 5,
             'contact_status' => 0,
-            'subscribe' => 0
+            'subscribe' => 0,
         ]);
 
         DB::table('contact_mentor')->insert([
@@ -43,7 +43,7 @@ class ContactMentorTableSeeder extends Seeder
             'contact_viewed' => 2,
             'contact_response' => 15,
             'contact_status' => 1,
-            'subscribe' => 1
+            'subscribe' => 1,
         ]);
 
         DB::table('contact_mentor')->insert([
@@ -60,7 +60,7 @@ class ContactMentorTableSeeder extends Seeder
             'contact_viewed' => 3,
             'contact_response' => 25,
             'contact_status' => 0,
-            'subscribe' => 0
+            'subscribe' => 0,
         ]);
 
     }

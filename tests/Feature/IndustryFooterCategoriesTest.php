@@ -30,7 +30,7 @@ class IndustryFooterCategoriesTest extends TestCase
         $response = $this->get(route('home'))->assertOk();
 
         foreach (['business', 'startup', 'investor'] as $type) {
-            $listingRoute = $type . '-listing';
+            $listingRoute = $type.'-listing';
             $response->assertSee(route($listingRoute, ['type' => $type, 'industry' => 2]));
             $response->assertSee(route($listingRoute, ['type' => $type, 'industry_parent' => 1]));
         }
@@ -44,7 +44,7 @@ class IndustryFooterCategoriesTest extends TestCase
     public function test_listing_pages_use_database_categories_for_filtering(): void
     {
         foreach (['business', 'startup', 'investor'] as $type) {
-            $this->get(route($type . '-listing', [
+            $this->get(route($type.'-listing', [
                 'type' => $type,
                 'industry' => 2,
             ]))

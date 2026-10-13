@@ -74,8 +74,8 @@ class HomeLatestArticlesTest extends TestCase
         DB::table('bx_articles')->insert([
             'article_id' => $id,
             'article_title' => $title,
-            'short_desc' => 'Summary for ' . $title,
-            'article_content' => '<p>Content for ' . $title . '</p>',
+            'short_desc' => 'Summary for '.$title,
+            'article_content' => '<p>Content for '.$title.'</p>',
             'author_id' => 1,
             'image_path' => null,
             'listing_image_path' => null,

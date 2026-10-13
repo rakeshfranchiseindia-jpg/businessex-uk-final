@@ -18,7 +18,7 @@ class ConversationReplyAttachmentTableSeeder extends Seeder
             'file_name' => 'document.pdf',
             'file_size' => '2.5 MB',
             'file_path' => 'uploads/images/sample1.jpg',
-            'is_active' => '1'
+            'is_active' => '1',
         ]);
 
         DB::table('conversation_reply_attachment')->insert([
@@ -27,7 +27,7 @@ class ConversationReplyAttachmentTableSeeder extends Seeder
             'file_name' => 'report.xlsx',
             'file_size' => '1.8 MB',
             'file_path' => 'uploads/images/sample2.jpg',
-            'is_active' => '2'
+            'is_active' => '2',
         ]);
 
         DB::table('conversation_reply_attachment')->insert([
@@ -36,7 +36,7 @@ class ConversationReplyAttachmentTableSeeder extends Seeder
             'file_name' => 'presentation.pptx',
             'file_size' => '4.2 MB',
             'file_path' => 'uploads/images/sample3.jpg',
-            'is_active' => '1'
+            'is_active' => '1',
         ]);
 
     }

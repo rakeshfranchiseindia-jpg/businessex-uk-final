@@ -12,11 +12,11 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('profile_investor', function (Blueprint $table) {
-            if (!Schema::hasColumn('profile_investor', 'location_preference')) {
+            if (! Schema::hasColumn('profile_investor', 'location_preference')) {
                 $table->string('location_preference', 255)->nullable()->after('company_designation');
             }
 
-            if (!Schema::hasColumn('profile_investor', 'sector_preference')) {
+            if (! Schema::hasColumn('profile_investor', 'sector_preference')) {
                 $table->string('sector_preference', 255)->nullable()->after('location_preference');
             }
         });

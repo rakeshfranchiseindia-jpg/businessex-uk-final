@@ -18,7 +18,7 @@ class ProfileVisitorsTableSeeder extends Seeder
             'profile_id' => 1,
             'user_id' => 1,
             'profile_type' => 1,
-            'profile_str' => 'BSN0001'
+            'profile_str' => 'BSN0001',
         ]);
 
         DB::table('profile_visitors')->insert([
@@ -27,7 +27,7 @@ class ProfileVisitorsTableSeeder extends Seeder
             'profile_id' => 2,
             'user_id' => 2,
             'profile_type' => 2,
-            'profile_str' => 'INV0002'
+            'profile_str' => 'INV0002',
         ]);
 
         DB::table('profile_visitors')->insert([
@@ -36,7 +36,7 @@ class ProfileVisitorsTableSeeder extends Seeder
             'profile_id' => 3,
             'user_id' => 3,
             'profile_type' => 3,
-            'profile_str' => 'LEN0003'
+            'profile_str' => 'LEN0003',
         ]);
 
     }

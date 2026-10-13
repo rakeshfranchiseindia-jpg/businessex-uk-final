@@ -23,7 +23,7 @@ return new class extends Migration
         $this->validateLegacySchema();
 
         if (Schema::hasTable('profiles')) {
-            throw new \RuntimeException('The profiles table already exists; refusing to import legacy profile links into an unknown state.');
+            throw new RuntimeException('The profiles table already exists; refusing to import legacy profile links into an unknown state.');
         }
 
         Schema::create('profiles', function (Blueprint $table): void {
@@ -50,14 +50,14 @@ return new class extends Migration
 
         foreach (self::PROFILE_TYPES as $legacyType => [$profileType, $tableName, $idColumn, $keyColumn]) {
             DB::table('user_profiles as mapping')
-                ->join($tableName . ' as legacy', 'legacy.' . $idColumn, '=', 'mapping.profile_id')
+                ->join($tableName.' as legacy', 'legacy.'.$idColumn, '=', 'mapping.profile_id')
                 ->where('mapping.profile_type', $legacyType)
                 ->whereColumn('legacy.user_id', 'mapping.user_id')
-                ->whereColumn('legacy.' . $keyColumn, 'mapping.profile_str')
+                ->whereColumn('legacy.'.$keyColumn, 'mapping.profile_str')
                 ->select([
                     'mapping.user_id as user_id',
-                    DB::raw("'" . $profileType . "' as profile_type"),
-                    DB::raw((string) $legacyType . ' as legacy_profile_type'),
+                    DB::raw("'".$profileType."' as profile_type"),
+                    DB::raw((string) $legacyType.' as legacy_profile_type'),
                     'mapping.profile_id as legacy_profile_id',
                     'mapping.profile_str as legacy_profile_key',
                     'mapping.user_prof_id as legacy_user_profile_id',
@@ -93,8 +93,8 @@ return new class extends Migration
         }
 
         foreach ($requiredTables as $tableName) {
-            if (!Schema::hasTable($tableName)) {
-                throw new \RuntimeException("Required legacy table [{$tableName}] is missing; import the BusinessX database dump before running this migration.");
+            if (! Schema::hasTable($tableName)) {
+                throw new RuntimeException("Required legacy table [{$tableName}] is missing; import the BusinessX database dump before running this migration.");
             }
         }
 
@@ -104,7 +104,7 @@ return new class extends Migration
             ->value('profile_type');
 
         if ($unknownType !== null) {
-            throw new \RuntimeException("Unsupported legacy profile_type [{$unknownType}] found in user_profiles; refusing to guess its profile table.");
+            throw new RuntimeException("Unsupported legacy profile_type [{$unknownType}] found in user_profiles; refusing to guess its profile table.");
         }
 
         $orphanedAccountLink = DB::table('user_profiles as mapping')
@@ -113,22 +113,22 @@ return new class extends Migration
             ->exists();
 
         if ($orphanedAccountLink) {
-            throw new \RuntimeException('At least one user_profiles row references a missing user_account; repair the ownership mapping before migrating.');
+            throw new RuntimeException('At least one user_profiles row references a missing user_account; repair the ownership mapping before migrating.');
         }
 
         foreach (self::PROFILE_TYPES as $legacyType => [, $tableName, $idColumn, $keyColumn]) {
             $orphanedProfileLink = DB::table('user_profiles as mapping')
-                ->leftJoin($tableName . ' as legacy', function ($join) use ($idColumn, $keyColumn): void {
-                    $join->on('legacy.' . $idColumn, '=', 'mapping.profile_id')
+                ->leftJoin($tableName.' as legacy', function ($join) use ($idColumn, $keyColumn): void {
+                    $join->on('legacy.'.$idColumn, '=', 'mapping.profile_id')
                         ->on('legacy.user_id', '=', 'mapping.user_id')
-                        ->on('legacy.' . $keyColumn, '=', 'mapping.profile_str');
+                        ->on('legacy.'.$keyColumn, '=', 'mapping.profile_str');
                 })
                 ->where('mapping.profile_type', $legacyType)
-                ->whereNull('legacy.' . $idColumn)
+                ->whereNull('legacy.'.$idColumn)
                 ->exists();
 
             if ($orphanedProfileLink) {
-                throw new \RuntimeException("A user_profiles row with profile_type [{$legacyType}] does not match its legacy profile record and owner; repair it before migrating.");
+                throw new RuntimeException("A user_profiles row with profile_type [{$legacyType}] does not match its legacy profile record and owner; repair it before migrating.");
             }
         }
 
@@ -139,7 +139,7 @@ return new class extends Migration
             ->exists();
 
         if ($duplicateProfileLink) {
-            throw new \RuntimeException('Duplicate user_profiles profile mappings exist; deduplicate them before migrating.');
+            throw new RuntimeException('Duplicate user_profiles profile mappings exist; deduplicate them before migrating.');
         }
     }
 };

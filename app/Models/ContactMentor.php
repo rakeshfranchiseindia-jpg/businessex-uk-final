@@ -2,7 +2,9 @@
 
 namespace App\Models;
 
-class ContactMentor extends \Illuminate\Database\Eloquent\Model
+use Illuminate\Database\Eloquent\Model;
+
+class ContactMentor extends Model
 {
     protected $table = 'contact_mentor';
 
@@ -24,10 +26,8 @@ class ContactMentor extends \Illuminate\Database\Eloquent\Model
         'subscribe',
     ];
 
-
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id', 'user_id');
     }
-
 }

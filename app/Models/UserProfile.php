@@ -2,7 +2,9 @@
 
 namespace App\Models;
 
-class UserProfile extends \Illuminate\Database\Eloquent\Model
+use Illuminate\Database\Eloquent\Model;
+
+class UserProfile extends Model
 {
     protected $table = 'user_profiles';
 
@@ -16,10 +18,8 @@ class UserProfile extends \Illuminate\Database\Eloquent\Model
         'profile_status',
     ];
 
-
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id', 'user_id');
     }
-
 }

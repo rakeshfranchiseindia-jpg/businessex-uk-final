@@ -22,7 +22,7 @@ class RequestContactTableSeeder extends Seeder
             'status' => '1',
             'viewed_status' => 0,
             'msg' => 'This is a sample description providing enough detail to be realistic for testing and development purposes.',
-            'timestamp' => '1720000000'
+            'timestamp' => '1720000000',
         ]);
 
         DB::table('request_contact')->insert([
@@ -35,7 +35,7 @@ class RequestContactTableSeeder extends Seeder
             'status' => '2',
             'viewed_status' => 1,
             'msg' => 'A comprehensive overview of business strategies, growth opportunities, and market trends in the current landscape.',
-            'timestamp' => '1720001000'
+            'timestamp' => '1720001000',
         ]);
 
         DB::table('request_contact')->insert([
@@ -48,7 +48,7 @@ class RequestContactTableSeeder extends Seeder
             'status' => '3',
             'viewed_status' => 0,
             'msg' => 'Detailed analysis covering key aspects of business operations, market competition, and potential areas for expansion.',
-            'timestamp' => '1720002000'
+            'timestamp' => '1720002000',
         ]);
 
     }

@@ -18,7 +18,7 @@ class UserProfilesTableSeeder extends Seeder
             'profile_id' => 1,
             'profile_type' => 1,
             'profile_str' => 'BSN0001',
-            'profile_status' => 0
+            'profile_status' => 0,
         ]);
 
         DB::table('user_profiles')->insert([
@@ -27,7 +27,7 @@ class UserProfilesTableSeeder extends Seeder
             'profile_id' => 2,
             'profile_type' => 2,
             'profile_str' => 'INV0002',
-            'profile_status' => 1
+            'profile_status' => 1,
         ]);
 
         DB::table('user_profiles')->insert([
@@ -36,7 +36,7 @@ class UserProfilesTableSeeder extends Seeder
             'profile_id' => 3,
             'profile_type' => 3,
             'profile_str' => 'LEN0003',
-            'profile_status' => 0
+            'profile_status' => 0,
         ]);
 
     }

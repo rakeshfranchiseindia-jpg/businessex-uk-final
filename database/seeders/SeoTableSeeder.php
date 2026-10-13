@@ -19,7 +19,7 @@ class SeoTableSeeder extends Seeder
             'title' => 'Getting Started with Business Growth',
             'keyword' => 'business, startup, investment',
             'description' => '192.168.1.1',
-            'meta_description' => '192.168.1.1'
+            'meta_description' => '192.168.1.1',
         ]);
 
         DB::table('seo')->insert([
@@ -29,7 +29,7 @@ class SeoTableSeeder extends Seeder
             'title' => 'Top Investment Strategies for 2025',
             'keyword' => 'funding, growth, strategy',
             'description' => '10.0.0.55',
-            'meta_description' => '10.0.0.55'
+            'meta_description' => '10.0.0.55',
         ]);
 
         DB::table('seo')->insert([
@@ -39,7 +39,7 @@ class SeoTableSeeder extends Seeder
             'title' => 'How to Scale Your Startup',
             'keyword' => 'technology, innovation, market',
             'description' => '172.16.0.100',
-            'meta_description' => '172.16.0.100'
+            'meta_description' => '172.16.0.100',
         ]);
 
     }

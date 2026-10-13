@@ -15,7 +15,7 @@ class StaticPageControllerTest extends TestCase
             ['terms-and-conditions', 'Terms Of Use'],
             ['contact-us', 'Contact'],
         ] as [$path, $title]) {
-            $this->get('/' . $path)
+            $this->get('/'.$path)
                 ->assertOk()
                 ->assertSee($title)
                 ->assertSee('static-page__content')

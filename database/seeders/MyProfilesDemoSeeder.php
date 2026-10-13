@@ -143,6 +143,6 @@ class MyProfilesDemoSeeder extends Seeder
             'profile_id' => $lender->lender_id,
         ], ['visitor_ip' => '127.0.0.1']);
 
-        $this->command->info('MyProfilesDemoSeeder: ensured 1 active Business/Startup/Mentor/Lender + bookmarks + visit history for user_id=' . $demoUserId);
+        $this->command->info('MyProfilesDemoSeeder: ensured 1 active Business/Startup/Mentor/Lender + bookmarks + visit history for user_id='.$demoUserId);
     }
 }

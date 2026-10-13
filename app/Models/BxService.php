@@ -2,7 +2,9 @@
 
 namespace App\Models;
 
-class BxService extends \Illuminate\Database\Eloquent\Model
+use Illuminate\Database\Eloquent\Model;
+
+class BxService extends Model
 {
     protected $table = 'bx_services';
 
@@ -34,5 +36,4 @@ class BxService extends \Illuminate\Database\Eloquent\Model
     protected $casts = [
         'event_date' => 'datetime',
     ];
-
 }

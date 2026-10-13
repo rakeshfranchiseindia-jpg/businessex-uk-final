@@ -25,7 +25,7 @@ return new class extends Migration
             $table->integer('totalComment')->nullable(false);
             $table->integer('totalVotes')->nullable(false);
             $table->integer('views')->nullable(false)->default(0);
-            $table->enum('status', ['A','D'])->nullable(false)->default('D');
+            $table->enum('status', ['A', 'D'])->nullable(false)->default('D');
             $table->string('seoTitle', 255)->nullable(false);
             $table->string('seoKeywords', 255)->nullable(false);
             $table->string('seoDescription', 255)->nullable(false);

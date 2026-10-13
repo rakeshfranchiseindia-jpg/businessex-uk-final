@@ -12,11 +12,11 @@ class BxArticlesTableSeeder extends Seeder
 {
     public function run(): void
     {
-        if (!Schema::hasTable('bx_articles')) {
+        if (! Schema::hasTable('bx_articles')) {
             throw new RuntimeException('Cannot seed articles: the bx_articles table does not exist. Run the database migrations first.');
         }
 
-        if (!Schema::hasTable('bx_author')) {
+        if (! Schema::hasTable('bx_author')) {
             throw new RuntimeException('Cannot seed articles: the bx_author table does not exist. Run the database migrations first.');
         }
 

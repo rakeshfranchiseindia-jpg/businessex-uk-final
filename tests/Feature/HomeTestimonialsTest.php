@@ -36,7 +36,7 @@ class HomeTestimonialsTest extends TestCase
     public function test_homepage_shows_only_the_three_ordered_active_testimonials_with_ratings(): void
     {
         for ($id = 1; $id <= 7; $id++) {
-            $this->insertTestimonial($id, 'Client ' . $id, true, $id);
+            $this->insertTestimonial($id, 'Client '.$id, true, $id);
         }
         $this->insertTestimonial(8, 'Hidden Client', false, 0);
 
@@ -56,7 +56,7 @@ class HomeTestimonialsTest extends TestCase
     {
         DB::table('testimonials')->insert([
             'id' => $id,
-            'text' => 'Review written by ' . $name,
+            'text' => 'Review written by '.$name,
             'name' => $name,
             'designation' => 'Client',
             'rating' => $id,

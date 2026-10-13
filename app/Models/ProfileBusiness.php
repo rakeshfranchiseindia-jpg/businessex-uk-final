@@ -2,7 +2,9 @@
 
 namespace App\Models;
 
-class ProfileBusiness extends \Illuminate\Database\Eloquent\Model
+use Illuminate\Database\Eloquent\Model;
+
+class ProfileBusiness extends Model
 {
     protected $table = 'profile_business';
 
@@ -106,7 +108,6 @@ class ProfileBusiness extends \Illuminate\Database\Eloquent\Model
         'last_login_at' => 'datetime',
     ];
 
-
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id', 'user_id');
@@ -146,5 +147,4 @@ class ProfileBusiness extends \Illuminate\Database\Eloquent\Model
     {
         return $this->hasMany(ProfileVisitor::class, 'profile_id', 'business_id');
     }
-
 }

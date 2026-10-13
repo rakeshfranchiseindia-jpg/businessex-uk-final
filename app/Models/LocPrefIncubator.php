@@ -2,7 +2,9 @@
 
 namespace App\Models;
 
-class LocPrefIncubator extends \Illuminate\Database\Eloquent\Model
+use Illuminate\Database\Eloquent\Model;
+
+class LocPrefIncubator extends Model
 {
     protected $table = 'loc_pref_incubators';
 
@@ -20,10 +22,8 @@ class LocPrefIncubator extends \Illuminate\Database\Eloquent\Model
         'profile_status',
     ];
 
-
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id', 'user_id');
     }
-
 }

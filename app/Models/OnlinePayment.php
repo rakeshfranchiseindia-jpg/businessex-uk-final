@@ -2,7 +2,9 @@
 
 namespace App\Models;
 
-class OnlinePayment extends \Illuminate\Database\Eloquent\Model
+use Illuminate\Database\Eloquent\Model;
+
+class OnlinePayment extends Model
 {
     protected $table = 'online_payments';
 
@@ -51,5 +53,4 @@ class OnlinePayment extends \Illuminate\Database\Eloquent\Model
     {
         return $this->belongsTo(BxCoupon::class, 'coupon_id', 'id');
     }
-
 }

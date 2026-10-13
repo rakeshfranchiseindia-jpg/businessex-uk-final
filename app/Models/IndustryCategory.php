@@ -2,7 +2,9 @@
 
 namespace App\Models;
 
-class IndustryCategory extends \Illuminate\Database\Eloquent\Model
+use Illuminate\Database\Eloquent\Model;
+
+class IndustryCategory extends Model
 {
     protected $table = 'industry_categories';
 
@@ -14,7 +16,6 @@ class IndustryCategory extends \Illuminate\Database\Eloquent\Model
         'parent_id',
         'category_status',
     ];
-
 
     public function parent()
     {
@@ -35,5 +36,4 @@ class IndustryCategory extends \Illuminate\Database\Eloquent\Model
     {
         return $query->orderBy('category_name', 'asc');
     }
-
 }

@@ -2,10 +2,11 @@
 
 namespace App\Models;
 
-class ConversationReplyAttachment extends \Illuminate\Database\Eloquent\Model
+use Illuminate\Database\Eloquent\Model;
+
+class ConversationReplyAttachment extends Model
 {
     protected $table = 'conversation_reply_attachment';
-
 
     protected $fillable = [
         'reply_id',
@@ -15,10 +16,8 @@ class ConversationReplyAttachment extends \Illuminate\Database\Eloquent\Model
         'is_active',
     ];
 
-
     public function reply()
     {
         return $this->belongsTo(ConversationReply::class, 'reply_id', 'id');
     }
-
 }

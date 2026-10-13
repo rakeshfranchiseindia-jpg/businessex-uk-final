@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Support\SchemaCache;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use App\Support\SchemaCache;
 use Illuminate\View\View;
 
 class BusinessListingController extends AbstractListingController
@@ -50,7 +50,7 @@ class BusinessListingController extends AbstractListingController
             $business->company_summary ?? $business->seller_intro ?? $business->business_pitch ?? null,
             $business->industry_sector ?? null,
             isset($business->inv_asking_price)
-                ? '£' . number_format((float) $business->inv_asking_price)
+                ? '£'.number_format((float) $business->inv_asking_price)
                 : null,
             $business->seller_prof_pic ?? null,
             'assets/img/default-business-profile.png',
@@ -58,7 +58,7 @@ class BusinessListingController extends AbstractListingController
                 'Established' => $business->estb_year ?? null,
                 'Employees' => $business->emp_count ?? null,
                 'Seeking' => isset($business->inv_asking_price)
-                    ? '£' . number_format((float) $business->inv_asking_price)
+                    ? '£'.number_format((float) $business->inv_asking_price)
                     : null,
             ])
         ));
@@ -82,7 +82,7 @@ class BusinessListingController extends AbstractListingController
 
         $query->where(function (Builder $nested) use ($categoryIds, $parentIds, $categoryNames): void {
             foreach ($categoryNames as $name) {
-                $nested->orWhere('industry_sector', 'like', '%' . $name . '%');
+                $nested->orWhere('industry_sector', 'like', '%'.$name.'%');
             }
 
             if (SchemaCache::hasTable('ind_pref_business')
@@ -119,7 +119,7 @@ class BusinessListingController extends AbstractListingController
             'investor' => ['seeking_investors'],
             'loan' => ['seeking_loan'],
         ];
-        if (!isset($columns[$intent])) {
+        if (! isset($columns[$intent])) {
             return;
         }
 

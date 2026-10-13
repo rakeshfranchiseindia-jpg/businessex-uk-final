@@ -12,8 +12,7 @@ class HomeController extends Controller
 {
     public function __construct(
         private readonly TestimonialController $testimonialController
-    ) {
-    }
+    ) {}
 
     public function index(): View
     {
@@ -120,7 +119,7 @@ class HomeController extends Controller
                 ->first();
 
             foreach ($investmentRanges as $index => &$range) {
-                $range['count'] = (int) ($counts->{'investment_range_' . $index} ?? 0);
+                $range['count'] = (int) ($counts->{'investment_range_'.$index} ?? 0);
             }
             unset($range);
         }
@@ -195,7 +194,7 @@ class HomeController extends Controller
                     $business->display_title = $business->advmt_headline
                         ?: ($business->seller_company ?: 'Business opportunity');
                     $business->display_industry = $business->industry_sector
-                        && !is_numeric($business->industry_sector)
+                        && ! is_numeric($business->industry_sector)
                             ? $business->industry_sector
                             : 'Business opportunity';
                     $business->image_url = $this->businessImageUrl($business->seller_prof_pic);
@@ -309,7 +308,7 @@ class HomeController extends Controller
                     $startup->display_title = $startup->advmt_headline
                         ?: ($startup->name_of_entity ?: 'Startup opportunity');
                     $startup->display_industry = $startup->industry_name
-                        ?: ($startup->industry_sector && !is_numeric($startup->industry_sector)
+                        ?: ($startup->industry_sector && ! is_numeric($startup->industry_sector)
                             ? $startup->industry_sector
                             : 'Startup opportunity');
                     $startup->display_summary = $startup->company_summary
@@ -393,13 +392,13 @@ class HomeController extends Controller
 
         if ($path) {
             $relativePath = ltrim(str_replace('\\', '/', $path), '/');
-            if (!str_contains($relativePath, '..')) {
+            if (! str_contains($relativePath, '..')) {
                 if (is_file(public_path($relativePath))) {
                     return asset($relativePath);
                 }
 
-                if (is_file(public_path('storage/' . $relativePath))) {
-                    return asset('storage/' . $relativePath);
+                if (is_file(public_path('storage/'.$relativePath))) {
+                    return asset('storage/'.$relativePath);
                 }
             }
         }
@@ -415,13 +414,13 @@ class HomeController extends Controller
 
         if ($path) {
             $relativePath = ltrim(str_replace('\\', '/', $path), '/');
-            if (!str_contains($relativePath, '..')) {
+            if (! str_contains($relativePath, '..')) {
                 if (is_file(public_path($relativePath))) {
                     return asset($relativePath);
                 }
 
-                if (is_file(public_path('storage/' . $relativePath))) {
-                    return asset('storage/' . $relativePath);
+                if (is_file(public_path('storage/'.$relativePath))) {
+                    return asset('storage/'.$relativePath);
                 }
             }
         }
@@ -437,13 +436,13 @@ class HomeController extends Controller
 
         if ($path) {
             $relativePath = ltrim(str_replace('\\', '/', $path), '/');
-            if (!str_contains($relativePath, '..')) {
+            if (! str_contains($relativePath, '..')) {
                 if (is_file(public_path($relativePath))) {
                     return asset($relativePath);
                 }
 
-                if (is_file(public_path('storage/' . $relativePath))) {
-                    return asset('storage/' . $relativePath);
+                if (is_file(public_path('storage/'.$relativePath))) {
+                    return asset('storage/'.$relativePath);
                 }
             }
         }
@@ -459,13 +458,13 @@ class HomeController extends Controller
 
         if ($path) {
             $relativePath = ltrim(str_replace('\\', '/', $path), '/');
-            if (!str_contains($relativePath, '..')) {
+            if (! str_contains($relativePath, '..')) {
                 if (is_file(public_path($relativePath))) {
                     return asset($relativePath);
                 }
 
-                if (is_file(public_path('storage/' . $relativePath))) {
-                    return asset('storage/' . $relativePath);
+                if (is_file(public_path('storage/'.$relativePath))) {
+                    return asset('storage/'.$relativePath);
                 }
             }
         }
@@ -481,11 +480,11 @@ class HomeController extends Controller
 
         if ($path) {
             $relativePath = ltrim(str_replace('\\', '/', $path), '/');
-            if (!str_contains($relativePath, '..') && is_file(public_path($relativePath))) {
+            if (! str_contains($relativePath, '..') && is_file(public_path($relativePath))) {
                 return asset($relativePath);
             }
         }
 
-        return asset('assets/img/article-' . ((($articleId - 1) % 4) + 1) . '.jpg');
+        return asset('assets/img/article-'.((($articleId - 1) % 4) + 1).'.jpg');
     }
 }

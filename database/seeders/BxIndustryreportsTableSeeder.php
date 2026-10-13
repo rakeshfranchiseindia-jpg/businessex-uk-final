@@ -30,7 +30,7 @@ class BxIndustryreportsTableSeeder extends Seeder
             'seo_desc' => 'Sample description text.',
             'industryreport_views' => 5,
             'industryreport_comments' => 0,
-            'created_by' => 1
+            'created_by' => 1,
         ]);
 
         DB::table('bx_industryreports')->insert([
@@ -51,7 +51,7 @@ class BxIndustryreportsTableSeeder extends Seeder
             'seo_desc' => 'Another sample description.',
             'industryreport_views' => 15,
             'industryreport_comments' => 2,
-            'created_by' => 2
+            'created_by' => 2,
         ]);
 
         DB::table('bx_industryreports')->insert([
@@ -72,7 +72,7 @@ class BxIndustryreportsTableSeeder extends Seeder
             'seo_desc' => 'Third sample description.',
             'industryreport_views' => 25,
             'industryreport_comments' => 0,
-            'created_by' => 3
+            'created_by' => 3,
         ]);
 
     }

@@ -59,8 +59,8 @@ class InvestorListingController extends AbstractListingController
             $investor->company_summary ?: $investor->inv_abt_urself ?: $investor->inv_intro,
             $investor->sector_preference ?: $investor->inv_headline,
             $investor->invest_size_min || $investor->invest_size_max
-                ? '£' . number_format((float) $investor->invest_size_min)
-                    . ' – £' . number_format((float) $investor->invest_size_max)
+                ? '£'.number_format((float) $investor->invest_size_min)
+                    .' – £'.number_format((float) $investor->invest_size_max)
                 : null,
             $investor->inv_profile_pic_path ?: $investor->company_logo_path,
             'assets/img/default-investor-profile.png',
@@ -68,8 +68,8 @@ class InvestorListingController extends AbstractListingController
                 'Company' => $investor->company_name,
                 'Role' => $investor->company_designation,
                 'Investment Range' => $investor->invest_size_min || $investor->invest_size_max
-                    ? '£' . number_format((float) $investor->invest_size_min)
-                        . ' – £' . number_format((float) $investor->invest_size_max)
+                    ? '£'.number_format((float) $investor->invest_size_min)
+                        .' – £'.number_format((float) $investor->invest_size_max)
                     : null,
             ])
         ));

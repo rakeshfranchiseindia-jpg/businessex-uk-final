@@ -2,7 +2,9 @@
 
 namespace App\Models;
 
-class ProfileVisitor extends \Illuminate\Database\Eloquent\Model
+use Illuminate\Database\Eloquent\Model;
+
+class ProfileVisitor extends Model
 {
     protected $table = 'profile_visitors';
 
@@ -16,10 +18,8 @@ class ProfileVisitor extends \Illuminate\Database\Eloquent\Model
         'profile_str',
     ];
 
-
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id', 'user_id');
     }
-
 }

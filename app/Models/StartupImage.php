@@ -2,9 +2,12 @@
 
 namespace App\Models;
 
-class StartupImage extends \Illuminate\Database\Eloquent\Model
+use Illuminate\Database\Eloquent\Model;
+
+class StartupImage extends Model
 {
     public const TYPE_IMAGE = 1;
+
     public const TYPE_DOCUMENT = 2;
 
     protected $table = 'startup_images';
@@ -19,10 +22,8 @@ class StartupImage extends \Illuminate\Database\Eloquent\Model
         'is_active',
     ];
 
-
     public function startup()
     {
         return $this->belongsTo(ProfileStartup::class, 'startup_id', 'startup_id');
     }
-
 }

@@ -1,0 +1,31 @@
+{
+    "preset": "laravel",
+    "exclude": [
+        "includes",
+        "tools"
+    ],
+    "notPath": [
+        "artical-detail.php",
+        "article.php",
+        "business-listing.php",
+        "business-registration.php",
+        "bx-inbox.php",
+        "dashboard-password.php",
+        "dashboard-profile.php",
+        "dashboard.php",
+        "forgot-password.php",
+        "instant-response.php",
+        "investor-listing.php",
+        "investor-registration.php",
+        "login.php",
+        "mentor-listing.php",
+        "mentor-registration.php",
+        "pricing.php",
+        "profile-details.php",
+        "proposal-received.php",
+        "proposal-sent.php",
+        "reset-password.php",
+        "startup-listing.php",
+        "startup-registration.php"
+    ]
+}

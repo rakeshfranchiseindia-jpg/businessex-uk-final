@@ -2,10 +2,11 @@
 
 namespace App\Models;
 
-class ContactComment extends \Illuminate\Database\Eloquent\Model
+use Illuminate\Database\Eloquent\Model;
+
+class ContactComment extends Model
 {
     protected $table = 'contact_comment';
-
 
     protected $fillable = [
         'contact_id',
@@ -27,10 +28,8 @@ class ContactComment extends \Illuminate\Database\Eloquent\Model
         'updated_date' => 'datetime',
     ];
 
-
     public function commentedBy()
     {
         return $this->belongsTo(User::class, 'commented_by', 'user_id');
     }
-
 }

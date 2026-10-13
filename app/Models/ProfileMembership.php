@@ -2,7 +2,9 @@
 
 namespace App\Models;
 
-class ProfileMembership extends \Illuminate\Database\Eloquent\Model
+use Illuminate\Database\Eloquent\Model;
+
+class ProfileMembership extends Model
 {
     protected $table = 'profile_memberships';
 
@@ -38,5 +40,4 @@ class ProfileMembership extends \Illuminate\Database\Eloquent\Model
     {
         return $this->belongsTo(UserAccount::class, 'user_id', 'user_id');
     }
-
 }

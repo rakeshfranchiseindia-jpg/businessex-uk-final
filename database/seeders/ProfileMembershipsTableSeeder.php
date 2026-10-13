@@ -27,7 +27,7 @@ class ProfileMembershipsTableSeeder extends Seeder
             'activation_date' => '2025-07-15 00:00:00',
             'expiry_date' => '2026-01-15 00:00:00',
             'is_active' => 0,
-            'upg_source' => 1
+            'upg_source' => 1,
         ]);
 
         DB::table('profile_memberships')->insert([
@@ -45,7 +45,7 @@ class ProfileMembershipsTableSeeder extends Seeder
             'activation_date' => '2025-08-15 00:00:00',
             'expiry_date' => '2026-06-15 00:00:00',
             'is_active' => 1,
-            'upg_source' => 2
+            'upg_source' => 2,
         ]);
 
         DB::table('profile_memberships')->insert([
@@ -63,7 +63,7 @@ class ProfileMembershipsTableSeeder extends Seeder
             'activation_date' => '2025-09-15 00:00:00',
             'expiry_date' => '2026-12-15 00:00:00',
             'is_active' => 0,
-            'upg_source' => 3
+            'upg_source' => 3,
         ]);
 
     }

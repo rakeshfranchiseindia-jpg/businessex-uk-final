@@ -2,7 +2,9 @@
 
 namespace App\Models;
 
-class IndPrefInvestor extends \Illuminate\Database\Eloquent\Model
+use Illuminate\Database\Eloquent\Model;
+
+class IndPrefInvestor extends Model
 {
     protected $table = 'ind_pref_investors';
 
@@ -16,10 +18,8 @@ class IndPrefInvestor extends \Illuminate\Database\Eloquent\Model
         'profile_status',
     ];
 
-
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id', 'user_id');
     }
-
 }

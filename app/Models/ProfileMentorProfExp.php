@@ -2,7 +2,9 @@
 
 namespace App\Models;
 
-class ProfileMentorProfExp extends \Illuminate\Database\Eloquent\Model
+use Illuminate\Database\Eloquent\Model;
+
+class ProfileMentorProfExp extends Model
 {
     protected $table = 'profile_mentor_prof_exp';
 
@@ -15,7 +17,6 @@ class ProfileMentorProfExp extends \Illuminate\Database\Eloquent\Model
         'exp_sector',
     ];
 
-
     public function mentorProfile()
     {
         return $this->belongsTo(ProfileMentor::class, 'mentor_profile_id', 'mentor_id');
@@ -25,5 +26,4 @@ class ProfileMentorProfExp extends \Illuminate\Database\Eloquent\Model
     {
         return $this->belongsTo(User::class, 'user_id', 'user_id');
     }
-
 }

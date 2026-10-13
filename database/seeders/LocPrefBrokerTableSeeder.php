@@ -19,7 +19,7 @@ class LocPrefBrokerTableSeeder extends Seeder
             'location_name' => '123 Business Park, Andheri East',
             'loc_state' => 'Maharashtra',
             'loc_country' => 'India',
-            'profile_status' => 0
+            'profile_status' => 0,
         ]);
 
         DB::table('loc_pref_broker')->insert([
@@ -29,7 +29,7 @@ class LocPrefBrokerTableSeeder extends Seeder
             'location_name' => '456 Tech Hub, Whitefield',
             'loc_state' => 'Delhi',
             'loc_country' => 'United States',
-            'profile_status' => 1
+            'profile_status' => 1,
         ]);
 
         DB::table('loc_pref_broker')->insert([
@@ -39,7 +39,7 @@ class LocPrefBrokerTableSeeder extends Seeder
             'location_name' => '789 Corporate Tower, Connaught Place',
             'loc_state' => 'Karnataka',
             'loc_country' => 'Singapore',
-            'profile_status' => 0
+            'profile_status' => 0,
         ]);
 
     }

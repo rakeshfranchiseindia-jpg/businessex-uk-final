@@ -27,7 +27,7 @@ class BxNewsTableSeeder extends Seeder
             'seo_desc' => 'Sample description text.',
             'news_views' => 5,
             'news_comments' => 0,
-            'created_by' => 1
+            'created_by' => 1,
         ]);
 
         DB::table('bx_news')->insert([
@@ -45,7 +45,7 @@ class BxNewsTableSeeder extends Seeder
             'seo_desc' => 'Another sample description.',
             'news_views' => 15,
             'news_comments' => 0,
-            'created_by' => 2
+            'created_by' => 2,
         ]);
 
         DB::table('bx_news')->insert([
@@ -63,7 +63,7 @@ class BxNewsTableSeeder extends Seeder
             'seo_desc' => 'Third sample description.',
             'news_views' => 25,
             'news_comments' => 0,
-            'created_by' => 3
+            'created_by' => 3,
         ]);
 
     }

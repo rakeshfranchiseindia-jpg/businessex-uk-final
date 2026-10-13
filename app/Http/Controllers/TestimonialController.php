@@ -2,15 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Support\SchemaCache;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
-use App\Support\SchemaCache;
 
 class TestimonialController extends Controller
 {
     public function homepageTestimonials(): Collection
     {
-        if (!SchemaCache::hasTable('testimonials')) {
+        if (! SchemaCache::hasTable('testimonials')) {
             return collect();
         }
 
@@ -58,7 +58,7 @@ class TestimonialController extends Controller
 
         if ($path) {
             $relativePath = ltrim(str_replace('\\', '/', $path), '/');
-            if (!str_contains($relativePath, '..') && is_file(public_path($relativePath))) {
+            if (! str_contains($relativePath, '..') && is_file(public_path($relativePath))) {
                 return asset($relativePath);
             }
         }

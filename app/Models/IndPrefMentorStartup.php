@@ -2,7 +2,9 @@
 
 namespace App\Models;
 
-class IndPrefMentorStartup extends \Illuminate\Database\Eloquent\Model
+use Illuminate\Database\Eloquent\Model;
+
+class IndPrefMentorStartup extends Model
 {
     protected $table = 'ind_pref_mentor_startup';
 
@@ -16,10 +18,8 @@ class IndPrefMentorStartup extends \Illuminate\Database\Eloquent\Model
         'profile_status',
     ];
 
-
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id', 'user_id');
     }
-
 }

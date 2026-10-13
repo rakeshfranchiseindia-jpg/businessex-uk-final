@@ -84,8 +84,8 @@ class ProfileRecordsSeeder extends Seeder
         foreach (self::PROFILES as $profileType => $definition) {
             foreach ($definition['profiles'] as $index => $record) {
                 $sequence = $index + 1;
-                $profileKey = 'DEMO' . $definition['code'] . str_pad((string) $sequence, 2, '0', STR_PAD_LEFT);
-                $email = 'demo.' . $profileType . str_pad((string) $sequence, 2, '0', STR_PAD_LEFT) . '@example.test';
+                $profileKey = 'DEMO'.$definition['code'].str_pad((string) $sequence, 2, '0', STR_PAD_LEFT);
+                $email = 'demo.'.$profileType.str_pad((string) $sequence, 2, '0', STR_PAD_LEFT).'@example.test';
                 DB::transaction(function () use ($definition, $email, $now, $profileKey, $profileType, $record, $sequence): void {
                     $userId = $this->ensureUser($email, $record, $profileType, $definition['code'], $sequence, $now);
                     $profileValues = $this->profileValues(
@@ -107,7 +107,7 @@ class ProfileRecordsSeeder extends Seeder
                         ->where($definition['key'], $profileKey)
                         ->value($definition['id']);
 
-                    if (!$profileId) {
+                    if (! $profileId) {
                         throw new RuntimeException("Unable to retrieve the seeded profile [{$profileKey}].");
                     }
 
@@ -145,7 +145,7 @@ class ProfileRecordsSeeder extends Seeder
         }
 
         foreach ($tables as $table) {
-            if (!Schema::hasTable($table)) {
+            if (! Schema::hasTable($table)) {
                 throw new RuntimeException("ProfileRecordsSeeder requires table [{$table}]. Run the migrations/import the BusinessX schema first.");
             }
         }
@@ -168,11 +168,11 @@ class ProfileRecordsSeeder extends Seeder
         $company = $record['company'];
 
         $values = [
-            'user_rand_id' => 'DEMOU' . $code . str_pad((string) $sequence, 2, '0', STR_PAD_LEFT),
+            'user_rand_id' => 'DEMOU'.$code.str_pad((string) $sequence, 2, '0', STR_PAD_LEFT),
             'name' => $personName,
             'email' => $email,
             'password' => Hash::make(self::DEMO_PASSWORD),
-            'mobile' => '+44 7700 ' . str_pad((string) (900000 + $sequence), 6, '0', STR_PAD_LEFT),
+            'mobile' => '+44 7700 '.str_pad((string) (900000 + $sequence), 6, '0', STR_PAD_LEFT),
             'company_name' => $company,
             'is_active' => 1,
             'reg_source' => 1,
@@ -220,7 +220,7 @@ class ProfileRecordsSeeder extends Seeder
             'mentor_company' => $record['company'] ?? null,
             'mentor_country' => 'United Kingdom',
             'mentor_city' => $record['city'] ?? null,
-            'mentor_adv_headline' => ($record['expertise'] ?? 'Experienced business mentor') . ' mentor',
+            'mentor_adv_headline' => ($record['expertise'] ?? 'Experienced business mentor').' mentor',
             'mentor_intro' => 'Experienced adviser helping growing UK businesses build practical plans and make confident decisions.',
             'mentor_profile_summary' => $record['expertise'] ?? null,
             'mentor_occupation' => 1,
@@ -231,7 +231,7 @@ class ProfileRecordsSeeder extends Seeder
             'inv_mobile' => '07700900004',
             'inv_country' => 'United Kingdom',
             'inv_city' => $record['city'] ?? null,
-            'inv_headline' => 'Investing in ' . ($record['focus'] ?? 'UK businesses'),
+            'inv_headline' => 'Investing in '.($record['focus'] ?? 'UK businesses'),
             'inv_intro' => 'Long-term investor supporting ambitious UK businesses with capital and practical experience.',
             'inv_type' => 1,
             'inv_abt_urself' => 'Focused on sustainable growth, clear governance and strong founding teams.',
@@ -243,7 +243,7 @@ class ProfileRecordsSeeder extends Seeder
             'company_summary' => 'A UK-based organisation supporting businesses with long-term growth opportunities.',
             'inv_profile_status' => 1,
             'reg_source' => 1,
-            'advmt_headline' => $record['pitch'] ?? (($record['company'] ?? 'UK business') . ' growth opportunity'),
+            'advmt_headline' => $record['pitch'] ?? (($record['company'] ?? 'UK business').' growth opportunity'),
             'startup_intro' => 'A UK-based early-stage company building practical solutions for its customers.',
             'industry_sector' => $record['industry'] ?? 1,
             'business_website' => 'https://example.test',
@@ -317,7 +317,7 @@ class ProfileRecordsSeeder extends Seeder
         string $profileKey,
         mixed $now
     ): void {
-        if (!Schema::hasTable('profiles')) {
+        if (! Schema::hasTable('profiles')) {
             return;
         }
 

@@ -2,7 +2,9 @@
 
 namespace App\Models;
 
-class IndPrefMentorContactPage extends \Illuminate\Database\Eloquent\Model
+use Illuminate\Database\Eloquent\Model;
+
+class IndPrefMentorContactPage extends Model
 {
     protected $table = 'ind_pref_mentor_contact_page';
 
@@ -18,10 +20,8 @@ class IndPrefMentorContactPage extends \Illuminate\Database\Eloquent\Model
         'contact_type',
     ];
 
-
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id', 'user_id');
     }
-
 }

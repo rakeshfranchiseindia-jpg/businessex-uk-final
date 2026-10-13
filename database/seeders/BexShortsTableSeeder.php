@@ -25,7 +25,7 @@ class BexShortsTableSeeder extends Seeder
             'seo_keywords' => 'business, startup, investment',
             'seo_desc' => 'Sample description text.',
             'status' => 0,
-            'created_by' => 1
+            'created_by' => 1,
         ]);
 
         DB::table('bex_shorts')->insert([
@@ -41,7 +41,7 @@ class BexShortsTableSeeder extends Seeder
             'seo_keywords' => 'funding, growth, strategy',
             'seo_desc' => 'Another sample description.',
             'status' => 1,
-            'created_by' => 2
+            'created_by' => 2,
         ]);
 
         DB::table('bex_shorts')->insert([
@@ -57,7 +57,7 @@ class BexShortsTableSeeder extends Seeder
             'seo_keywords' => 'technology, innovation, market',
             'seo_desc' => 'Third sample description.',
             'status' => 0,
-            'created_by' => 3
+            'created_by' => 3,
         ]);
 
     }

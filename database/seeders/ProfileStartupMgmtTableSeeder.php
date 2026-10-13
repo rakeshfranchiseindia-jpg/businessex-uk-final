@@ -18,7 +18,7 @@ class ProfileStartupMgmtTableSeeder extends Seeder
             'user_id' => 1,
             'mgmt_name' => 'Rajesh Kumar',
             'mgmt_designation' => 'CEO',
-            'mgmt_email' => 'admin@businessex.com'
+            'mgmt_email' => 'admin@businessex.com',
         ]);
 
         DB::table('profile_startup_mgmt')->insert([
@@ -27,7 +27,7 @@ class ProfileStartupMgmtTableSeeder extends Seeder
             'user_id' => 2,
             'mgmt_name' => 'Priya Sharma',
             'mgmt_designation' => 'CTO',
-            'mgmt_email' => 'john.doe@example.com'
+            'mgmt_email' => 'john.doe@example.com',
         ]);
 
         DB::table('profile_startup_mgmt')->insert([
@@ -36,7 +36,7 @@ class ProfileStartupMgmtTableSeeder extends Seeder
             'user_id' => 3,
             'mgmt_name' => 'Amit Patel',
             'mgmt_designation' => 'Managing Director',
-            'mgmt_email' => 'priya.sharma@example.com'
+            'mgmt_email' => 'priya.sharma@example.com',
         ]);
 
     }

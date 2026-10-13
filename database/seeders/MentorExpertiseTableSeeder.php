@@ -17,7 +17,7 @@ class MentorExpertiseTableSeeder extends Seeder
             'mentor_id' => 1,
             'user_id' => 1,
             'exp_years' => 2,
-            'exp_industry' => 1
+            'exp_industry' => 1,
         ]);
 
         DB::table('mentor_expertise')->insert([
@@ -25,7 +25,7 @@ class MentorExpertiseTableSeeder extends Seeder
             'mentor_id' => 2,
             'user_id' => 2,
             'exp_years' => 3,
-            'exp_industry' => 2
+            'exp_industry' => 2,
         ]);
 
         DB::table('mentor_expertise')->insert([
@@ -33,7 +33,7 @@ class MentorExpertiseTableSeeder extends Seeder
             'mentor_id' => 3,
             'user_id' => 3,
             'exp_years' => 4,
-            'exp_industry' => 3
+            'exp_industry' => 3,
         ]);
 
     }

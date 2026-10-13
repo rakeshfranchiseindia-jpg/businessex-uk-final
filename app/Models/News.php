@@ -2,7 +2,9 @@
 
 namespace App\Models;
 
-class News extends \Illuminate\Database\Eloquent\Model
+use Illuminate\Database\Eloquent\Model;
+
+class News extends Model
 {
     protected $table = 'news';
 
@@ -29,5 +31,4 @@ class News extends \Illuminate\Database\Eloquent\Model
     protected $casts = [
         'news_date' => 'datetime',
     ];
-
 }

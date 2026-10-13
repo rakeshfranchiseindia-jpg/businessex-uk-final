@@ -15,19 +15,19 @@ class HongkongTableSeeder extends Seeder
         DB::table('hongkong')->insert([
             'hk_id' => 1,
             'name' => 'Rajesh Kumar',
-            'email' => 'admin@businessex.com'
+            'email' => 'admin@businessex.com',
         ]);
 
         DB::table('hongkong')->insert([
             'hk_id' => 2,
             'name' => 'Priya Sharma',
-            'email' => 'john.doe@example.com'
+            'email' => 'john.doe@example.com',
         ]);
 
         DB::table('hongkong')->insert([
             'hk_id' => 3,
             'name' => 'Amit Patel',
-            'email' => 'priya.sharma@example.com'
+            'email' => 'priya.sharma@example.com',
         ]);
 
     }

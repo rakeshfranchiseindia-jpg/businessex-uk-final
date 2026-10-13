@@ -2,8 +2,9 @@
 
 namespace Tests\Feature;
 
-use Carbon\CarbonImmutable;
 use App\Models\UserAccount;
+use Carbon\CarbonImmutable;
+use Database\Seeders\BxArticlesTableSeeder;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
@@ -144,7 +145,7 @@ class ArticlePagesTest extends TestCase
     public function test_authenticated_user_can_submit_a_comment_for_a_published_article(): void
     {
         $this->insertArticle(12, 'Commentable article', 'business');
-        $user = new UserAccount();
+        $user = new UserAccount;
         $user->setRawAttributes([
             'user_id' => 42,
             'name' => 'Signed In Member',
@@ -249,7 +250,7 @@ class ArticlePagesTest extends TestCase
 
     public function test_article_seeder_adds_ten_published_articles_and_is_safe_to_rerun(): void
     {
-        $seeder = new \Database\Seeders\BxArticlesTableSeeder();
+        $seeder = new BxArticlesTableSeeder;
         $seeder->run();
 
         $this->assertSame(10, DB::table('bx_articles')->where('article_status', 1)->count());
@@ -272,7 +273,7 @@ class ArticlePagesTest extends TestCase
         DB::table('bx_articles')->insert([
             'article_id' => $id,
             'article_title' => $title,
-            'short_desc' => 'A summary of ' . $title,
+            'short_desc' => 'A summary of '.$title,
             'article_content' => $content,
             'author_id' => 1,
             'image_path' => '',
@@ -281,7 +282,7 @@ class ArticlePagesTest extends TestCase
             'article_status' => $published,
             'seo_title' => $title,
             'seo_keywords' => $tags,
-            'seo_desc' => 'Description for ' . $title,
+            'seo_desc' => 'Description for '.$title,
             'article_views' => $id,
             'article_comments' => 0,
             'created_at' => $publishedAt ?? '2026-08-24 06:31:29',

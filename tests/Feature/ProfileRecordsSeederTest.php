@@ -99,7 +99,7 @@ class ProfileRecordsSeederTest extends TestCase
 
     public function test_seeder_creates_five_linked_profiles_of_each_type_and_is_safe_to_rerun(): void
     {
-        $seeder = new ProfileRecordsSeeder();
+        $seeder = new ProfileRecordsSeeder;
         $seeder->run();
 
         foreach (['profile_business', 'profile_mentors', 'profile_investor', 'profile_startups'] as $table) {

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Support\SchemaCache;
 use Carbon\CarbonImmutable;
 use DOMDocument;
 use DOMElement;
@@ -10,8 +11,8 @@ use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\DB;
-use App\Support\SchemaCache;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
 
@@ -44,15 +45,15 @@ class ArticleController extends Controller
         $categoryMap = collect($categories)->keyBy('slug');
         $selectedCategory = $categoryMap->get($filters['category'] ?? '');
 
-        if (!empty($filters['category']) && !$selectedCategory) {
+        if (! empty($filters['category']) && ! $selectedCategory) {
             abort(404, 'Article category not found.');
         }
 
         $articles = $available
             ? $this->articleQuery()
                 ->where('bx_articles.article_status', 1)
-                ->when(!empty($filters['q']), function ($query) use ($filters): void {
-                    $term = '%' . trim($filters['q']) . '%';
+                ->when(! empty($filters['q']), function ($query) use ($filters): void {
+                    $term = '%'.trim($filters['q']).'%';
                     $query->where(function ($search) use ($term): void {
                         $search->where('bx_articles.article_title', 'like', $term)
                             ->orWhere('bx_articles.short_desc', 'like', $term)
@@ -62,7 +63,7 @@ class ArticleController extends Controller
                     });
                 })
                 ->when($selectedCategory, fn ($query) => $this->filterByTag($query, $selectedCategory['name']))
-                ->when(!empty($filters['period']) && $filters['period'] !== 'all', function ($query) use ($filters): void {
+                ->when(! empty($filters['period']) && $filters['period'] !== 'all', function ($query) use ($filters): void {
                     $cutoff = CarbonImmutable::now()->subDays(self::DATE_FILTERS[$filters['period']]);
                     $query->where(function ($dateQuery) use ($cutoff): void {
                         $dateQuery->where('bx_articles.created_at', '>=', $cutoff)
@@ -240,12 +241,12 @@ class ArticleController extends Controller
             ? "LOWER(',' || REPLACE(bx_articles.article_tags, ', ', ',') || ',')"
             : "LOWER(CONCAT(',', REPLACE(bx_articles.article_tags, ', ', ','), ','))";
 
-        return $query->whereRaw($tagList . ' LIKE ?', ['%,' . $normalized . ',%'], $boolean);
+        return $query->whereRaw($tagList.' LIKE ?', ['%,'.$normalized.',%'], $boolean);
     }
 
     private function categories(): array
     {
-        if (!SchemaCache::hasTable('bx_articles')) {
+        if (! SchemaCache::hasTable('bx_articles')) {
             return [];
         }
 
@@ -268,7 +269,7 @@ class ArticleController extends Controller
 
     private function splitTags(?string $tags): array
     {
-        if (!$tags) {
+        if (! $tags) {
             return [];
         }
 
@@ -283,12 +284,12 @@ class ArticleController extends Controller
 
         if ($path) {
             $relativePath = ltrim(str_replace('\\', '/', $path), '/');
-            if (!str_contains($relativePath, '..') && is_file(public_path($relativePath))) {
+            if (! str_contains($relativePath, '..') && is_file(public_path($relativePath))) {
                 return asset($relativePath);
             }
         }
 
-        return asset('assets/img/article-' . ((($articleId - 1) % 4) + 1) . '.jpg');
+        return asset('assets/img/article-'.((($articleId - 1) % 4) + 1).'.jpg');
     }
 
     private function readingTime(?string $content): int
@@ -303,14 +304,14 @@ class ArticleController extends Controller
         $document = new DOMDocument('1.0', 'UTF-8');
         $previous = libxml_use_internal_errors(true);
         $document->loadHTML(
-            '<?xml encoding="utf-8" ?><div id="article-content">' . (string) $content . '</div>',
+            '<?xml encoding="utf-8" ?><div id="article-content">'.(string) $content.'</div>',
             LIBXML_HTML_NODEFDTD
         );
         libxml_clear_errors();
         libxml_use_internal_errors($previous);
 
         $container = $document->getElementById('article-content');
-        if (!$container) {
+        if (! $container) {
             return e(strip_tags((string) $content));
         }
 
@@ -329,26 +330,29 @@ class ArticleController extends Controller
         $removeEntirely = ['script', 'style', 'iframe', 'object', 'svg', 'form'];
 
         foreach (iterator_to_array($parent->childNodes) as $child) {
-            if (!$child instanceof DOMElement) {
+            if (! $child instanceof DOMElement) {
                 if ($child->nodeType !== XML_TEXT_NODE) {
                     $parent->removeChild($child);
                 }
+
                 continue;
             }
 
             $tag = strtolower($child->tagName);
             if (in_array($tag, $removeEntirely, true)) {
                 $parent->removeChild($child);
+
                 continue;
             }
 
             $this->sanitizeNodes($child);
 
-            if (!in_array($tag, $allowed, true)) {
+            if (! in_array($tag, $allowed, true)) {
                 while ($child->firstChild) {
                     $parent->insertBefore($child->firstChild, $child);
                 }
                 $parent->removeChild($child);
+
                 continue;
             }
 
@@ -374,14 +378,14 @@ class ArticleController extends Controller
             [],
             0,
             self::PAGE_SIZE,
-            \Illuminate\Pagination\Paginator::resolveCurrentPage(),
+            Paginator::resolveCurrentPage(),
             ['path' => $request->url(), 'query' => $request->query()]
         );
     }
 
     private function ensureArticleTableExists(): void
     {
-        if (!SchemaCache::hasTable('bx_articles')) {
+        if (! SchemaCache::hasTable('bx_articles')) {
             abort(503, 'Article content is not available until the BusinessX article database has been configured.');
         }
     }

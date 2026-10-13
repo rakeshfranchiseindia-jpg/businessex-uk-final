@@ -2,7 +2,9 @@
 
 namespace App\Models;
 
-class BexShort extends \Illuminate\Database\Eloquent\Model
+use Illuminate\Database\Eloquent\Model;
+
+class BexShort extends Model
 {
     protected $table = 'bex_shorts';
 
@@ -23,10 +25,8 @@ class BexShort extends \Illuminate\Database\Eloquent\Model
         'created_by',
     ];
 
-
     public function author()
     {
         return $this->belongsTo(BxAuthor::class, 'author_id', 'author_id');
     }
-
 }

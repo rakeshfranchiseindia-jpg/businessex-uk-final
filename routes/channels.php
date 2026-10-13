@@ -1,7 +1,7 @@
 <?php
 
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Broadcast;
+use Illuminate\Support\Facades\DB;
 
 Broadcast::channel('conversation.{conversationId}', function ($user, int $conversationId): bool {
     return DB::table('profile_contact_conversations')

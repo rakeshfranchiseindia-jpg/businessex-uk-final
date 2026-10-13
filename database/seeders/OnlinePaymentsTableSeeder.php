@@ -30,7 +30,7 @@ class OnlinePaymentsTableSeeder extends Seeder
             'udf' => 'product_info_placeholder',
             'payment_status' => 0,
             'payment_mode' => 'online',
-            'status_message' => 0
+            'status_message' => 0,
         ]);
 
         DB::table('online_payments')->insert([
@@ -57,7 +57,7 @@ class OnlinePaymentsTableSeeder extends Seeder
             'addon_four' => 1,
             'addon_five' => 1,
             'addon_six' => 1,
-            'status_message' => 1
+            'status_message' => 1,
         ]);
 
         DB::table('online_payments')->insert([
@@ -78,7 +78,7 @@ class OnlinePaymentsTableSeeder extends Seeder
             'udf' => 'product_info_placeholder',
             'payment_status' => 0,
             'payment_mode' => 'upi',
-            'status_message' => 0
+            'status_message' => 0,
         ]);
 
     }

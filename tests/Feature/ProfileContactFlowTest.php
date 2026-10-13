@@ -5,11 +5,11 @@ namespace Tests\Feature;
 use App\Models\UserAccount;
 use App\Notifications\DashboardActivityNotification;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Http\UploadedFile;
 use Tests\TestCase;
 
 class ProfileContactFlowTest extends TestCase
@@ -490,7 +490,7 @@ class ProfileContactFlowTest extends TestCase
             ->assertSee('Northstar Growth Opportunity');
 
         $this->post(route('dashboard.proposals.store'), [
-            'profile' => 'business:' . $profileId,
+            'profile' => 'business:'.$profileId,
             'recipient_user_id' => $recipientId,
             'title' => 'Acquisition proposal with terms',
             'description' => 'Please review the attached terms.',
@@ -545,7 +545,7 @@ class ProfileContactFlowTest extends TestCase
         $this->actingAs(UserAccount::query()->findOrFail($ownerId))
             ->from(route('dashboard.proposals.sent'))
             ->post(route('dashboard.proposals.store'), [
-                'profile' => 'business:' . $profileId,
+                'profile' => 'business:'.$profileId,
                 'recipient_user_id' => $recipientId,
                 'title' => 'Proposal requiring an attachment',
                 'description' => 'Please review the attached terms.',
@@ -602,14 +602,14 @@ class ProfileContactFlowTest extends TestCase
 
         $this->actingAs(UserAccount::query()->findOrFail($ownerId))
             ->post(route('dashboard.proposals.store'), [
-                'profile' => 'business:' . $otherProfileId,
+                'profile' => 'business:'.$otherProfileId,
                 'recipient_user_id' => $recipientId,
                 'title' => 'Unauthorized profile proposal',
                 'description' => 'This must not be sent.',
             ])
             ->assertNotFound();
         $this->post(route('dashboard.proposals.store'), [
-            'profile' => 'business:' . $profileId,
+            'profile' => 'business:'.$profileId,
             'recipient_user_id' => $otherOwnerId,
             'title' => 'Uninterested recipient proposal',
             'description' => 'This must not be sent.',

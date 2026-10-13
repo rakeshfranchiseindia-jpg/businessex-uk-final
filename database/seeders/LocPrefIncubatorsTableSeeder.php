@@ -22,7 +22,7 @@ class LocPrefIncubatorsTableSeeder extends Seeder
             'loc_country' => 'India',
             'loc_latitude' => '19.0760',
             'loc_longitude' => '72.8777',
-            'profile_status' => 0
+            'profile_status' => 0,
         ]);
 
         DB::table('loc_pref_incubators')->insert([
@@ -35,7 +35,7 @@ class LocPrefIncubatorsTableSeeder extends Seeder
             'loc_country' => 'United States',
             'loc_latitude' => '28.7041',
             'loc_longitude' => '77.1025',
-            'profile_status' => 1
+            'profile_status' => 1,
         ]);
 
         DB::table('loc_pref_incubators')->insert([
@@ -48,7 +48,7 @@ class LocPrefIncubatorsTableSeeder extends Seeder
             'loc_country' => 'Singapore',
             'loc_latitude' => '12.9716',
             'loc_longitude' => '77.5946',
-            'profile_status' => 0
+            'profile_status' => 0,
         ]);
 
     }

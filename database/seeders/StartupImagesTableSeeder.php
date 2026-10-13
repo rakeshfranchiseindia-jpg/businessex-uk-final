@@ -18,7 +18,7 @@ class StartupImagesTableSeeder extends Seeder
             'type' => 1,
             'startup_img_path' => 'uploads/images/sample1.jpg',
             'startup_img_name' => 'uploads/images/sample1.jpg',
-            'is_active' => 0
+            'is_active' => 0,
         ]);
 
         DB::table('startup_images')->insert([
@@ -27,7 +27,7 @@ class StartupImagesTableSeeder extends Seeder
             'type' => 2,
             'startup_img_path' => 'uploads/images/sample2.jpg',
             'startup_img_name' => 'uploads/images/sample2.jpg',
-            'is_active' => 1
+            'is_active' => 1,
         ]);
 
         DB::table('startup_images')->insert([
@@ -36,7 +36,7 @@ class StartupImagesTableSeeder extends Seeder
             'type' => 3,
             'startup_img_path' => 'uploads/images/sample3.jpg',
             'startup_img_name' => 'uploads/images/sample3.jpg',
-            'is_active' => 0
+            'is_active' => 0,
         ]);
 
     }

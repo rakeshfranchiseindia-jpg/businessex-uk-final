@@ -17,7 +17,7 @@ class ArticleNewsImagesTableSeeder extends Seeder
             'content_id' => 1,
             'type' => 1,
             'img_path' => 'uploads/images/sample1.jpg',
-            'is_active' => 0
+            'is_active' => 0,
         ]);
 
         DB::table('article_news_images')->insert([
@@ -25,7 +25,7 @@ class ArticleNewsImagesTableSeeder extends Seeder
             'content_id' => 2,
             'type' => 2,
             'img_path' => 'uploads/images/sample2.jpg',
-            'is_active' => 1
+            'is_active' => 1,
         ]);
 
         DB::table('article_news_images')->insert([
@@ -33,7 +33,7 @@ class ArticleNewsImagesTableSeeder extends Seeder
             'content_id' => 3,
             'type' => 3,
             'img_path' => 'uploads/images/sample3.jpg',
-            'is_active' => 0
+            'is_active' => 0,
         ]);
 
     }

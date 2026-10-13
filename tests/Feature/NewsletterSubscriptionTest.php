@@ -2,12 +2,12 @@
 
 namespace Tests\Feature;
 
+use App\Mail\NewsletterSubscriptionConfirmation;
+use App\Mail\NewsletterVerificationEmail;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Schema;
-use App\Mail\NewsletterSubscriptionConfirmation;
-use App\Mail\NewsletterVerificationEmail;
 use Tests\TestCase;
 
 class NewsletterSubscriptionTest extends TestCase
@@ -58,7 +58,7 @@ class NewsletterSubscriptionTest extends TestCase
                 'phone' => '+44 1234 567890',
                 'city' => 'London',
             ])
-            ->assertRedirect(route('home') . '#newsletter-subscription')
+            ->assertRedirect(route('home').'#newsletter-subscription')
             ->assertSessionHas('newsletter_status');
 
         $this->assertDatabaseHas('businessex_newsletter', [
@@ -127,7 +127,7 @@ class NewsletterSubscriptionTest extends TestCase
                 'phone' => '+44 1111 222333',
                 'city' => 'London',
             ])
-            ->assertRedirect(route('home') . '#newsletter-subscription');
+            ->assertRedirect(route('home').'#newsletter-subscription');
 
         $this->assertDatabaseCount('businessex_newsletter', 1);
         $this->assertDatabaseHas('businessex_newsletter', [

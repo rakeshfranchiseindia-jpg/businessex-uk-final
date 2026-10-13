@@ -2,7 +2,9 @@
 
 namespace App\Models;
 
-class BxArticle extends \Illuminate\Database\Eloquent\Model
+use Illuminate\Database\Eloquent\Model;
+
+class BxArticle extends Model
 {
     protected $table = 'bx_articles';
 
@@ -25,7 +27,6 @@ class BxArticle extends \Illuminate\Database\Eloquent\Model
         'created_by',
     ];
 
-
     public function author()
     {
         return $this->belongsTo(BxAuthor::class, 'author_id', 'author_id');
@@ -46,7 +47,6 @@ class BxArticle extends \Illuminate\Database\Eloquent\Model
         return $this->hasMany(ContentTagAssigned::class, 'content_id', 'article_id');
     }
 
-
     public function scopePublished($query)
     {
         return $query->where('article_status', 1);
@@ -61,5 +61,4 @@ class BxArticle extends \Illuminate\Database\Eloquent\Model
     {
         return $this->belongsTo(IndustryCategory::class, 'category_id', 'cat_id');
     }
-
 }

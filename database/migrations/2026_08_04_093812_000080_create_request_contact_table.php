@@ -17,13 +17,13 @@ return new class extends Migration
             $table->integer('sender_profile_type')->nullable(false);
 
             // ✅ Corrected enum definition
-            $table->enum('status', ['1','2','3'])
-                  ->default('1')
-                  ->comment('1:New(Pending), 2:Accepted, 3:Rejected');
+            $table->enum('status', ['1', '2', '3'])
+                ->default('1')
+                ->comment('1:New(Pending), 2:Accepted, 3:Rejected');
 
             $table->tinyInteger('viewed_status')
-                  ->default(0)
-                  ->comment('0:not viewed, 1:viewed');
+                ->default(0)
+                ->comment('0:not viewed, 1:viewed');
 
             $table->text('msg')->nullable(false);
             $table->string('timestamp', 200)->nullable(false);

@@ -24,7 +24,7 @@ class ContactBrokerTableSeeder extends Seeder
             'contact_company' => 'Sample string data',
             'contact_investment' => '5000000',
             'contact_comment' => 'Sample description text.',
-            'contact_viewed' => 1
+            'contact_viewed' => 1,
         ]);
 
         DB::table('contact_broker')->insert([
@@ -39,7 +39,7 @@ class ContactBrokerTableSeeder extends Seeder
             'contact_company' => 'Another sample entry',
             'contact_investment' => '15000000',
             'contact_comment' => 'Another sample description.',
-            'contact_viewed' => 2
+            'contact_viewed' => 2,
         ]);
 
         DB::table('contact_broker')->insert([
@@ -54,7 +54,7 @@ class ContactBrokerTableSeeder extends Seeder
             'contact_company' => 'Third sample value',
             'contact_investment' => '50000000',
             'contact_comment' => 'Third sample description.',
-            'contact_viewed' => 3
+            'contact_viewed' => 3,
         ]);
 
     }

@@ -97,7 +97,7 @@ class ProfileStartupsTableSeeder extends Seeder
             'contact_status' => 0,
             'activated_by' => 1,
             'activated_at' => '2025-01-01 10:30:00',
-            'last_login_at' => '2025-01-01 10:30:00'
+            'last_login_at' => '2025-01-01 10:30:00',
         ]);
 
         DB::table('profile_startups')->insert([
@@ -185,7 +185,7 @@ class ProfileStartupsTableSeeder extends Seeder
             'contact_status' => 1,
             'activated_by' => 2,
             'activated_at' => '2025-02-02 10:30:00',
-            'last_login_at' => '2025-02-02 10:30:00'
+            'last_login_at' => '2025-02-02 10:30:00',
         ]);
 
         DB::table('profile_startups')->insert([
@@ -273,7 +273,7 @@ class ProfileStartupsTableSeeder extends Seeder
             'contact_status' => 0,
             'activated_by' => 3,
             'activated_at' => '2025-03-03 10:30:00',
-            'last_login_at' => '2025-03-03 10:30:00'
+            'last_login_at' => '2025-03-03 10:30:00',
         ]);
 
     }

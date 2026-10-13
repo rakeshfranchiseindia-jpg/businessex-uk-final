@@ -2,7 +2,9 @@
 
 namespace App\Models;
 
-class BxIndustryReport extends \Illuminate\Database\Eloquent\Model
+use Illuminate\Database\Eloquent\Model;
+
+class BxIndustryReport extends Model
 {
     protected $table = 'bx_industryreports';
 
@@ -28,10 +30,8 @@ class BxIndustryReport extends \Illuminate\Database\Eloquent\Model
         'created_by',
     ];
 
-
     public function author()
     {
         return $this->belongsTo(BxAuthor::class, 'author_id', 'author_id');
     }
-
 }

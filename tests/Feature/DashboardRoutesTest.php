@@ -3,10 +3,10 @@
 namespace Tests\Feature;
 
 use App\Models\UserAccount;
-use App\Support\PublicContentCache;
-use Illuminate\Support\Facades\Cache;
 use App\Notifications\DashboardActivityNotification;
+use App\Support\PublicContentCache;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Schema;

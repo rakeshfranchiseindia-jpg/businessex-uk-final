@@ -2,10 +2,11 @@
 
 namespace App\Models;
 
-class ConversationReply extends \Illuminate\Database\Eloquent\Model
+use Illuminate\Database\Eloquent\Model;
+
+class ConversationReply extends Model
 {
     protected $table = 'conversation_reply';
-
 
     protected $fillable = [
         'reply',
@@ -15,7 +16,6 @@ class ConversationReply extends \Illuminate\Database\Eloquent\Model
         'request_id',
         'readstatus',
     ];
-
 
     public function from()
     {
@@ -31,5 +31,4 @@ class ConversationReply extends \Illuminate\Database\Eloquent\Model
     {
         return $this->hasMany(ConversationReplyAttachment::class, 'reply_id', 'id');
     }
-
 }

@@ -20,7 +20,7 @@ class BusinessexRiseconferenceTableSeeder extends Seeder
             'contact_email' => 'admin@businessex.com',
             'contact_mobile' => '9876543210',
             'contact_company' => 'Sample string data',
-            'contact_country' => 'India'
+            'contact_country' => 'India',
         ]);
 
         DB::table('businessex_riseconference')->insert([
@@ -31,7 +31,7 @@ class BusinessexRiseconferenceTableSeeder extends Seeder
             'contact_email' => 'john.doe@example.com',
             'contact_mobile' => '8765432109',
             'contact_company' => 'Another sample entry',
-            'contact_country' => 'United States'
+            'contact_country' => 'United States',
         ]);
 
         DB::table('businessex_riseconference')->insert([
@@ -42,7 +42,7 @@ class BusinessexRiseconferenceTableSeeder extends Seeder
             'contact_email' => 'priya.sharma@example.com',
             'contact_mobile' => '7654321098',
             'contact_company' => 'Third sample value',
-            'contact_country' => 'Singapore'
+            'contact_country' => 'Singapore',
         ]);
 
     }

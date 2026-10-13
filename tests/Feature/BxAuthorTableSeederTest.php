@@ -43,7 +43,7 @@ class BxAuthorTableSeederTest extends TestCase
             'is_active' => 1,
         ]);
 
-        $seeder = new BxAuthorTableSeeder();
+        $seeder = new BxAuthorTableSeeder;
         $seeder->run();
 
         $this->assertDatabaseCount('bx_author', 3);

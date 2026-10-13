@@ -25,7 +25,7 @@ class BxCouponTableSeeder extends Seeder
             'max_redemption' => 5,
             'redemption_number' => 5,
             'platform' => 1,
-            'is_active' => 0
+            'is_active' => 0,
         ]);
 
         DB::table('bx_coupon')->insert([
@@ -41,7 +41,7 @@ class BxCouponTableSeeder extends Seeder
             'max_redemption' => 15,
             'redemption_number' => 15,
             'platform' => 2,
-            'is_active' => 1
+            'is_active' => 1,
         ]);
 
         DB::table('bx_coupon')->insert([
@@ -57,7 +57,7 @@ class BxCouponTableSeeder extends Seeder
             'max_redemption' => 25,
             'redemption_number' => 25,
             'platform' => 3,
-            'is_active' => 0
+            'is_active' => 0,
         ]);
 
     }

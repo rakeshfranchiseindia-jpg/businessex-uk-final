@@ -18,7 +18,7 @@ class BusinessBookmarksTableSeeder extends Seeder
             'profile_id' => 1,
             'profile_type' => 1,
             'profile_str' => 'BSN0001',
-            'bookmark_status' => 0
+            'bookmark_status' => 0,
         ]);
 
         DB::table('business_bookmarks')->insert([
@@ -27,7 +27,7 @@ class BusinessBookmarksTableSeeder extends Seeder
             'profile_id' => 2,
             'profile_type' => 2,
             'profile_str' => 'INV0002',
-            'bookmark_status' => 1
+            'bookmark_status' => 1,
         ]);
 
         DB::table('business_bookmarks')->insert([
@@ -36,7 +36,7 @@ class BusinessBookmarksTableSeeder extends Seeder
             'profile_id' => 3,
             'profile_type' => 3,
             'profile_str' => 'LEN0003',
-            'bookmark_status' => 0
+            'bookmark_status' => 0,
         ]);
 
     }
