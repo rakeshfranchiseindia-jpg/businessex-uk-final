@@ -3,6 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Events\ConversationMessageSent;
+use App\Http\Requests\Dashboard\SendProposalRequest;
+use App\Http\Requests\Dashboard\SendSelectedProfileProposalRequest;
+use App\Http\Requests\Dashboard\UpdateAccountProfileRequest;
+use App\Http\Requests\Dashboard\UpdatePasswordRequest;
 use App\Models\UserAccount;
 use App\Notifications\DashboardActivityNotification;
 use App\Support\PublicContentCache;
@@ -884,21 +888,10 @@ class DashboardController extends Controller
         ]);
     }
 
-    public function updateProfile(Request $request): RedirectResponse
+    public function updateProfile(UpdateAccountProfileRequest $request): RedirectResponse
     {
         $account = $request->user();
-
-        // Email and mobile are the identity/contact details tied to the
-        // account at registration — locked here (read-only in the UI too)
-        // so they can't drift from what's on file. Validated as "present"
-        // only so a tampered request can't null them out; the submitted
-        // values are never written.
-        $validated = $request->validate([
-            'name' => ['required', 'string', 'max:255', "regex:/^[A-Za-z][A-Za-z .'-]*$/"],
-            'location' => ['required', 'string', 'max:60'],
-            'designation' => ['required', 'string', 'max:60', "regex:/^[A-Za-z][A-Za-z .'-]*$/"],
-            'company' => ['required', 'string', 'max:255', "regex:/^[A-Za-z][A-Za-z .'-]*$/"],
-        ]);
+        $validated = $request->validated();
 
         $account->forceFill([
             'name' => trim($validated['name']),
@@ -918,26 +911,9 @@ class DashboardController extends Controller
         return $this->page('dashboard-password', 'Change Password');
     }
 
-    public function updatePassword(Request $request): RedirectResponse
+    public function updatePassword(UpdatePasswordRequest $request): RedirectResponse
     {
-        $validated = $request->validate([
-            'oldPassword' => ['required', 'string'],
-            'newPassword' => [
-                'required',
-                'string',
-                'min:8',
-                'regex:/[A-Za-z]/',
-                'regex:/[0-9]/',
-                'regex:/[^A-Za-z0-9]/',
-                'different:oldPassword',
-            ],
-            'confirmPassword' => ['required', 'same:newPassword'],
-        ], [
-            'newPassword.min' => 'The new password must be at least 8 characters.',
-            'newPassword.regex' => 'The new password must contain a letter, a number, and a symbol.',
-            'newPassword.different' => 'The new password must be different from your old password.',
-            'confirmPassword.same' => 'The password confirmation does not match.',
-        ]);
+        $validated = $request->validated();
 
         $account = $request->user();
         if (! $account->password || ! Hash::check($validated['oldPassword'], $account->password)) {
@@ -1209,7 +1185,7 @@ class DashboardController extends Controller
             ->with('status', 'Your reply was sent.');
     }
 
-    public function sendProposal(Request $request, int $conversation): RedirectResponse
+    public function sendProposal(SendProposalRequest $request, int $conversation): RedirectResponse
     {
         $thread = DB::table('profile_contact_conversations')
             ->where('id', $conversation)
@@ -1217,30 +1193,15 @@ class DashboardController extends Controller
             ->first();
         abort_if($thread === null, 404);
 
-        $validated = $request->validate([
-            'title' => ['required', 'string', 'max:255'],
-            'description' => ['required', 'string', 'max:10000'],
-            'amount' => ['nullable', 'numeric', 'min:0', 'max:999999999999.99'],
-            'attachments' => ['nullable', 'array', 'max:5'],
-            'attachments.*' => ['file', 'max:10240', 'mimes:pdf,doc,docx,xls,xlsx,ppt,pptx,png,jpg,jpeg'],
-        ]);
-        $this->createProposal($request, $thread, $validated);
+        $this->createProposal($request, $thread, $request->validated());
 
         return redirect()->route('dashboard.inbox.conversation', $thread->id)
             ->with('status', 'Your proposal was sent to the interested member.');
     }
 
-    public function sendSelectedProfileProposal(Request $request): RedirectResponse
+    public function sendSelectedProfileProposal(SendSelectedProfileProposalRequest $request): RedirectResponse
     {
-        $validated = $request->validate([
-            'profile' => ['required', 'string', 'regex:/^(business|investor|mentor|startup):[1-9][0-9]*$/'],
-            'recipient_user_id' => ['required', 'integer', 'min:1'],
-            'title' => ['required', 'string', 'max:255'],
-            'description' => ['required', 'string', 'max:10000'],
-            'amount' => ['nullable', 'numeric', 'min:0', 'max:999999999999.99'],
-            'attachments' => ['nullable', 'array', 'max:5'],
-            'attachments.*' => ['file', 'max:10240', 'mimes:pdf,doc,docx,xls,xlsx,ppt,pptx,png,jpg,jpeg'],
-        ]);
+        $validated = $request->validated();
 
         [$type, $rawProfileId] = explode(':', $validated['profile'], 2);
         $profileId = (int) $rawProfileId;
