@@ -42,8 +42,8 @@ Route::prefix('dashboard')
             ->whereNumber('conversation')
             ->middleware('throttle:30,1')
             ->name('inbox.reply');
-        Route::post('/inbox/{conversation}/proposals', 'sendProposal')->whereNumber('conversation')->name('inbox.proposals.store');
-        Route::post('/proposals', 'sendSelectedProfileProposal')->name('proposals.store');
+        Route::post('/inbox/{conversation}/proposals', 'sendProposal')->whereNumber('conversation')->middleware('throttle:10,1')->name('inbox.proposals.store');
+        Route::post('/proposals', 'sendSelectedProfileProposal')->middleware('throttle:10,1')->name('proposals.store');
         Route::get('/proposals/{proposal}/attachments/{attachment}', 'downloadProposalAttachment')
             ->whereNumber('proposal')
             ->whereNumber('attachment')

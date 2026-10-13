@@ -392,7 +392,7 @@ class DashboardController extends Controller
                     'visibility' => $isImage ? 'public' : 'private',
                 ]);
                 if (! is_string($storedPath) || $storedPath === '') {
-                    throw new \RuntimeException("Unable to store profile attachment [{$fieldName}] in S3.");
+                    throw new \RuntimeException("Unable to store profile attachment [{$upload['field_name']}] in S3.");
                 }
 
                 $storedPaths[] = $storedPath;
@@ -1292,7 +1292,11 @@ class DashboardController extends Controller
         $url = Storage::disk($file->disk)->temporaryUrl(
             $file->object_key,
             now()->addMinutes(5),
-            ['ResponseContentDisposition' => HeaderUtils::makeDisposition('attachment', $file->original_name)]
+            ['ResponseContentDisposition' => HeaderUtils::makeDisposition(
+                'attachment',
+                $file->original_name,
+                $this->asciiFilenameFallback($file->original_name),
+            )]
         );
 
         return redirect()->away($url);
@@ -1310,29 +1314,42 @@ class DashboardController extends Controller
             ->first();
         abort_unless($proposalRecord, 404);
 
-        DB::table('profile_proposals')
-            ->where('id', $proposalRecord->id)
-            ->where('recipient_user_id', $request->user()->user_id)
-            ->where('status', 'pending')
-            ->update([
-                'status' => $validated['status'],
-                'responded_at' => now(),
-                'updated_at' => now(),
-            ]);
-        DB::table('profile_contact_conversations')
-            ->where('id', $proposalRecord->conversation_id)
-            ->update(['updated_at' => now()]);
-        UserAccount::query()->findOrFail((int) $proposalRecord->sender_user_id)
-            ->notify(new DashboardActivityNotification(
-                'proposal_status',
-                'Proposal '.$validated['status'],
-                'Your proposal was '.$validated['status'].'.',
-                route('dashboard.inbox.conversation', $proposalRecord->conversation_id),
-                (int) $proposalRecord->conversation_id,
-            ));
+        // The conditional update is the source of truth: when accept and
+        // decline race (double click, two tabs), only the request that moved
+        // the proposal out of "pending" notifies the sender.
+        $changed = DB::transaction(function () use ($proposalRecord, $request, $validated): bool {
+            $updated = DB::table('profile_proposals')
+                ->where('id', $proposalRecord->id)
+                ->where('recipient_user_id', $request->user()->user_id)
+                ->where('status', 'pending')
+                ->update([
+                    'status' => $validated['status'],
+                    'responded_at' => now(),
+                    'updated_at' => now(),
+                ]);
+            if ($updated !== 1) {
+                return false;
+            }
+
+            DB::table('profile_contact_conversations')
+                ->where('id', $proposalRecord->conversation_id)
+                ->update(['updated_at' => now()]);
+            UserAccount::query()->findOrFail((int) $proposalRecord->sender_user_id)
+                ->notify(new DashboardActivityNotification(
+                    'proposal_status',
+                    'Proposal '.$validated['status'],
+                    'Your proposal was '.$validated['status'].'.',
+                    route('dashboard.inbox.conversation', $proposalRecord->conversation_id),
+                    (int) $proposalRecord->conversation_id,
+                ));
+
+            return true;
+        });
 
         return redirect()->route('dashboard.inbox.conversation', $proposalRecord->conversation_id)
-            ->with('status', 'Proposal '.$validated['status'].'.');
+            ->with('status', $changed
+                ? 'Proposal '.$validated['status'].'.'
+                : 'This proposal has already been answered.');
     }
 
     public function sentProposals(): View
@@ -1365,24 +1382,13 @@ class DashboardController extends Controller
             'message' => ['required', 'string', 'max:500'],
         ]);
         $now = now();
-        $settings = DB::table('profile_instant_responses')
-            ->where('user_id', $request->user()->user_id)
-            ->exists();
-        $values = [
+        DB::table('profile_instant_responses')->upsert([
+            'user_id' => $request->user()->user_id,
             'enabled' => $request->boolean('enabled'),
             'message' => trim($validated['message']),
+            'created_at' => $now,
             'updated_at' => $now,
-        ];
-        if ($settings) {
-            DB::table('profile_instant_responses')
-                ->where('user_id', $request->user()->user_id)
-                ->update($values);
-        } else {
-            DB::table('profile_instant_responses')->insert($values + [
-                'user_id' => $request->user()->user_id,
-                'created_at' => $now,
-            ]);
-        }
+        ], ['user_id'], ['enabled', 'message', 'updated_at']);
 
         return redirect()->route('dashboard.instant-response')
             ->with('status', 'Your instant response settings were saved.');
@@ -1466,27 +1472,26 @@ class DashboardController extends Controller
             return;
         }
 
-        $read = [
+        // Opening the same conversation in two tabs used to race the
+        // exists()/insert() pair into a duplicate-key error.
+        DB::table('profile_contact_conversation_reads')->upsert([
+            'conversation_id' => $conversationId,
+            'user_id' => Auth::id(),
             'last_read_message_id' => (int) $lastMessageId,
+            'created_at' => now(),
             'updated_at' => now(),
-        ];
-        $exists = DB::table('profile_contact_conversation_reads')
-            ->where('conversation_id', $conversationId)
-            ->where('user_id', Auth::id())
-            ->exists();
+        ], ['conversation_id', 'user_id'], ['last_read_message_id', 'updated_at']);
+    }
 
-        if ($exists) {
-            DB::table('profile_contact_conversation_reads')
-                ->where('conversation_id', $conversationId)
-                ->where('user_id', Auth::id())
-                ->update($read);
-        } else {
-            DB::table('profile_contact_conversation_reads')->insert($read + [
-                'conversation_id' => $conversationId,
-                'user_id' => Auth::id(),
-                'created_at' => now(),
-            ]);
-        }
+    /**
+     * ASCII-only download name for clients that ignore filename*; Symfony
+     * rejects fallbacks containing non-ASCII, "%", "/" or "\".
+     */
+    private function asciiFilenameFallback(string $name): string
+    {
+        $fallback = trim(preg_replace('/[^\x20-\x7E]|[%\/\\\\"]/', '_', Str::ascii($name)) ?? '');
+
+        return $fallback !== '' ? $fallback : 'attachment';
     }
 
     private function profileConversationLabel(string $type, int $id): string
@@ -1608,6 +1613,32 @@ class DashboardController extends Controller
 
             return DB::transaction(function () use ($request, $thread, $validated, $storedObjects): int {
                 $now = now();
+
+                // The same proposal resubmitted within a minute is a double
+                // submit: keep the first one and do not notify again.
+                $duplicateId = DB::table('profile_proposals')
+                    ->where('conversation_id', $thread->id)
+                    ->where('sender_user_id', $request->user()->user_id)
+                    ->where('title', trim($validated['title']))
+                    ->where('description', trim($validated['description']))
+                    ->where('created_at', '>=', $now->copy()->subMinute())
+                    ->lockForUpdate()
+                    ->value('id');
+                if ($duplicateId !== null) {
+                    foreach ($storedObjects as $storedObject) {
+                        try {
+                            Storage::disk('s3')->delete($storedObject['object_key']);
+                        } catch (Throwable $cleanupException) {
+                            Log::warning('Unable to remove an attachment uploaded with a duplicate proposal.', [
+                                'object_key' => $storedObject['object_key'],
+                                'exception' => $cleanupException->getMessage(),
+                            ]);
+                        }
+                    }
+
+                    return (int) $duplicateId;
+                }
+
                 $proposalId = DB::table('profile_proposals')->insertGetId([
                     'conversation_id' => $thread->id,
                     'profile_type' => $thread->profile_type,

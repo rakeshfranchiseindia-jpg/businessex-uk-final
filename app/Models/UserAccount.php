@@ -23,7 +23,6 @@ class UserAccount extends Authenticatable
         'password',
         'mobile',
         'company_name',
-        'is_active',
         'reg_profile',
     ];
 
