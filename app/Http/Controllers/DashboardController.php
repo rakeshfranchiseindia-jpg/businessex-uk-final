@@ -1069,13 +1069,14 @@ class DashboardController extends Controller
             ]);
 
         $labels = $this->profileConversationLabels($conversations);
-        $ownerCompanies = DB::table('user_account')
-            ->whereIn('user_id', $conversations
-                ->where('sender_user_id', Auth::id())
-                ->pluck('owner_user_id')
-                ->unique()
-                ->values())
-            ->pluck('company_name', 'user_id');
+        $ownerIds = $conversations
+            ->where('sender_user_id', Auth::id())
+            ->pluck('owner_user_id')
+            ->unique()
+            ->values();
+        $ownerCompanies = $ownerIds->isEmpty()
+            ? collect()
+            : DB::table('user_account')->whereIn('user_id', $ownerIds)->pluck('company_name', 'user_id');
 
         return $conversations->map(function (object $conversation) use ($labels, $ownerCompanies): object {
             $conversation->profile_label = $labels[$conversation->profile_type.':'.(int) $conversation->profile_id];
@@ -1542,10 +1543,12 @@ class DashboardController extends Controller
         $proposals = $query->orderByDesc('created_at')->paginate(15)->withQueryString();
         $page = $proposals->getCollection();
         $counterpartColumn = $direction === 'sent' ? 'recipient_user_id' : 'sender_user_id';
-        $accounts = DB::table('user_account')
-            ->whereIn('user_id', $page->pluck($counterpartColumn)->unique()->values())
-            ->get(['user_id', 'name', 'company_name'])
-            ->keyBy('user_id');
+        $accounts = $page->isEmpty()
+            ? collect()
+            : DB::table('user_account')
+                ->whereIn('user_id', $page->pluck($counterpartColumn)->unique()->values())
+                ->get(['user_id', 'name', 'company_name'])
+                ->keyBy('user_id');
         $labels = $this->profileConversationLabels($page);
         $this->attachProposalFiles($page);
 
