@@ -18,6 +18,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
+use App\Support\PublicContentCache;
 use App\Support\SchemaCache;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -441,6 +442,7 @@ class DashboardController extends Controller
                         ->update($updates + ['updated_at' => now()]);
                 }
             });
+            PublicContentCache::forgetProfileContent();
         } catch (Throwable $exception) {
             foreach ($storedPaths as $path) {
                 try {

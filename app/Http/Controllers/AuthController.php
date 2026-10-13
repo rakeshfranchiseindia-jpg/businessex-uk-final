@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\UserAccount;
 use App\Services\Payments\MembershipPaymentService;
+use App\Support\PublicContentCache;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
@@ -334,6 +335,7 @@ class AuthController extends Controller
 
                 return $authenticatedAccount ?: UserAccount::query()->findOrFail($userId);
             });
+            PublicContentCache::forgetProfileContent();
         } catch (Throwable $exception) {
             if ($storedFiles !== []) {
                 try {
@@ -468,6 +470,7 @@ class AuthController extends Controller
 
             return UserAccount::query()->findOrFail($userId);
         });
+        PublicContentCache::forgetProfileContent();
 
         try {
             Mail::to($account->email)->queue(new VerifyAccountEmail($account));

@@ -3,6 +3,8 @@
 namespace Tests\Feature;
 
 use App\Models\UserAccount;
+use App\Support\PublicContentCache;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -559,10 +561,12 @@ class AuthenticationTest extends TestCase
         foreach ($types as $type => $legacyType) {
             $email = $type . '@example.org';
             $payload = $this->registrationPayload($type, $email);
+            Cache::put(PublicContentCache::HOME_KEY, ['stale' => true]);
 
             $this->post(route('registration.store', $type), $payload)
                 ->assertRedirect(route("{$type}-registration"))
                 ->assertSessionHas('verification_notice');
+            $this->assertFalse(Cache::has(PublicContentCache::HOME_KEY), 'A new profile must refresh the home page cache.');
 
             $account = DB::table('user_account')->where('email', $email)->first();
             $this->assertNotNull($account);

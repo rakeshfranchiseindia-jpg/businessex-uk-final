@@ -4,6 +4,8 @@ namespace Tests\Feature;
 
 use App\Models\UserAccount;
 use App\Services\Payments\MembershipPaymentService;
+use App\Support\PublicContentCache;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
@@ -63,10 +65,12 @@ class MembershipPaymentTest extends TestCase
         $this->paymentRow(['order_no' => 'BXUPGRADE1', 'udf' => 'order_1', 'user_id' => $user->user_id, 'profile_id' => $profileId]);
 
         $payload = $this->signedCallback('BXUPGRADE1', 'order_1', 'pay_1');
+        Cache::put(PublicContentCache::HOME_KEY, ['stale' => true]);
 
         $this->actingAs($user)->postJson(route('dashboard.my-plan.payment.verify'), $payload)
             ->assertOk()
             ->assertJson(['success' => true]);
+        $this->assertFalse(Cache::has(PublicContentCache::HOME_KEY));
 
         $membership = DB::table('profile_memberships')->sole();
         $this->assertSame(1, (int) $membership->is_active);

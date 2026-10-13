@@ -2,6 +2,7 @@
 
 namespace App\Services\Payments;
 
+use App\Support\PublicContentCache;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -151,6 +152,7 @@ class MembershipPaymentService
                 'membership_plan' => $planCode,
                 'updated_at' => now(),
             ]);
+            PublicContentCache::forgetProfileContent();
 
             return true;
         });
@@ -185,6 +187,7 @@ class MembershipPaymentService
         ]);
 
         $this->recordMembership($payment);
+        PublicContentCache::forgetProfileContent();
     }
 
     /**

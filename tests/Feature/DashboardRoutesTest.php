@@ -3,6 +3,8 @@
 namespace Tests\Feature;
 
 use App\Models\UserAccount;
+use App\Support\PublicContentCache;
+use Illuminate\Support\Facades\Cache;
 use App\Notifications\DashboardActivityNotification;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
@@ -582,6 +584,7 @@ class DashboardRoutesTest extends TestCase
             ->assertSee('name="business_photo_1"', false)
             ->assertSee('<option value="2018" selected>', false);
 
+        Cache::put(PublicContentCache::HOME_KEY, ['stale' => true]);
         $this->put(route('dashboard.profiles.update', ['type' => 'business', 'id' => $profileId]), [
             'advmt_headline' => 'Updated headline',
             'seller_company' => 'Updated company',
@@ -601,6 +604,7 @@ class DashboardRoutesTest extends TestCase
         ])
             ->assertRedirect(route('dashboard.profiles.show', ['type' => 'business', 'id' => $profileId]))
             ->assertSessionHas('profile_record_status', 'Business profile updated successfully.');
+        $this->assertFalse(Cache::has(PublicContentCache::HOME_KEY), 'A profile edit must refresh the home page cache.');
 
         $this->assertDatabaseHas('profile_business', [
             'business_id' => $profileId,

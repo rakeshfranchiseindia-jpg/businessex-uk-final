@@ -2,9 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Support\PublicContentCache;
+use App\Support\SchemaCache;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\DB;
-use App\Support\SchemaCache;
 use Illuminate\View\View;
 
 class HomeController extends Controller
@@ -15,6 +16,22 @@ class HomeController extends Controller
     }
 
     public function index(): View
+    {
+        // Everything on the home page is the same for every visitor.
+        $data = PublicContentCache::home(fn (): array => $this->homeData());
+
+        return view('pages.home', [
+            'page' => 'home',
+            'showHeader' => true,
+            'showFooter' => true,
+            ...$data,
+        ]);
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function homeData(): array
     {
         $industryCategories = collect();
         $ukCities = collect();
@@ -351,10 +368,7 @@ class HomeController extends Controller
                 });
         }
 
-        return view('pages.home', [
-            'page' => 'home',
-            'showHeader' => true,
-            'showFooter' => true,
+        return [
             'industryCategories' => $industryCategories,
             'ukCities' => $ukCities,
             'investmentRanges' => $investmentRanges,
@@ -368,7 +382,7 @@ class HomeController extends Controller
             'worldClassMentors' => $worldClassMentors,
             'activeMentorCount' => $activeMentorCount,
             'testimonials' => $this->testimonialController->homepageTestimonials(),
-        ]);
+        ];
     }
 
     private function businessImageUrl(?string $path): string
