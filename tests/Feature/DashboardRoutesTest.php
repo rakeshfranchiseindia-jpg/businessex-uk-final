@@ -29,6 +29,7 @@ class DashboardRoutesTest extends TestCase
             $table->boolean('is_active')->default(true);
             $table->string('reg_profile')->nullable();
             $table->timestamp('email_verified_at')->nullable();
+            $table->rememberToken();
             $table->timestamps();
         });
 
@@ -328,8 +329,8 @@ class DashboardRoutesTest extends TestCase
             ->assertSee('href="'.route('dashboard.profiles.create.form', 'investor').'"', false)
             ->assertSee('href="'.route('dashboard.profiles.create.form', 'mentor').'"', false)
             ->assertSee('href="'.route('dashboard.profiles.create.form', 'startup').'"', false)
-            ->assertSee('Dashboard Test User')
-            ->assertSee('contact-details@example.test');
+            ->assertDontSee('value="Dashboard Test User"', false)
+            ->assertDontSee('value="contact-details@example.test"', false);
     }
 
     public function test_my_plan_shows_available_offers_without_an_active_membership_and_active_membership_details_when_present(): void
@@ -369,8 +370,8 @@ class DashboardRoutesTest extends TestCase
             ->assertSee('value="gold"', false)
             ->assertSee('value="platinum"', false)
             ->assertSee('Promo Code:')
-            ->assertSee('Credit Card')
-            ->assertSee('Net Banking')
+            ->assertSee('value="online"', false)
+            ->assertSee('value="upi"', false)
             ->assertSee('name="payment_mode"', false)
             ->assertSee('Submit');
         $this->assertSame(4, substr_count($this->get(route('dashboard.my-plan'))->getContent(), 'class="my-plan-card my-plan-card-'));
@@ -644,14 +645,16 @@ class DashboardRoutesTest extends TestCase
 
         $this->get(route('dashboard.profile'))
             ->assertOk()
-            ->assertSee('name="name" autocomplete="name" value="Listing Test User 01"', false)
-            ->assertSee('name="email" type="email" autocomplete="email" value="listing.test.01@example.test"', false)
-            ->assertSee('name="phone" type="tel" autocomplete="tel" value="07700900001"', false)
+            ->assertSee('value="Listing Test User 01"', false)
+            ->assertSee('id="profile-email" type="email" value="listing.test.01@example.test" readonly disabled', false)
+            ->assertSee('id="profile-phone" type="tel" value="07700900001" readonly disabled', false)
+            ->assertDontSee('name="email"', false)
+            ->assertDontSee('name="phone"', false)
             ->assertSee('data-phone-country-code', false)
             ->assertSee('UK +44')
             ->assertSee('name="location" autocomplete="address-level2" value="London"', false)
-            ->assertSee('name="designation" value="Owner"', false)
-            ->assertSee('name="company" value="Listing Test Company 01"', false)
+            ->assertSee('value="Owner"', false)
+            ->assertSee('value="Listing Test Company 01"', false)
             ->assertSee(route('dashboard.profile.update'), false);
     }
 
@@ -675,7 +678,7 @@ class DashboardRoutesTest extends TestCase
 
         $this->put(route('dashboard.profile.update'), [
             'name' => 'Updated Test User',
-            'email' => 'listing.test.01@example.test',
+            'email' => 'attacker@example.test',
             'phone' => '07700111222',
             'location' => 'Manchester',
             'designation' => 'Director',
@@ -687,15 +690,16 @@ class DashboardRoutesTest extends TestCase
         $this->assertDatabaseHas('user_account', [
             'user_id' => $userId,
             'name' => 'Updated Test User',
+            // Locked fields keep their registered values.
             'email' => 'listing.test.01@example.test',
-            'mobile' => '07700111222',
+            'mobile' => '07700900001',
             'location' => 'Manchester',
             'designation' => 'Director',
             'company_name' => 'Updated Test Company',
         ]);
     }
 
-    public function test_password_form_changes_password_and_shows_success_message(): void
+    public function test_password_change_signs_the_user_out_and_asks_them_to_sign_in_again(): void
     {
         $oldPassword = 'OldPass123!';
         $userId = DB::table('user_account')->insertGetId([
@@ -714,19 +718,14 @@ class DashboardRoutesTest extends TestCase
             'newPassword' => 'NewPass456!',
             'confirmPassword' => 'NewPass456!',
         ])
-            ->assertRedirect(route('dashboard.password'))
-            ->assertSessionHas('password_status', 'Your password was updated successfully.');
+            ->assertRedirect(route('login'))
+            ->assertSessionHas('status', 'Your password was updated. Please sign in again with your new password.');
 
+        $this->assertGuest();
         $this->assertTrue(Hash::check(
             'NewPass456!',
             DB::table('user_account')->where('user_id', $userId)->value('password')
         ));
-
-        $this->withSession(['password_status' => 'Your password was updated successfully.'])
-            ->get(route('dashboard.password'))
-            ->assertOk()
-            ->assertSee('Your password was updated successfully.')
-            ->assertSee('role="status"', false);
     }
 
     public function test_password_form_rejects_incorrect_old_password_and_keeps_password_unchanged(): void

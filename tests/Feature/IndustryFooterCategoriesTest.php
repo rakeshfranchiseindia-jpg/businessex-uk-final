@@ -2,9 +2,7 @@
 
 namespace Tests\Feature;
 
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Schema;
 use Tests\TestCase;
 
 class IndustryFooterCategoriesTest extends TestCase
@@ -13,14 +11,8 @@ class IndustryFooterCategoriesTest extends TestCase
     {
         parent::setUp();
 
-        Schema::create('industry_categories', function (Blueprint $table): void {
-            $table->increments('cat_id');
-            $table->string('category_name');
-            $table->string('category_slug');
-            $table->integer('parent_id')->default(0);
-            $table->tinyInteger('category_status')->default(1);
-            $table->timestamps();
-        });
+        // Listing pages query the real profile tables, so use the real schema.
+        $this->artisan('migrate')->assertSuccessful();
 
         DB::table('industry_categories')->insert([
             $this->category(1, 'Test Industry', 0),
@@ -31,13 +23,6 @@ class IndustryFooterCategoriesTest extends TestCase
             $this->category(6, 'Subcategory Five', 1),
             $this->category(7, 'Inactive Category', 0, 0),
         ]);
-    }
-
-    protected function tearDown(): void
-    {
-        Schema::dropIfExists('industry_categories');
-
-        parent::tearDown();
     }
 
     public function test_footer_shows_four_subcategories_and_view_all_links_for_each_listing_tab(): void
@@ -65,7 +50,8 @@ class IndustryFooterCategoriesTest extends TestCase
             ]))
                 ->assertOk()
                 ->assertSee('"id":2', false)
-                ->assertSee('const categoryId = params.get', false);
+                ->assertSee('<option value="2" selected', false)
+                ->assertSee('Subcategory One');
         }
     }
 

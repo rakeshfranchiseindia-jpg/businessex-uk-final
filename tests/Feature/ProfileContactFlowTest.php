@@ -446,9 +446,12 @@ class ProfileContactFlowTest extends TestCase
             ->assertOk()
             ->assertSee('Strategic acquisition proposal')
             ->assertSee('Accepted');
+        // The header notification menu may still mention the proposal, so
+        // check the filtered list itself rather than the whole page.
         $this->get(route('dashboard.proposals.received', ['status' => 'declined']))
             ->assertOk()
-            ->assertDontSee('Strategic acquisition proposal');
+            ->assertViewHas('selectedProposalStatus', 'declined')
+            ->assertViewHas('proposals', fn ($proposals): bool => $proposals->isEmpty());
 
         $this->actingAs($owner)
             ->get(route('dashboard.inbox.conversation', $conversationId))

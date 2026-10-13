@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Schema;
 use App\Mail\NewsletterSubscriptionConfirmation;
+use App\Mail\NewsletterVerificationEmail;
 use Tests\TestCase;
 
 class NewsletterSubscriptionTest extends TestCase
@@ -26,10 +27,21 @@ class NewsletterSubscriptionTest extends TestCase
             $table->string('unsubscribe_reason')->nullable();
             $table->timestamps();
         });
+
+        // SubscribeController only accepts cities from bx_cities.
+        Schema::create('bx_cities', function (Blueprint $table): void {
+            $table->increments('id');
+            $table->string('city', 55);
+            $table->string('state', 15)->default('');
+            $table->integer('country')->default(5);
+            $table->timestamps();
+        });
+        DB::table('bx_cities')->insert(['city' => 'London', 'state' => 'England']);
     }
 
     protected function tearDown(): void
     {
+        Schema::dropIfExists('bx_cities');
         Schema::dropIfExists('businessex_newsletter');
 
         parent::tearDown();
@@ -55,14 +67,42 @@ class NewsletterSubscriptionTest extends TestCase
             'email' => 'newsletter@example.com',
             'phone' => '+44 1234 567890',
             'city' => 'London',
-            'status' => 'S',
+            'status' => 'P',
             'unsubscribe_reason' => null,
         ]);
         Mail::assertQueued(
-            NewsletterSubscriptionConfirmation::class,
-            fn (NewsletterSubscriptionConfirmation $mail): bool =>
-                $mail->hasTo('newsletter@example.com')
+            NewsletterVerificationEmail::class,
+            fn (NewsletterVerificationEmail $mail): bool => $mail->hasTo('newsletter@example.com')
                 && $mail->name === 'Newsletter Reader'
+        );
+        Mail::assertNotQueued(NewsletterSubscriptionConfirmation::class);
+    }
+
+    public function test_verification_link_confirms_subscription_once(): void
+    {
+        Mail::fake();
+
+        $this->post(route('newsletter.subscribe'), [
+            'name' => 'Newsletter Reader',
+            'email' => 'reader@example.com',
+            'phone' => '+44 1234 567890',
+            'city' => 'London',
+        ]);
+
+        $verifyUrl = Mail::queued(NewsletterVerificationEmail::class)->first()->verifyUrl;
+
+        $this->get($verifyUrl.'&tampered=1')->assertForbidden();
+
+        $this->get($verifyUrl)
+            ->assertRedirect(route('home').'#newsletter-subscription')
+            ->assertSessionHas('newsletter_status');
+        $this->get($verifyUrl)->assertRedirect();
+
+        $this->assertDatabaseHas('businessex_newsletter', ['email' => 'reader@example.com', 'status' => 'S']);
+        Mail::assertQueued(NewsletterSubscriptionConfirmation::class, 1);
+        Mail::assertQueued(
+            NewsletterSubscriptionConfirmation::class,
+            fn (NewsletterSubscriptionConfirmation $mail): bool => $mail->hasTo('reader@example.com')
                 && str_contains($mail->render(), 'Thanks for subscribing, Newsletter Reader')
         );
     }
@@ -96,7 +136,7 @@ class NewsletterSubscriptionTest extends TestCase
             'email' => 'reader@example.com',
             'phone' => '+44 1111 222333',
             'city' => 'London',
-            'status' => 'S',
+            'status' => 'P',
             'unsubscribe_reason' => null,
         ]);
     }
@@ -112,6 +152,21 @@ class NewsletterSubscriptionTest extends TestCase
             ])
             ->assertRedirect(route('home'))
             ->assertSessionHasErrors('email');
+
+        $this->assertDatabaseCount('businessex_newsletter', 0);
+    }
+
+    public function test_unknown_city_is_rejected(): void
+    {
+        $this->from(route('home'))
+            ->post(route('newsletter.subscribe'), [
+                'name' => 'Reader',
+                'email' => 'reader@example.com',
+                'phone' => '+44 1111 222333',
+                'city' => 'Atlantis',
+            ])
+            ->assertRedirect(route('home'))
+            ->assertSessionHasErrors('city');
 
         $this->assertDatabaseCount('businessex_newsletter', 0);
     }
@@ -154,6 +209,6 @@ class NewsletterSubscriptionTest extends TestCase
             ->assertOk()
             ->assertSee('id="newsletter-subscription"', false)
             ->assertSee('class="news-feedback news-feedback-success" role="status"', false)
-            ->assertSee('You are subscribed to the BusinessX newsletter. Please check your email for confirmation.');
+            ->assertSee('Please check your email and click the confirmation link to complete your subscription.');
     }
 }
