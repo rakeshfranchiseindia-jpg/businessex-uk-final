@@ -30,6 +30,8 @@ use Throwable;
 
 class DashboardController extends Controller
 {
+    private const THREAD_MESSAGES_SHOWN = 100;
+
     private const PROFILE_MEDIA_COLUMNS = [
         'business' => [
             'business_photo_1' => ['seller_prof_pic'],
@@ -1102,10 +1104,18 @@ class DashboardController extends Controller
             ? $thread->sender_name
             : (DB::table('user_account')->where('user_id', $thread->owner_user_id)->value('company_name') ?: 'Profile owner');
         $thread->profile_label = $this->profileConversationLabel($thread->profile_type, (int) $thread->profile_id);
-        $messages = DB::table('profile_contact_messages')
-            ->where('conversation_id', $thread->id)
-            ->orderBy('id')
-            ->get();
+        // Newest messages only (same window as the live-chat endpoint), shown
+        // oldest-first; long threads would otherwise render every message.
+        $messageQuery = DB::table('profile_contact_messages')->where('conversation_id', $thread->id);
+        $messages = (clone $messageQuery)
+            ->orderByDesc('id')
+            ->limit(self::THREAD_MESSAGES_SHOWN)
+            ->get()
+            ->reverse()
+            ->values();
+        $olderMessageCount = $messages->count() < self::THREAD_MESSAGES_SHOWN
+            ? 0
+            : max(0, $messageQuery->count() - $messages->count());
         $proposals = DB::table('profile_proposals')
             ->where('conversation_id', $thread->id)
             ->orderByDesc('created_at')
@@ -1115,6 +1125,7 @@ class DashboardController extends Controller
         return $this->interaction('inbox', 'BX Inbox')->with([
             'conversation' => $thread,
             'messages' => $messages,
+            'olderMessageCount' => $olderMessageCount,
             'proposals' => $proposals,
         ]);
     }

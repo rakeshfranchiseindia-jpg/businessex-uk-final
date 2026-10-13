@@ -268,6 +268,9 @@ Manage your BusinessX interactions.
                 </section>
               @endif
               <p class="inbox-live-status" data-live-status role="status" aria-live="polite">Connecting to live chat…</p>
+              @if (($olderMessageCount ?? 0) > 0)
+                <p class="inbox-older-messages">{{ number_format($olderMessageCount) }} earlier {{ \Illuminate\Support\Str::plural('message', $olderMessageCount) }} not shown.</p>
+              @endif
               <div class="inbox-message-list" aria-label="Conversation messages" data-live-conversation="{{ $conversation->id }}" data-current-user-id="{{ auth()->user()->user_id }}">
                 <?php foreach ($messages as $message): ?>
                   <?php $isCurrentUser = (int) $message->sender_user_id === (int) auth()->user()->user_id; ?>

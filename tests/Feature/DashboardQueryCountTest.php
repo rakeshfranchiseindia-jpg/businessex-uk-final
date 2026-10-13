@@ -39,6 +39,32 @@ class DashboardQueryCountTest extends TestCase
         $this->assertSame($small, $large);
     }
 
+    public function test_conversation_page_shows_only_the_newest_hundred_messages(): void
+    {
+        $this->seedConversations(1);
+        $senderId = (int) DB::table('profile_contact_conversations')->where('id', $this->conversationId)->value('sender_user_id');
+        for ($i = 1; $i <= 104; $i++) {
+            DB::table('profile_contact_messages')->insert([
+                'conversation_id' => $this->conversationId,
+                'sender_user_id' => $senderId,
+                'message' => sprintf('Thread message %03d', $i),
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+        }
+
+        // 105 messages in total (one seeded above): the oldest 5 are hidden.
+        $this->actingAs(UserAccount::query()->findOrFail($this->ownerId))
+            ->get(route('dashboard.inbox.conversation', $this->conversationId))
+            ->assertOk()
+            ->assertSee('5 earlier messages not shown.')
+            ->assertSee('Thread message 104')
+            ->assertSee('Thread message 005')
+            ->assertDontSee('Thread message 004')
+            ->assertViewHas('messages', fn ($messages): bool => $messages->count() === 100
+                && $messages->first()->message === 'Thread message 005');
+    }
+
     /**
      * @return array<string, int>
      */

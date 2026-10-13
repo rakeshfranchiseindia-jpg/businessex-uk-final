@@ -19,6 +19,8 @@ class ArticleController extends Controller
 {
     private const PAGE_SIZE = 9;
 
+    private const COMMENTS_SHOWN = 50;
+
     private const DATE_FILTERS = [
         'day' => 1,
         'week' => 7,
@@ -183,12 +185,15 @@ class ArticleController extends Controller
         $comments = collect();
         $commentCount = (int) $record->article_comments;
         if (SchemaCache::hasTable('articles_comments')) {
-            $comments = DB::table('articles_comments')
+            $approvedComments = DB::table('articles_comments')
                 ->where('article_id', $record->article_id)
-                ->where('comment_status', 1)
+                ->where('comment_status', 1);
+            $commentCount = (clone $approvedComments)->count();
+            // Show the newest comments only; the heading still reports the total.
+            $comments = $approvedComments
                 ->orderByDesc('created_at')
+                ->limit(self::COMMENTS_SHOWN)
                 ->get(['comment_name', 'comment_detail', 'created_at']);
-            $commentCount = $comments->count();
         }
         $record->article_comments = $commentCount;
 

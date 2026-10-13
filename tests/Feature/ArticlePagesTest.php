@@ -209,6 +209,30 @@ class ArticlePagesTest extends TestCase
             ->assertSee('Comments (1)');
     }
 
+    public function test_detail_shows_the_newest_fifty_comments_and_the_total_count(): void
+    {
+        $this->insertArticle(14, 'Busy article', 'business');
+        for ($i = 1; $i <= 55; $i++) {
+            DB::table('articles_comments')->insert([
+                'article_id' => 14,
+                'comment_name' => sprintf('Commenter %02d', $i),
+                'comment_email' => 'c@example.test',
+                'comment_detail' => sprintf('Comment body %02d.', $i),
+                'comment_status' => 1,
+                'created_at' => now()->addMinutes($i),
+                'updated_at' => now(),
+            ]);
+        }
+
+        $this->get(route('articles.show', 14))
+            ->assertOk()
+            ->assertSee('Comments (55)')
+            ->assertSee('Comment body 55.')
+            ->assertSee('Comment body 06.')
+            ->assertDontSee('Comment body 05.')
+            ->assertViewHas('comments', fn ($comments): bool => $comments->count() === 50);
+    }
+
     public function test_date_filter_and_legacy_detail_url_work(): void
     {
         $this->insertArticle(10, 'Old date-filter article', 'trade', true, '<p>Old article body.</p>', CarbonImmutable::now()->subDays(45)->toDateTimeString());
