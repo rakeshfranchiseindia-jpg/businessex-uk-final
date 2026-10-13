@@ -70,7 +70,8 @@ BusinessX connects businesses, startups, investors and mentors.
       <div class="plan-selection-fields">
         <div class="plan-selection-field">
           <label for="pricing-name">Your Name <span>*</span></label>
-          <input id="pricing-name" type="text" placeholder="Enter name" autocomplete="name" required>
+          <input id="pricing-name" type="text" placeholder="Enter name" autocomplete="name" pattern="[A-Za-z\s]+" title="Name should only contain letters and spaces" required>
+          <p class="field-error" data-error-for="pricing-name" role="alert"></p>
         </div>
         <div class="plan-selection-field">
           <label for="pricing-mobile">Mobile No. <span>*</span></label>
@@ -78,14 +79,17 @@ BusinessX connects businesses, startups, investors and mentors.
             @include('components.phone-country-code')
             <input id="pricing-mobile" type="tel" placeholder="Enter Mobile" autocomplete="tel" required>
           </div>
+          <p class="field-error" data-error-for="pricing-mobile" role="alert"></p>
         </div>
         <div class="plan-selection-field">
           <label for="pricing-email">Email id <span>*</span></label>
           <input id="pricing-email" type="email" placeholder="Enter Email id" autocomplete="email" required>
+          <p class="field-error" data-error-for="pricing-email" role="alert"></p>
         </div>
         <div class="plan-selection-field">
           <label for="pricing-company">Company Name <span>*</span></label>
-          <input id="pricing-company" type="text" placeholder="Enter Company Name" autocomplete="organization" required>
+          <input id="pricing-company" type="text" placeholder="Enter Company Name" autocomplete="organization" pattern="[A-Za-z\s]+" title="Company name should only contain letters and spaces" required>
+          <p class="field-error" data-error-for="pricing-company" role="alert"></p>
         </div>
         <div class="plan-selection-field">
           <label for="pricing-payment-mode">Payment Mode <span>*</span></label>
@@ -94,6 +98,7 @@ BusinessX connects businesses, startups, investors and mentors.
             <option value="online">Online</option>
             <option value="upi">UPI</option>
           </select>
+          <p class="field-error" data-error-for="pricing-payment-mode" role="alert"></p>
         </div>
       </div>
       <p id="pricing-payment-status" role="status" style="display:none;margin-top:12px;padding:10px 14px;border-radius:6px;font-size:13px;"></p>
@@ -117,7 +122,7 @@ BusinessX connects businesses, startups, investors and mentors.
             <li><span class="ic ic-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"><polyline points="20 6 9 17 4 12"/></svg></span> 5 Business Proposals</li>
             <li><span class="ic ic-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"><polyline points="20 6 9 17 4 12"/></svg></span>  Receive Unlimited Investment Proposals</li>
           </ul>
-          <a href="{{ route('registration') }}" class="plan-btn plan-btn-outline">Select Plan</a>
+          <a href="{{ route('registration') }}" class="plan-btn plan-btn-outline">Buy Now</a>
         </div>
 
         <!-- Premium -->
@@ -126,7 +131,7 @@ BusinessX connects businesses, startups, investors and mentors.
           <div class="plan-name">PREMIUM</div>
           <div class="plan-subtitle">Grow your business with premium tools</div>
           <div class="plan-price">
-            <span class="amount" data-price-monthly="£29" data-price-annual="£299">£29</span>
+            <span class="amount" data-price-monthly="£69.99" data-price-annual="£699.90">£69.99</span>
             <span class="period" data-billing-period="/ Month">/ Month</span>
           </div>
           <div class="plan-note">Billed annually</div>
@@ -138,7 +143,7 @@ BusinessX connects businesses, startups, investors and mentors.
             <li><span class="ic ic-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"><polyline points="20 6 9 17 4 12"/></svg></span>10 Website Visitor Queries</li>
             <li><span class="ic ic-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"><polyline points="20 6 9 17 4 12"/></svg></span>Profile Views</li>
           </ul>
-          <button type="button" class="plan-btn plan-btn-gold" data-pay-plan="premium">Get Started</button>
+          <button type="button" class="plan-btn plan-btn-gold" data-pay-plan="premium">Buy Now</button>
         </div>
 
         <!-- Gold -->
@@ -146,7 +151,7 @@ BusinessX connects businesses, startups, investors and mentors.
           <div class="plan-name">GOLD</div>
           <div class="plan-subtitle">Greater visibility and support for your business.</div>
           <div class="plan-price">
-            <span class="amount" data-price-monthly="£89" data-price-annual="£999">£89</span>
+            <span class="amount" data-price-monthly="£129.99" data-price-annual="£1299.90">£129.99</span>
             <span class="period" data-billing-period="/ Month">/ Month</span>
           </div>
           <div class="plan-note">Billed annually</div>
@@ -159,7 +164,7 @@ BusinessX connects businesses, startups, investors and mentors.
             <li><span class="ic ic-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"><polyline points="20 6 9 17 4 12"/></svg></span>Profile Views</li>
             <li><span class="ic ic-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"><polyline points="20 6 9 17 4 12"/></svg></span>Profile Promotion</li>
           </ul>
-          <button type="button" class="plan-btn plan-btn-gold-outline" data-pay-plan="gold">Choose Gold</button>
+          <button type="button" class="plan-btn plan-btn-gold-outline" data-pay-plan="gold">Buy Now</button>
         </div>
 
         <!-- Platinum -->
@@ -178,7 +183,7 @@ BusinessX connects businesses, startups, investors and mentors.
             <li><span class="ic ic-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"><polyline points="20 6 9 17 4 12"/></svg></span>Acceleration Marketing</li>
             <li><span class="ic ic-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"><polyline points="20 6 9 17 4 12"/></svg></span>Businesses Valution</li>
           </ul>
-          <a href="{{ route('registration') }}" class="plan-btn plan-btn-gold">Choose Platinum</a>
+          <a href="{{ route('registration') }}" class="plan-btn plan-btn-gold">Buy Now</a>
         </div>
       </div>
     </div>
@@ -239,11 +244,11 @@ BusinessX connects businesses, startups, investors and mentors.
                 </th>
                 <th>
                   <div class="plan-name" style="color: var(--gold-600);">PREMIUM</div>
-                  <div class="plan-price-mini">£299 / Year</div>
+                  <div class="plan-price-mini">£699.90 / Year</div>
                 </th>
                 <th>
                   <div class="plan-name" style="color: var(--navy-700);">GOLD</div>
-                  <div class="plan-price-mini">£999 / Year</div>
+                  <div class="plan-price-mini">£1,299.90 / Year</div>
                 </th>
                 <th>
                   <div class="plan-name" style="color: var(--gold-600);">PLATINUM</div>

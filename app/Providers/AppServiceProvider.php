@@ -3,11 +3,13 @@
 namespace App\Providers;
 
 use Illuminate\Cache\RateLimiting\Limit;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\View;
+use App\Http\Controllers\DashboardController;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -85,6 +87,16 @@ class AppServiceProvider extends ServiceProvider
             }
 
             $view->with('ukCities', $ukCities);
+        });
+
+        // Every dashboard page shares the same header (search, notifications,
+        // account menu) via this one partial — keep the data it needs in one
+        // place instead of repeating ->with($this->dashboardActivityData())
+        // in each DashboardController action.
+        View::composer('dashboard.partials.header', function ($view): void {
+            if (Auth::check()) {
+                $view->with(app(DashboardController::class)->dashboardActivityData());
+            }
         });
     }
 }

@@ -6,6 +6,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BusinessListingController;
 use App\Http\Controllers\BusinessProfileController;
 use App\Http\Controllers\ChatbotController;
+use App\Http\Controllers\ContactController;
 use App\Http\Controllers\CitySuggestionController;
 use App\Http\Controllers\EmailVerificationController;
 use App\Http\Controllers\HomeController;
@@ -52,6 +53,7 @@ Route::get('/disclaimer', [StaticPageController::class, 'show'])->defaults('page
 Route::get('/privacy-policy', [StaticPageController::class, 'show'])->defaults('page', 'privacy-policy')->name('privacy-policy');
 Route::get('/terms-and-conditions', [StaticPageController::class, 'show'])->defaults('page', 'terms')->name('terms');
 Route::get('/contact-us', [StaticPageController::class, 'show'])->defaults('page', 'contact')->name('contact');
+Route::post('/contact-us', [ContactController::class, 'store'])->name('contact.submit');
 
 foreach ($pages as $uri => $name) {
     Route::get($uri, [PageController::class, 'show'])->name($name);

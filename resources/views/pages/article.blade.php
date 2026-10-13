@@ -205,19 +205,44 @@ BusinessX articles, news and international trade insights.
     .newsletter-banner .content { display: flex; align-items: center; gap: 16px; position: relative; z-index: 2; }
     .newsletter-banner h3 { font-size: 20px; font-weight: 700; color: var(--white); margin-bottom: 4px; }
     .newsletter-banner p { font-size: 14px; color: rgba(255,255,255,0.7); }
-    .newsletter-banner form { display: flex; gap: 8px; position: relative; z-index: 2; min-width: 320px; }
-    .newsletter-banner input {
-      flex: 1; height: 44px; padding: 0 14px;
+    .newsletter-banner form {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 14px;
+      position: relative; z-index: 2; min-width: 320px; flex: 1;
+    }
+    .newsletter-banner .sr-only {
+      position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+      overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;
+    }
+    .newsletter-banner .news-field { display: flex; flex-direction: column; gap: 6px; }
+    .newsletter-banner input,
+    .newsletter-banner .phone-country-code {
+      width: 100%; height: 44px; padding: 0 14px;
       background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2);
       color: var(--white); border-radius: 6px; font-size: 14px;
     }
     .newsletter-banner input::placeholder { color: rgba(255,255,255,0.5); }
+    .newsletter-banner .phone-input-group { display: flex; gap: 8px; }
+    .newsletter-banner .phone-country-code {
+      flex: 0 0 40%; width: 40%; padding-right: 30px;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' fill='%23ffffff'%3E%3Cpath d='M2 4l4 4 4-4'/%3E%3C/svg%3E");
+      background-repeat: no-repeat; background-position: right 12px center; background-size: 12px;
+    }
+    .newsletter-banner input:focus,
+    .newsletter-banner .phone-country-code:focus { outline: none; border-color: var(--gold-500); background-color: rgba(255,255,255,0.15); }
+    .newsletter-banner .news-field-error { color: #fecaca; font-size: 12px; }
     .newsletter-banner button {
-      padding: 0 20px; background: var(--gold-500); color: var(--navy-900);
+      grid-column: 1 / -1; justify-self: start;
+      padding: 0 20px; height: 44px; background: var(--gold-500); color: var(--navy-900);
       border-radius: 6px; font-weight: 700; font-size: 14px;
       white-space: nowrap;
     }
     .newsletter-banner button:hover { background: var(--gold-600); }
+    .newsletter-banner .news-feedback {
+      grid-column: 1 / -1; margin: 0; padding: 12px 16px; border-radius: 8px; font-size: 14px; line-height: 1.5;
+    }
+    .newsletter-banner .news-feedback-success { background: #ecfdf5; color: #166534; }
+    .newsletter-banner .news-feedback-error { background: #fef2f2; color: #991b1b; }
 
     /* Featured Article Detail (below fold) */
     .featured-detail {
@@ -745,15 +770,37 @@ BusinessX articles, news and international trade insights.
             </div>
             <form action="{{ route('newsletter.subscribe') }}" method="POST">
               @csrf
-              <input id="article-newsletter-email" name="email" type="email" aria-label="Email address" placeholder="Enter your email" value="{{ old('email') }}" maxlength="255" required>
+              <div class="news-field">
+                <label class="sr-only" for="article-newsletter-name">Name</label>
+                <input id="article-newsletter-name" name="name" type="text" aria-label="Name" placeholder="Name" value="{{ old('name') }}" maxlength="255" autocomplete="name" pattern="[A-Za-z\s]+" title="Name should only contain letters and spaces" required>
+                @error('name') <span class="news-field-error" role="alert">{{ $message }}</span> @enderror
+              </div>
+              <div class="news-field">
+                <label class="sr-only" for="article-newsletter-email">Email</label>
+                <input id="article-newsletter-email" name="email" type="email" aria-label="Email address" placeholder="Email" value="{{ old('email') }}" maxlength="255" autocomplete="email" required>
+                @error('email') <span class="news-field-error" role="alert">{{ $message }}</span> @enderror
+              </div>
+              <div class="news-field">
+                <label class="sr-only" for="article-newsletter-phone">Phone</label>
+                <div class="phone-input-group">
+                  @include('components.phone-country-code')
+                  <input id="article-newsletter-phone" name="phone" type="tel" aria-label="Phone number" placeholder="Phone" value="{{ old('phone') }}" maxlength="32" autocomplete="tel" required>
+                </div>
+                @error('phone') <span class="news-field-error" role="alert">{{ $message }}</span> @enderror
+              </div>
+              <div class="news-field">
+                <label class="sr-only" for="article-newsletter-city">City</label>
+                <input id="article-newsletter-city" name="city" type="text" aria-label="City" placeholder="City" value="{{ old('city') }}" maxlength="100" autocomplete="address-level2" required>
+                @error('city') <span class="news-field-error" role="alert">{{ $message }}</span> @enderror
+              </div>
               <button type="submit" style="color:#ffffff">Subscribe</button>
             </form>
             @if (session('newsletter_status'))
-              <p role="status">{{ session('newsletter_status') }}</p>
+              <p class="news-feedback news-feedback-success" role="status">{{ session('newsletter_status') }}</p>
             @endif
-            @error('email')
-              <p role="alert">{{ $message }}</p>
-            @enderror
+            @if (session('newsletter_error'))
+              <p class="news-feedback news-feedback-error" role="alert">{{ session('newsletter_error') }}</p>
+            @endif
           </div>
 
         </div>

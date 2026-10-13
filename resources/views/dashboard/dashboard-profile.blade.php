@@ -8,38 +8,19 @@ Edit your BusinessX account profile.
 @endsection
 
 @section('head')
+<link rel="stylesheet" href="{{ asset('css/dashboard.css') }}">
 <link rel="stylesheet" href="{{ asset('css/account-dashboard.css') }}">
 @endsection
 
 @section('content')
 
-  <div class="workspace-shell">
-    <aside class="workspace-sidebar">
-      <a class="workspace-brand" href="{{ route('home') }}" aria-label="BusinessX home"><img src="{{ asset('assets/img/businessx-logo.png?v=20261008') }}" alt="BusinessX"></a>
-      <div class="workspace-user"><strong>{{ auth()->user()->name }}</strong><span>{{ \Illuminate\Support\Str::title(auth()->user()->reg_profile ?: 'member') }} account</span></div>
-      <nav aria-label="Account navigation">
-        <a href="{{ route('dashboard.index') }}">Dashboard</a>
-        <a href="{{ route('dashboard.profile') }}" aria-current="page">Edit Profile</a>
-        <a href="{{ route('dashboard.password') }}">Change Password</a>
-        <a href="{{ route('dashboard.my-plan') }}">My Plan</a>
-        <span class="workspace-nav-heading">My Interaction</span>
-        <a href="{{ route('dashboard.inbox') }}">BX Inbox</a>
-        <a href="{{ route('dashboard.proposals.sent') }}">Proposal sent</a>
-        <a href="{{ route('dashboard.proposals.received') }}">Proposal received</a>
-        <a href="{{ route('dashboard.instant-response') }}">Instant Response</a>
-        <a href="#dashboard-live-chat" data-open-live-chat>Live Chat</a>
-      </nav>
-    </aside>
+  <div class="dash-shell">
+    @include('dashboard.partials.sidebar')
 
-    <div class="workspace-main">
-      <header class="workspace-topbar">
-        <strong>My Account / Edit Profile</strong>
-        <form class="logout-form" method="post" action="{{ route('logout') }}">
-          @csrf
-          <button type="submit" class="workspace-signout">Sign Out</button>
-        </form>
-      </header>
-      <main class="workspace-content">
+    <div class="dash-main">
+      @include('dashboard.partials.header')
+
+      <main class="account-dashboard">
         <div class="page-title-row">
           <div>
             <h1>Edit Profile</h1>
@@ -62,7 +43,7 @@ Edit your BusinessX account profile.
             <div class="workspace-form-grid">
               <div class="workspace-field">
                 <label for="profile-name">Name *</label>
-                <input id="profile-name" name="name" autocomplete="name" value="{{ old('name', $account->name) }}" required>
+                <input id="profile-name" name="name" autocomplete="name" pattern="[A-Za-z\s]+" title="Name should only contain letters and spaces" value="{{ old('name', $account->name) }}" required>
                 @error('name') <span role="alert">{{ $message }}</span> @enderror
               </div>
               <div class="workspace-field">
@@ -85,12 +66,12 @@ Edit your BusinessX account profile.
               </div>
               <div class="workspace-field">
                 <label for="profile-designation">Designation *</label>
-                <input id="profile-designation" name="designation" value="{{ old('designation', $account->designation) }}" required>
+                <input id="profile-designation" name="designation" pattern="[A-Za-z\s]+" title="Designation should only contain letters and spaces" value="{{ old('designation', $account->designation) }}" required>
                 @error('designation') <span role="alert">{{ $message }}</span> @enderror
               </div>
               <div class="workspace-field">
                 <label for="profile-company">Company *</label>
-                <input id="profile-company" name="company" value="{{ old('company', $account->company_name) }}" autocomplete="organization" required>
+                <input id="profile-company" name="company" pattern="[A-Za-z\s]+" title="Company should only contain letters and spaces" value="{{ old('company', $account->company_name) }}" autocomplete="organization" required>
                 @error('company') <span role="alert">{{ $message }}</span> @enderror
               </div>
             </div>

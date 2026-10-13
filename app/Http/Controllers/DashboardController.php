@@ -521,7 +521,10 @@ class DashboardController extends Controller
             }
         }
 
-        return $cards->sortByDesc('search_count')->take($limit)->values();
+        return $cards->filter(fn ($card): bool => $card->search_count > 0)
+            ->sortByDesc('search_count')
+            ->take($limit)
+            ->values();
     }
 
     private function profileCard(string $type, array $definition, object $profile): object
@@ -739,6 +742,36 @@ class DashboardController extends Controller
 
     public function myPlan(): View
     {
+        // Profiles the user can pay to upgrade — only Active ones, same
+        // "which profile" choice the registration dropdown uses elsewhere.
+        $upgradableProfiles = collect();
+        foreach (self::PROFILE_TYPES as $type => $definition) {
+            if (! Schema::hasTable($definition['table'])
+                || ! Schema::hasColumn($definition['table'], 'user_id')) {
+                continue;
+            }
+
+            DB::table($definition['table'])
+                ->where('user_id', Auth::id())
+                ->where($definition['status'], 1)
+                ->get([$definition['id'], ...$definition['title']])
+                ->each(function ($profile) use ($type, $definition, $upgradableProfiles): void {
+                    $title = null;
+                    foreach ($definition['title'] as $column) {
+                        if (filled($profile->{$column} ?? null)) {
+                            $title = $profile->{$column};
+                            break;
+                        }
+                    }
+
+                    $upgradableProfiles->push((object) [
+                        'type' => $type,
+                        'id' => $profile->{$definition['id']},
+                        'label' => $definition['label'].' — '.($title ?: 'Untitled profile'),
+                    ]);
+                });
+        }
+
         $activeMemberships = collect();
 
         if (Schema::hasTable('profile_memberships')
@@ -836,6 +869,7 @@ class DashboardController extends Controller
         return $this->page('my-plan', 'My Plan')->with([
             'activeMemberships' => $activeMemberships,
             'availablePlans' => $availablePlans,
+            'upgradableProfiles' => $upgradableProfiles,
             'profileTypeLabels' => [
                 1 => 'Business',
                 2 => 'Investor',
@@ -852,7 +886,7 @@ class DashboardController extends Controller
     {
         $account = $request->user();
         $validated = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
+            'name' => ['required', 'string', 'max:255', "regex:/^[A-Za-z][A-Za-z .'-]*$/"],
             'email' => [
                 'required',
                 'email',
@@ -861,8 +895,8 @@ class DashboardController extends Controller
             ],
             'phone' => ['required', 'string', 'max:20'],
             'location' => ['required', 'string', 'max:60'],
-            'designation' => ['required', 'string', 'max:60'],
-            'company' => ['required', 'string', 'max:255'],
+            'designation' => ['required', 'string', 'max:60', "regex:/^[A-Za-z][A-Za-z .'-]*$/"],
+            'company' => ['required', 'string', 'max:255', "regex:/^[A-Za-z][A-Za-z .'-]*$/"],
         ]);
 
         $emailChanged = mb_strtolower(trim($validated['email'])) !== mb_strtolower($account->email);
@@ -1384,7 +1418,7 @@ class DashboardController extends Controller
         ]);
     }
 
-    private function dashboardActivityData(): array
+    public function dashboardActivityData(): array
     {
         $user = Auth::user();
         $notifications = $user->notifications()

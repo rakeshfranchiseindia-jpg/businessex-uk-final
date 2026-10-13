@@ -913,7 +913,7 @@ BusinessX - The UK's leading business exchange network. Buy or sell a business, 
             </div>
             <div class="input-wrap">
               <svg class="input-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-              <input type="text" name="name" value="{{ old('name') }}" placeholder="Enter Your Name" maxlength="100" autocomplete="name" required>
+              <input type="text" name="name" value="{{ old('name') }}" placeholder="Enter Your Name" maxlength="100" autocomplete="name" pattern="[A-Za-z\s]+" title="Name should only contain letters and spaces" required>
               @error('name') <p role="alert" style="margin:6px 0;color:#991b1b;font-size:12px;">{{ $message }}</p> @enderror
             </div>
             <div class="input-wrap">
@@ -930,7 +930,7 @@ BusinessX - The UK's leading business exchange network. Buy or sell a business, 
             </div>
             <div class="input-wrap">
               <svg class="input-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18M5 21V7l8-4v18M19 21V11l-6-4"/></svg>
-              <input type="text" name="company_name" value="{{ old('company_name') }}" placeholder="Enter Company Name" maxlength="255" autocomplete="organization" required>
+              <input type="text" name="company_name" value="{{ old('company_name') }}" placeholder="Enter Company Name" maxlength="255" autocomplete="organization" pattern="[A-Za-z\s]+" title="Company name should only contain letters and spaces" required>
               @error('company_name') <p role="alert" style="margin:6px 0;color:#991b1b;font-size:12px;">{{ $message }}</p> @enderror
             </div>
             <button type="submit" class="btn-submit">Submit</button>
@@ -1630,7 +1630,7 @@ BusinessX - The UK's leading business exchange network. Buy or sell a business, 
           @csrf
           <div class="news-field">
             <label class="sr-only" for="home-newsletter-name">Name</label>
-            <input id="home-newsletter-name" name="name" type="text" aria-label="Name" placeholder="Name" value="{{ old('name') }}" maxlength="255" autocomplete="name" required>
+            <input id="home-newsletter-name" name="name" type="text" aria-label="Name" placeholder="Name" value="{{ old('name') }}" maxlength="255" autocomplete="name" pattern="[A-Za-z\s]+" title="Name should only contain letters and spaces" required>
             @error('name') <span class="news-field-error" role="alert">{{ $message }}</span> @enderror
           </div>
           <div class="news-field">

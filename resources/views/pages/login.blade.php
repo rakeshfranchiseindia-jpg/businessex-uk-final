@@ -610,7 +610,7 @@ BusinessX connects businesses, startups, investors and mentors.
           @endif
           <div class="field">
             <label for="quick-register-name">Name</label>
-            <input id="quick-register-name" name="name" type="text" value="{{ old('name') }}" autocomplete="name" maxlength="100" required>
+            <input id="quick-register-name" name="name" type="text" value="{{ old('name') }}" autocomplete="name" maxlength="100" pattern="[A-Za-z\s]+" title="Name should only contain letters and spaces" required>
             @error('name') <p role="alert" class="quick-register-error">{{ $message }}</p> @enderror
           </div>
           <div class="field">
@@ -628,7 +628,7 @@ BusinessX connects businesses, startups, investors and mentors.
           </div>
           <div class="field">
             <label for="quick-register-company">Company</label>
-            <input id="quick-register-company" name="company_name" type="text" value="{{ old('company_name') }}" autocomplete="organization" maxlength="255" required>
+            <input id="quick-register-company" name="company_name" type="text" value="{{ old('company_name') }}" autocomplete="organization" maxlength="255" pattern="[A-Za-z\s]+" title="Company name should only contain letters and spaces" required>
             @error('company_name') <p role="alert" class="quick-register-error">{{ $message }}</p> @enderror
           </div>
           <button type="submit" class="quick-register-submit">Create account</button>

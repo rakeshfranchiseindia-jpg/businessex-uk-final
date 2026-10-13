@@ -178,7 +178,7 @@
         <div class="dialog-fields">
           <div class="dialog-field">
             <label for="contact-name">Your name</label>
-            <input id="contact-name" name="name" type="text" maxlength="255" value="{{ old('name', $contactDefaults['name']) }}" required>
+            <input id="contact-name" name="name" type="text" maxlength="255" pattern="[A-Za-z\s]+" title="Name should only contain letters and spaces" value="{{ old('name', $contactDefaults['name']) }}" required>
           </div>
           <div class="dialog-field">
             <label for="contact-email">Email</label>

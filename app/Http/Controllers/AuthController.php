@@ -70,6 +70,25 @@ class AuthController extends Controller
         ],
     ];
 
+    // Dynamic registration-wizard text fields (see config/registration_profiles.php)
+    // that hold a person/company/role name and must be letters-only, matching the
+    // convention used elsewhere in the app. Deliberately an explicit whitelist
+    // (not a "name"/"company" substring match) so fields like company_summary or
+    // company_website, which are free text, are never caught by it.
+    private const NAME_TYPE_FIELDS = [
+        'seller_designation',
+        'seller_company',
+        'director_name',
+        'contact_name',
+        'contact_designation',
+        'company_name',
+        'company_designation',
+        'mentor_company',
+        'mentor_designation',
+        'startup_designation',
+        'name_of_entity',
+    ];
+
     private const PROFILE_MEDIA_COLUMNS = [
         'business' => [
             'business_photo_1' => ['seller_prof_pic'],
@@ -372,10 +391,10 @@ class AuthController extends Controller
 
         $validated = $request->validate([
             'profile_type' => ['required', 'string', Rule::in(array_keys(self::PROFILE_TYPES))],
-            'name' => ['required', 'string', 'max:100'],
+            'name' => ['required', 'string', 'max:100', "regex:/^[A-Za-z][A-Za-z .'-]*$/"],
             'email' => ['required', 'email', 'max:255', Rule::unique('user_account', 'email')],
             'mobile' => ['required', 'string', 'max:20'],
-            'company_name' => ['required', 'string', 'max:255'],
+            'company_name' => ['required', 'string', 'max:255', "regex:/^[A-Za-z][A-Za-z .'-]*$/"],
             '_quick_registration' => ['required', 'in:1'],
         ]);
 
@@ -546,6 +565,13 @@ class AuthController extends Controller
                     $fieldRules[] = Rule::in(array_map('strval', $field['options']));
                 } elseif (($field['type'] ?? null) === 'tel') {
                     $fieldRules[] = 'regex:/^07[0-9]{9}$/';
+                } elseif (
+                    ($field['type'] ?? 'text') === 'text'
+                    && in_array($fieldName, self::NAME_TYPE_FIELDS, true)
+                ) {
+                    // Letters-only (with space/period/apostrophe/hyphen), matching the
+                    // convention used across the rest of the app for name-type fields.
+                    $fieldRules[] = "regex:/^[A-Za-z][A-Za-z .'-]*$/";
                 } elseif (str_contains($fieldName, 'pincode') || str_contains($fieldName, 'postcode')) {
                     $fieldRules[] = 'regex:/^[A-Za-z]{1,2}[0-9][A-Za-z0-9]? ?[0-9][A-Za-z]{2}$/';
                 } elseif (preg_match('/\b(city|location|town)\b|_(city|location|town)\b/i', $fieldName)) {

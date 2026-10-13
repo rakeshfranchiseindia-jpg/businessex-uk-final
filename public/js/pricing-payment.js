@@ -26,13 +26,63 @@ document.addEventListener('DOMContentLoaded', () => {
     return { name, mobile, email, company, payment_mode: paymentMode, profile_type: profileType, billing_period: billingPeriod };
   }
 
+  function clearFieldErrors() {
+    document.querySelectorAll('.plan-selection-field .field-error').forEach(el => {
+      el.textContent = '';
+      el.classList.remove('is-visible');
+    });
+    document.querySelectorAll('.plan-selection-field .has-error').forEach(el => {
+      el.classList.remove('has-error');
+    });
+  }
+
+  function showFieldError(fieldId, message) {
+    const field = document.getElementById(fieldId);
+    const errorEl = document.querySelector(`.field-error[data-error-for="${fieldId}"]`);
+    field?.classList.add('has-error');
+    if (errorEl) {
+      errorEl.textContent = message;
+      errorEl.classList.add('is-visible');
+    }
+  }
+
   function validate(data) {
-    if (!data.name) return 'Please enter your name.';
-    if (!data.mobile) return 'Please enter your mobile number.';
-    if (!data.email) return 'Please enter your email id.';
-    if (!data.company) return 'Please enter your company name.';
-    if (!data.payment_mode) return 'Please select a payment mode.';
-    return null;
+    clearFieldErrors();
+    const errors = {};
+    const nameField = document.getElementById('pricing-name');
+    const companyField = document.getElementById('pricing-company');
+
+    if (!data.name) {
+      errors['pricing-name'] = 'Please enter your name.';
+    } else if (nameField && !nameField.checkValidity()) {
+      errors['pricing-name'] = 'Name should only contain letters and spaces.';
+    }
+
+    if (!data.mobile) {
+      errors['pricing-mobile'] = 'Please enter your mobile number.';
+    }
+
+    if (!data.email) {
+      errors['pricing-email'] = 'Please enter your email id.';
+    }
+
+    if (!data.company) {
+      errors['pricing-company'] = 'Please enter your company name.';
+    } else if (companyField && !companyField.checkValidity()) {
+      errors['pricing-company'] = 'Company name should only contain letters and spaces.';
+    }
+
+    if (!data.payment_mode) {
+      errors['pricing-payment-mode'] = 'Please select a payment mode.';
+    }
+
+    // Only ever show the first problem — fix it, click again, see the next one.
+    const order = ['pricing-name', 'pricing-mobile', 'pricing-email', 'pricing-company', 'pricing-payment-mode'];
+    const firstFieldId = order.find(fieldId => errors[fieldId]);
+    if (!firstFieldId) return null;
+
+    showFieldError(firstFieldId, errors[firstFieldId]);
+    return { fieldId: firstFieldId, message: errors[firstFieldId] };
   }
 
   buttons.forEach(button => {
@@ -40,7 +90,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const formData = collectFormData();
       const validationError = validate(formData);
       if (validationError) {
-        showStatus(validationError, 'error');
+        document.getElementById(validationError.fieldId)?.focus();
         return;
       }
 
@@ -112,6 +162,19 @@ document.addEventListener('DOMContentLoaded', () => {
       } finally {
         button.disabled = false;
         button.textContent = originalText;
+      }
+    });
+  });
+
+  // Clear a field's inline error as soon as the visitor fixes it.
+  ['pricing-name', 'pricing-mobile', 'pricing-email', 'pricing-company', 'pricing-payment-mode'].forEach(fieldId => {
+    const field = document.getElementById(fieldId);
+    field?.addEventListener('input', () => {
+      field.classList.remove('has-error');
+      const errorEl = document.querySelector(`.field-error[data-error-for="${fieldId}"]`);
+      if (errorEl) {
+        errorEl.textContent = '';
+        errorEl.classList.remove('is-visible');
       }
     });
   });

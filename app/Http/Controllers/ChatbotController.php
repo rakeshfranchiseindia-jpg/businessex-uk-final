@@ -61,7 +61,7 @@ class ChatbotController extends Controller
     public function storeLead(Request $request): JsonResponse
     {
         $validated = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
+            'name' => ['required', 'string', 'max:255', "regex:/^[A-Za-z][A-Za-z .'-]*$/"],
             'email' => ['required', 'email', 'max:255'],
             'mobile' => ['required', 'string', 'max:32'],
             'message' => ['required', 'string', 'min:2', 'max:2000'],

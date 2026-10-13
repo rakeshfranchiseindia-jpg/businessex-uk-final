@@ -9,6 +9,7 @@ View and manage your {{ strtolower($profileLabel) }} profile.
 @endsection
 
 @section('head')
+<link rel="stylesheet" href="{{ asset('css/dashboard.css') }}">
 <link rel="stylesheet" href="{{ asset('css/account-dashboard.css') }}">
 <style>
   .owned-profile-fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 24px; }
@@ -34,33 +35,13 @@ View and manage your {{ strtolower($profileLabel) }} profile.
 @endsection
 
 @section('content')
-<div class="workspace-shell">
-  <aside class="workspace-sidebar">
-    <a class="workspace-brand" href="{{ route('home') }}" aria-label="BusinessX home"><img src="{{ asset('assets/img/businessx-logo.png?v=20261008') }}" alt="BusinessX"></a>
-    <div class="workspace-user"><strong>{{ auth()->user()->name }}</strong><span>{{ \Illuminate\Support\Str::title(auth()->user()->reg_profile ?: 'member') }} account</span></div>
-    <nav aria-label="Account navigation">
-      <a href="{{ route('dashboard.index') }}">Dashboard</a>
-      <a href="{{ route('dashboard.profile') }}">Edit Profile</a>
-      <a href="{{ route('dashboard.password') }}">Change Password</a>
-      <a href="{{ route('dashboard.my-plan') }}">My Plan</a>
-      <span class="workspace-nav-heading">My Interaction</span>
-      <a href="{{ route('dashboard.inbox') }}">BX Inbox</a>
-      <a href="{{ route('dashboard.proposals.sent') }}">Proposal sent</a>
-      <a href="{{ route('dashboard.proposals.received') }}">Proposal received</a>
-      <a href="{{ route('dashboard.instant-response') }}">Instant Response</a>
-      <a href="#dashboard-live-chat" data-open-live-chat>Live Chat</a>
-    </nav>
-  </aside>
+<div class="dash-shell">
+  @include('dashboard.partials.sidebar')
 
-  <div class="workspace-main">
-    <header class="workspace-topbar">
-      <strong>My Account / {{ $profileLabel }} Profile</strong>
-      <form class="logout-form" method="post" action="{{ route('logout') }}">
-        @csrf
-        <button type="submit" class="workspace-signout">Sign Out</button>
-      </form>
-    </header>
-    <main class="workspace-content">
+  <div class="dash-main">
+    @include('dashboard.partials.header')
+
+    <main class="account-dashboard">
       <div class="page-title-row">
         <div>
           <h1>{{ $edit ? ($profileType === 'business' ? 'Manage Business Information' : 'Manage '.$profileLabel.' Profile') : 'View '.$profileLabel.' Profile' }}</h1>

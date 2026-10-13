@@ -18,7 +18,7 @@ class SubscribeController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $validated = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
+            'name' => ['required', 'string', 'max:255', "regex:/^[A-Za-z][A-Za-z .'-]*$/"],
             'email' => ['required', 'email', 'max:255'],
             'phone' => ['required', 'string', 'max:32'],
             'city' => ['required', 'string', 'max:100', Rule::exists('bx_cities', 'city')],

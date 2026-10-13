@@ -246,7 +246,7 @@ class ProfileContactController extends Controller
             && DB::table('user_account')->where('user_id', $profile->user_id)->exists(), 404);
 
         $validated = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
+            'name' => ['required', 'string', 'max:255', "regex:/^[A-Za-z][A-Za-z .'-]*$/"],
             'email' => ['required', 'email', 'max:255'],
             'phone' => ['nullable', 'string', 'max:30'],
             'message' => ['required', 'string', 'max:10000'],

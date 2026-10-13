@@ -15,7 +15,7 @@
     <div class="bx-chatbot-fallback" data-chatbot-fallback hidden>
       <form data-chatbot-lead-form>
         <p>Leave your details and our team can follow up:</p>
-        <label>Name<input name="name" autocomplete="name" maxlength="255" required></label>
+        <label>Name<input name="name" autocomplete="name" maxlength="255" pattern="[A-Za-z\s]+" title="Name should only contain letters and spaces" required></label>
         <label>Email<input name="email" type="email" autocomplete="email" maxlength="255" required></label>
         <label>Mobile<div class="phone-input-group">
           @include('components.phone-country-code')

@@ -5,6 +5,15 @@
       ? route('dashboard.profiles.store', $registrationType)
       : route($registrationType . '-profile.store');
   $registrationCancelUrl = auth()->check() ? route('dashboard.index') : route('login');
+  // Mirrors AuthController::NAME_TYPE_FIELDS — explicit whitelist so free-text
+  // fields like company_summary/company_website never get the letters-only pattern.
+  $nameTypeFields = [
+      'seller_name', 'seller_designation', 'seller_company',
+      'director_name', 'contact_name', 'contact_designation',
+      'inv_name', 'company_name', 'company_designation',
+      'mentor_name', 'mentor_company', 'mentor_designation',
+      'startup_name', 'startup_designation', 'name_of_entity',
+  ];
 ?>
 @if (session('verification_notice'))
   <p role="status" style="margin-bottom:16px;padding:12px;border-radius:6px;background:#ecfdf5;color:#166534;">{{ session('verification_notice') }}</p>
@@ -93,7 +102,7 @@
                   <div class="phone-input-group">
                     @include('components.phone-country-code')
                 <?php endif; ?>
-                <input id="<?= $fieldId ?>" class="<?= $errorClass ?>" name="<?= htmlspecialchars($fieldInputName, ENT_QUOTES, 'UTF-8') ?>" type="<?= htmlspecialchars($fieldType, ENT_QUOTES, 'UTF-8') ?>" value="<?= in_array($fieldType, ['file', 'password'], true) ? '' : e(old($field['name'], $profileDefaults[$field['name']] ?? '')) ?>" placeholder="<?= htmlspecialchars($field['placeholder'] ?? '', ENT_QUOTES, 'UTF-8') ?>" <?= isset($field['accept']) ? 'accept="' . htmlspecialchars($field['accept'], ENT_QUOTES, 'UTF-8') . '"' : '' ?> <?= $fieldType === 'file' ? 'data-max-size-mb="1"' : '' ?> <?= $fieldType === 'number' ? 'min="0" step="any"' : '' ?> <?= ($field['name'] ?? '') === 'inv_stake' ? 'max="100"' : '' ?> <?= $fieldType === 'tel' ? 'pattern="07[0-9]{9}" title="Enter a valid UK mobile number starting with 07 (11 digits)."' : '' ?> <?= !empty($field['multiple']) ? 'multiple' : '' ?> <?= $required ? 'required' : '' ?>>
+                <input id="<?= $fieldId ?>" class="<?= $errorClass ?>" name="<?= htmlspecialchars($fieldInputName, ENT_QUOTES, 'UTF-8') ?>" type="<?= htmlspecialchars($fieldType, ENT_QUOTES, 'UTF-8') ?>" value="<?= in_array($fieldType, ['file', 'password'], true) ? '' : e(old($field['name'], $profileDefaults[$field['name']] ?? '')) ?>" placeholder="<?= htmlspecialchars($field['placeholder'] ?? '', ENT_QUOTES, 'UTF-8') ?>" <?= isset($field['accept']) ? 'accept="' . htmlspecialchars($field['accept'], ENT_QUOTES, 'UTF-8') . '"' : '' ?> <?= $fieldType === 'file' ? 'data-max-size-mb="1"' : '' ?> <?= $fieldType === 'number' ? 'min="0" step="any"' : '' ?> <?= ($field['name'] ?? '') === 'inv_stake' ? 'max="100"' : '' ?> <?= $fieldType === 'tel' ? 'pattern="07[0-9]{9}" title="Enter a valid UK mobile number starting with 07 (11 digits)."' : '' ?> <?= ($fieldType === 'text' && in_array($field['name'] ?? '', $nameTypeFields, true)) ? 'pattern="[A-Za-z\s]+" title="Name should only contain letters and spaces"' : '' ?> <?= !empty($field['multiple']) ? 'multiple' : '' ?> <?= $required ? 'required' : '' ?>>
                 <?php if ($fieldType === 'file'): ?>
                   <p class="upload-hint">Max 1MB<?= isset($field['accept']) ? ' · ' . htmlspecialchars(strtoupper(str_replace(['.', ','], ['', ', '], $field['accept'])), ENT_QUOTES, 'UTF-8') : '' ?></p>
                 <?php endif; ?>

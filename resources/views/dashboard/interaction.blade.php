@@ -45,37 +45,19 @@ Manage your BusinessX interactions.
 @endsection
 
 @section('head')
+<link rel="stylesheet" href="{{ asset('css/dashboard.css') }}">
 <link rel="stylesheet" href="{{ asset('css/account-dashboard.css') }}">
 @endsection
 
 @section('content')
 
-  <div class="workspace-shell">
-    <aside class="workspace-sidebar">
-      <a class="workspace-brand" href="{{ route('home') }}" aria-label="BusinessX home"><img src="{{ asset('assets/img/businessx-logo.png?v=20261008') }}" alt="BusinessX"></a>
-      <div class="workspace-user"><strong>{{ auth()->user()->name }}</strong><span>{{ \Illuminate\Support\Str::title(auth()->user()->reg_profile ?: 'member') }} account</span></div>
-      <nav aria-label="Account navigation">
-        <a href="{{ route('dashboard.index') }}">Dashboard</a>
-        <a href="{{ route('dashboard.profile') }}">Edit Profile</a>
-        <a href="{{ route('dashboard.password') }}">Change Password</a>
-        <a href="{{ route('dashboard.my-plan') }}">My Plan</a>
-        <span class="workspace-nav-heading">My Interaction</span>
-        <?php foreach ($interactionLinks as $key => $link): ?>
-          <a href="{{ route($link['route']) }}"<?= $key === $interactionPageKey ? ' aria-current="page"' : '' ?>>{{ $link['label'] }}</a>
-        <?php endforeach; ?>
-        <a href="#dashboard-live-chat" data-open-live-chat>Live Chat</a>
-      </nav>
-    </aside>
+  <div class="dash-shell">
+    @include('dashboard.partials.sidebar')
 
-    <div class="workspace-main">
-      <header class="workspace-topbar">
-        <strong>My Account / My Interaction / <?= htmlspecialchars($interactionPage['title'], ENT_QUOTES, 'UTF-8') ?></strong>
-        <form class="logout-form" method="post" action="{{ route('logout') }}">
-          @csrf
-          <button type="submit" class="workspace-signout">Sign Out</button>
-        </form>
-      </header>
-      <main class="workspace-content">
+    <div class="dash-main">
+      @include('dashboard.partials.header')
+
+      <main class="account-dashboard">
         <div class="page-title-row">
           <div>
             <h1><?= htmlspecialchars($interactionPage['title'], ENT_QUOTES, 'UTF-8') ?></h1>
