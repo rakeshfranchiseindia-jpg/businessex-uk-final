@@ -1,0 +1,25 @@
+# The project root is served directly by Apache (XAMPP htdocs). Only the
+# Laravel front controller (public/) and the static HTML mockups (root *.php,
+# css/, js/, assets/) may be reachable. Everything else - secrets, source,
+# logs, VCS metadata, dependencies - is denied.
+#
+# Production must point the DocumentRoot at public/ instead of relying on this.
+
+Options -Indexes
+
+# Dotfiles and dot-directories (.env, .git, .phpunit.result.cache, ...).
+<FilesMatch "^\.">
+    Require all denied
+</FilesMatch>
+
+# Tooling, manifests, docs and data files at any depth.
+<FilesMatch "(?i)(^artisan$|^composer\.(json|lock)$|^package(-lock)?\.json$|^phpunit\.xml|^vite\.config\.js$|\.(md|lock|log|sql|sqlite|env|bak|backup|ya?ml|neon|dist)$)">
+    Require all denied
+</FilesMatch>
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # Application source, configuration, storage and dependencies.
+    RewriteRule ^(\.git|app|bootstrap|config|database|includes|node_modules|resources|routes|storage|tests|tools|vendor)(/|$) - [F,L]
+</IfModule>
