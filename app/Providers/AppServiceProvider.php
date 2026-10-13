@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Validation\Rules\Password;
 use Illuminate\Support\Facades\View;
 use App\Http\Controllers\DashboardController;
 
@@ -26,6 +27,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        // Matches the hint shown on the reset/set-password forms.
+        Password::defaults(fn () => Password::min(8)->max(255)->letters()->numbers());
+
         // A multi-step registration wizard naturally takes more than a
         // handful of submit attempts while fixing validation errors
         // (city, mobile format, etc). The old project's "auth" limiter

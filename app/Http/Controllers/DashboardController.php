@@ -952,9 +952,7 @@ class DashboardController extends Controller
         // Sign the account out everywhere: drop every active session row for
         // this user (other devices/browsers), then end the current request's
         // own session too, so this device lands on the login page as well.
-        if (Schema::hasTable('sessions') && Schema::hasColumn('sessions', 'user_id')) {
-            DB::table('sessions')->where('user_id', $account->user_id)->delete();
-        }
+        $account->terminateSessions();
         Auth::guard('web')->logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
