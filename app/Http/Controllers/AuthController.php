@@ -203,9 +203,7 @@ class AuthController extends Controller
             $profile['name'].'.regex' => 'Please enter a valid name using letters only.',
             $profile['email'].'.not_regex' => 'Please use a real email address.',
         ];
-        if (isset($profile['mobile'])) {
-            $messages[$profile['mobile'].'.regex'] = 'Please enter a valid UK mobile number starting with 07 (11 digits).';
-        }
+        $messages[$profile['mobile'].'.regex'] = 'Please enter a valid UK mobile number starting with 07 (11 digits).';
         $validated = $request->validate($rules, $messages, $attributes);
 
         $uploadedFieldName = null;
@@ -289,7 +287,7 @@ class AuthController extends Controller
                         (int) $profileId,
                         (int) $userId,
                         in_array($paymentOrderNo, (array) session(PricingPaymentController::SESSION_VERIFIED_ORDERS, []), true),
-                        (string) ($authenticatedAccount?->email ?? $email)
+                        (string) ($authenticatedAccount->email ?? $email)
                     );
                 }
 

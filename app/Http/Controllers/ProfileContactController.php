@@ -327,7 +327,7 @@ class ProfileContactController extends Controller
             ->where($definition['id'], $id)
             ->where($definition['status'], 1)
             ->first();
-        abort_unless($profile, 404);
+        abort_if($profile === null, 404);
 
         return [$definition, $profile];
     }

@@ -479,7 +479,7 @@ class DashboardController extends Controller
             ->where($definition['id'], $id)
             ->where('user_id', Auth::id())
             ->first();
-        abort_unless($profile, 404);
+        abort_if($profile === null, 404);
 
         return [$definition, $profile];
     }
@@ -1016,7 +1016,7 @@ class DashboardController extends Controller
                     ->orWhere('sender_user_id', Auth::id());
             })
             ->first();
-        abort_unless($thread, 404);
+        abort_if($thread === null, 404);
         $this->markConversationAsRead((int) $thread->id);
 
         $messages = DB::table('profile_contact_messages')
@@ -1046,6 +1046,9 @@ class DashboardController extends Controller
         return response()->json(['messages' => $messages]);
     }
 
+    /**
+     * @return Collection<int, \stdClass>
+     */
     private function conversationsForUser(): Collection
     {
         $latestMessages = DB::table('profile_contact_messages')
@@ -1095,7 +1098,7 @@ class DashboardController extends Controller
                     ->orWhere('sender_user_id', Auth::id());
             })
             ->first();
-        abort_unless($thread, 404);
+        abort_if($thread === null, 404);
         $this->markConversationAsRead((int) $thread->id);
 
         $thread->is_owner = (int) $thread->owner_user_id === (int) Auth::id();
@@ -1138,7 +1141,7 @@ class DashboardController extends Controller
                     ->orWhere('sender_user_id', $request->user()->user_id);
             })
             ->first();
-        abort_unless($thread, 404);
+        abort_if($thread === null, 404);
 
         $validated = $request->validate([
             'message' => ['required', 'string', 'max:10000'],
@@ -1212,7 +1215,7 @@ class DashboardController extends Controller
             ->where('id', $conversation)
             ->where('owner_user_id', $request->user()->user_id)
             ->first();
-        abort_unless($thread, 404);
+        abort_if($thread === null, 404);
 
         $validated = $request->validate([
             'title' => ['required', 'string', 'max:255'],
@@ -1253,7 +1256,7 @@ class DashboardController extends Controller
             ->where('user_id', $request->user()->user_id)
             ->where($definition['status'], 1)
             ->first();
-        abort_unless($ownedProfile, 404);
+        abort_if($ownedProfile === null, 404);
 
         $thread = DB::table('profile_contact_conversations')
             ->where('owner_user_id', $request->user()->user_id)
@@ -1262,7 +1265,7 @@ class DashboardController extends Controller
             ->where('profile_id', $profileId)
             ->orderByDesc('updated_at')
             ->first();
-        abort_unless($thread, 404);
+        abort_if($thread === null, 404);
 
         $this->createProposal($request, $thread, $validated);
 
@@ -1279,13 +1282,13 @@ class DashboardController extends Controller
                     ->orWhere('recipient_user_id', Auth::id());
             })
             ->first();
-        abort_unless($proposalRecord, 404);
+        abort_if($proposalRecord === null, 404);
 
         $file = DB::table('profile_proposal_attachments')
             ->where('id', $attachment)
             ->where('proposal_id', $proposalRecord->id)
             ->first();
-        abort_unless($file, 404);
+        abort_if($file === null, 404);
 
         $url = Storage::disk($file->disk)->temporaryUrl(
             $file->object_key,
@@ -1310,7 +1313,7 @@ class DashboardController extends Controller
             ->where('recipient_user_id', $request->user()->user_id)
             ->where('status', 'pending')
             ->first();
-        abort_unless($proposalRecord, 404);
+        abort_if($proposalRecord === null, 404);
 
         // The conditional update is the source of truth: when accept and
         // decline race (double click, two tabs), only the request that moved

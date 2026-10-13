@@ -18,7 +18,7 @@ class ArticleCommentController extends Controller
             ->where('article_status', 1)
             ->first(['article_id']);
 
-        abort_unless($record, 404);
+        abort_if($record === null, 404);
 
         $validated = $request->validate([
             'comment_detail' => ['required', 'string', 'min:3', 'max:3000'],

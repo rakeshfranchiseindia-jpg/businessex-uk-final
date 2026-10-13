@@ -19,7 +19,7 @@ class EmailVerificationController extends Controller
     {
         $account = UserAccount::query()->findOrFail($id);
         abort_unless(hash_equals(sha1($account->email), $hash), 403);
-        abort_unless($account->is_active, 403);
+        abort_unless((bool) $account->is_active, 403);
 
         if (! $account->hasVerifiedEmail()) {
             $account->forceFill([

@@ -28,12 +28,12 @@ class SchemaCache
 
     public static function hasTable(string $table): bool
     {
-        return static::instance()->columnTypes($table) !== null;
+        return self::instance()->columnTypes($table) !== null;
     }
 
     public static function hasColumn(string $table, string $column): bool
     {
-        $columns = static::instance()->columnTypes($table);
+        $columns = self::instance()->columnTypes($table);
 
         return $columns !== null && array_key_exists(strtolower($column), $columns);
     }
@@ -44,7 +44,7 @@ class SchemaCache
     public static function hasColumns(string $table, array $columns): bool
     {
         foreach ($columns as $column) {
-            if (! static::hasColumn($table, $column)) {
+            if (! self::hasColumn($table, $column)) {
                 return false;
             }
         }
@@ -57,12 +57,12 @@ class SchemaCache
      */
     public static function getColumnListing(string $table): array
     {
-        return array_column(static::instance()->columnTypes($table) ?? [], 'name');
+        return array_column(self::instance()->columnTypes($table) ?? [], 'name');
     }
 
     public static function getColumnType(string $table, string $column): string
     {
-        $type = static::instance()->columnTypes($table)[strtolower($column)]['type'] ?? null;
+        $type = self::instance()->columnTypes($table)[strtolower($column)]['type'] ?? null;
 
         if ($type === null) {
             throw new InvalidArgumentException("There is no column with name '{$column}' on table '{$table}'.");

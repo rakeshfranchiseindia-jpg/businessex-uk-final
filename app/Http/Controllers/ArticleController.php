@@ -82,7 +82,7 @@ class ArticleController extends Controller
                 ->withQueryString()
             : $this->emptyPaginator($request);
 
-        foreach ($articles as $article) {
+        foreach ($articles->items() as $article) {
             $article->image_url = $this->imageUrl($article->listing_image_path ?: $article->image_path, $article->article_id);
             $article->tag_list = $this->splitTags($article->article_tags);
             $article->read_minutes = $this->readingTime($article->article_content);
