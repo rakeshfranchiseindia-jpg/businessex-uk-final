@@ -2,19 +2,19 @@
 
 namespace App\Http\Controllers;
 
+use App\Support\SchemaCache;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Schema;
 
 class TestimonialController extends Controller
 {
     public function homepageTestimonials(): Collection
     {
-        if (!Schema::hasTable('testimonials')) {
+        if (! SchemaCache::hasTable('testimonials')) {
             return collect();
         }
 
-        $columns = Schema::getColumnListing('testimonials');
+        $columns = SchemaCache::getColumnListing('testimonials');
         $query = DB::table('testimonials')
             ->select(['id', 'text', 'name', 'designation']);
 
@@ -58,7 +58,7 @@ class TestimonialController extends Controller
 
         if ($path) {
             $relativePath = ltrim(str_replace('\\', '/', $path), '/');
-            if (!str_contains($relativePath, '..') && is_file(public_path($relativePath))) {
+            if (! str_contains($relativePath, '..') && is_file(public_path($relativePath))) {
                 return asset($relativePath);
             }
         }

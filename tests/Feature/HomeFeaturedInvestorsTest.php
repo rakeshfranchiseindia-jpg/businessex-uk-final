@@ -43,15 +43,15 @@ class HomeFeaturedInvestorsTest extends TestCase
             DB::table('profile_investor')->insert([
                 'inv_profile_status' => $id === 15 ? 0 : 1,
                 'created_at' => now()->subDays(15 - $id),
-                'inv_name' => 'Homepage Investor ' . str_pad((string) $id, 2, '0', STR_PAD_LEFT),
-                'company_name' => 'Investor Company ' . $id,
+                'inv_name' => 'Homepage Investor '.str_pad((string) $id, 2, '0', STR_PAD_LEFT),
+                'company_name' => 'Investor Company '.$id,
                 'company_designation' => 'Director',
                 'inv_city' => $id === 14 ? null : 'London',
                 'company_city' => $id === 14 ? 'Bristol' : null,
-                'inv_headline' => 'Investor headline ' . $id,
-                'inv_intro' => 'Investor introduction ' . $id,
-                'inv_abt_urself' => 'Investor background ' . $id,
-                'company_summary' => 'Investor summary ' . $id,
+                'inv_headline' => 'Investor headline '.$id,
+                'inv_intro' => 'Investor introduction '.$id,
+                'inv_abt_urself' => 'Investor background '.$id,
+                'company_summary' => 'Investor summary '.$id,
                 'inv_profile_pic_path' => null,
             ]);
         }
@@ -67,7 +67,7 @@ class HomeFeaturedInvestorsTest extends TestCase
             ->assertSee(asset('assets/img/default-investor-profile.png'));
 
         for ($id = 3; $id <= 14; $id++) {
-            $response->assertSee('Homepage Investor ' . str_pad((string) $id, 2, '0', STR_PAD_LEFT));
+            $response->assertSee('Homepage Investor '.str_pad((string) $id, 2, '0', STR_PAD_LEFT));
         }
 
         $response->assertDontSee('Homepage Investor 01')

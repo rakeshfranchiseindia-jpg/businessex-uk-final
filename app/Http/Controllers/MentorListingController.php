@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Support\SchemaCache;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\View\View;
 
 class MentorListingController extends AbstractListingController
@@ -15,7 +15,7 @@ class MentorListingController extends AbstractListingController
         $query = DB::table('profile_mentors')
             ->where('mentor_profile_status', 1);
 
-        if (Schema::hasColumn('profile_mentors', 'deleted_at')) {
+        if (SchemaCache::hasColumn('profile_mentors', 'deleted_at')) {
             $query->whereNull('deleted_at');
         }
 

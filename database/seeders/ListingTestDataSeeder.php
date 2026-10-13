@@ -55,7 +55,7 @@ class ListingTestDataSeeder extends Seeder
                 $sequence = str_pad((string) $index, 2, '0', STR_PAD_LEFT);
                 $name = "Listing Test User {$sequence}";
                 $email = "listing.test.{$sequence}@example.test";
-                $phone = '07700900' . str_pad((string) $index, 3, '0', STR_PAD_LEFT);
+                $phone = '07700900'.str_pad((string) $index, 3, '0', STR_PAD_LEFT);
                 $company = "Listing Test Company {$sequence}";
                 $location = self::LOCATIONS[($index - 1) % count(self::LOCATIONS)];
                 $categoryName = self::CATEGORIES[($index - 1) % count(self::CATEGORIES)];

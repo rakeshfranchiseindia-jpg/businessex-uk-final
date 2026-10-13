@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Support\SchemaCache;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\View\View;
 
 class StartupListingController extends AbstractListingController
@@ -17,7 +17,7 @@ class StartupListingController extends AbstractListingController
             ->where('startup_profile_status', 1)
             ->select('profile_startups.*');
 
-        if (Schema::hasTable('industry_categories')) {
+        if (SchemaCache::hasTable('industry_categories')) {
             $query->leftJoin(
                 'industry_categories as startup_industry',
                 'startup_industry.cat_id',
@@ -65,7 +65,7 @@ class StartupListingController extends AbstractListingController
                 ? null
                 : $startup->industry_sector),
             $startup->inv_asking_price !== null
-                ? '£' . number_format((float) $startup->inv_asking_price)
+                ? '£'.number_format((float) $startup->inv_asking_price)
                 : null,
             $startup->startup_prof_pic,
             'assets/img/default-startup-profile.png',
@@ -73,7 +73,7 @@ class StartupListingController extends AbstractListingController
                 'Founder' => $startup->startup_name,
                 'Company Stage' => $startup->company_stage,
                 'Funding sought' => $startup->inv_asking_price !== null
-                    ? '£' . number_format((float) $startup->inv_asking_price)
+                    ? '£'.number_format((float) $startup->inv_asking_price)
                     : null,
             ])
         ));
@@ -98,7 +98,7 @@ class StartupListingController extends AbstractListingController
             'incubator' => ['seeking_incubators'],
         ];
         $intent = $request->query('intent');
-        if (!isset($intentColumns[$intent])) {
+        if (! isset($intentColumns[$intent])) {
             return;
         }
 

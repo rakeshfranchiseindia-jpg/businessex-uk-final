@@ -17,7 +17,7 @@ return new class extends Migration
             $table->integer('newsletter_id')->unsigned()->autoIncrement();
             $table->integer('user_id')->nullable(false);
             $table->string('email', 255)->nullable(false);
-            $table->enum('status', ['S','P','U'])->nullable(false)->default('P');
+            $table->enum('status', ['S', 'P', 'U'])->nullable(false)->default('P');
             $table->string('unsubscribe_reason', 255)->nullable();
             $table->timestamps();
             $table->unique('email');

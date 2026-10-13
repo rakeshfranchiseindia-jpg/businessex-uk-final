@@ -2,7 +2,9 @@
 
 namespace App\Models;
 
-class Hongkong extends \Illuminate\Database\Eloquent\Model
+use Illuminate\Database\Eloquent\Model;
+
+class Hongkong extends Model
 {
     protected $table = 'hongkong';
 
@@ -12,5 +14,4 @@ class Hongkong extends \Illuminate\Database\Eloquent\Model
         'name',
         'email',
     ];
-
 }

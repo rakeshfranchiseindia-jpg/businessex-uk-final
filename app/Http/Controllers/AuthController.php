@@ -2,7 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\VerifyAccountEmail;
 use App\Models\UserAccount;
+use App\Services\Payments\MembershipPaymentService;
+use App\Support\PublicContentCache;
+use App\Support\SchemaCache;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
@@ -12,14 +16,12 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\RateLimiter;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 use RuntimeException;
 use Throwable;
-use App\Mail\VerifyAccountEmail;
 
 class AuthController extends Controller
 {
@@ -129,11 +131,11 @@ class AuthController extends Controller
         ]);
 
         $email = Str::lower(trim($credentials['email']));
-        $throttleKey = Str::lower($email) . '|' . $request->ip();
+        $throttleKey = Str::lower($email).'|'.$request->ip();
 
         if (RateLimiter::tooManyAttempts($throttleKey, 5)) {
             throw ValidationException::withMessages([
-                'email' => 'Too many sign-in attempts. Please try again in ' . RateLimiter::availableIn($throttleKey) . ' seconds.',
+                'email' => 'Too many sign-in attempts. Please try again in '.RateLimiter::availableIn($throttleKey).' seconds.',
             ]);
         }
 
@@ -142,7 +144,7 @@ class AuthController extends Controller
             ->where('is_active', 1)
             ->first();
 
-        if (!$account || !$account->password || !Hash::check($credentials['password'], $account->password)) {
+        if (! $account || ! $account->password || ! Hash::check($credentials['password'], $account->password)) {
             RateLimiter::hit($throttleKey, 60);
 
             throw ValidationException::withMessages([
@@ -151,7 +153,7 @@ class AuthController extends Controller
         }
 
         RateLimiter::clear($throttleKey);
-        if (!$account->hasVerifiedEmail()) {
+        if (! $account->hasVerifiedEmail()) {
             throw ValidationException::withMessages([
                 'email' => 'Please verify your email address before signing in. Use the form below to send a new verification link.',
             ]);
@@ -198,18 +200,16 @@ class AuthController extends Controller
         }
         $attributes[$profile['email']] = 'email';
         $messages = [
-            $profile['name'] . '.regex' => 'Please enter a valid name using letters only.',
-            $profile['email'] . '.not_regex' => 'Please use a real email address.',
+            $profile['name'].'.regex' => 'Please enter a valid name using letters only.',
+            $profile['email'].'.not_regex' => 'Please use a real email address.',
         ];
-        if (isset($profile['mobile'])) {
-            $messages[$profile['mobile'] . '.regex'] = 'Please enter a valid UK mobile number starting with 07 (11 digits).';
-        }
+        $messages[$profile['mobile'].'.regex'] = 'Please enter a valid UK mobile number starting with 07 (11 digits).';
         $validated = $request->validate($rules, $messages, $attributes);
 
         $uploadedFieldName = null;
         foreach ($profileFields as $step) {
             foreach ($step['fields'] as $field) {
-                if (($field['type'] ?? null) === 'file' && !empty($validated[$field['name'] ?? ''] ?? null)) {
+                if (($field['type'] ?? null) === 'file' && ! empty($validated[$field['name'] ?? ''] ?? null)) {
                     $uploadedFieldName = $field['name'];
                     break 2;
                 }
@@ -281,14 +281,13 @@ class AuthController extends Controller
 
                 $paymentOrderNo = request()->string('payment_order_no')->trim()->toString();
                 if ($paymentOrderNo !== '') {
-                    PricingPaymentController::claimForProfile(
+                    app(MembershipPaymentService::class)->claimForProfile(
                         $paymentOrderNo,
                         $type,
-                        $profile['type'],
-                        $profile['table'],
-                        $profile['id'],
                         (int) $profileId,
-                        (int) $userId
+                        (int) $userId,
+                        in_array($paymentOrderNo, (array) session(PricingPaymentController::SESSION_VERIFIED_ORDERS, []), true),
+                        (string) ($authenticatedAccount->email ?? $email)
                     );
                 }
 
@@ -318,7 +317,7 @@ class AuthController extends Controller
                     'updated_at' => $now,
                 ], 'user_prof_id');
 
-                if (Schema::hasTable('profiles')) {
+                if (SchemaCache::hasTable('profiles')) {
                     DB::table('profiles')->insert([
                         'user_id' => $userId,
                         'profile_type' => $type,
@@ -334,6 +333,7 @@ class AuthController extends Controller
 
                 return $authenticatedAccount ?: UserAccount::query()->findOrFail($userId);
             });
+            PublicContentCache::forgetProfileContent();
         } catch (Throwable $exception) {
             if ($storedFiles !== []) {
                 try {
@@ -438,7 +438,7 @@ class AuthController extends Controller
             if ($type === 'business') {
                 $profileValues['ofc_country'] = 'United Kingdom';
             }
-            $profileColumns = Schema::getColumnListing($profile['table']);
+            $profileColumns = SchemaCache::getColumnListing($profile['table']);
             $profileValues = array_intersect_key($profileValues, array_flip($profileColumns));
             $profileId = DB::table($profile['table'])->insertGetId($profileValues, $profile['id']);
 
@@ -452,7 +452,7 @@ class AuthController extends Controller
                 'updated_at' => $now,
             ], 'user_prof_id');
 
-            if (Schema::hasTable('profiles')) {
+            if (SchemaCache::hasTable('profiles')) {
                 DB::table('profiles')->insert([
                     'user_id' => $userId,
                     'profile_type' => $type,
@@ -468,6 +468,7 @@ class AuthController extends Controller
 
             return UserAccount::query()->findOrFail($userId);
         });
+        PublicContentCache::forgetProfileContent();
 
         try {
             Mail::to($account->email)->queue(new VerifyAccountEmail($account));
@@ -515,11 +516,12 @@ class AuthController extends Controller
                     foreach ($field['options'] as $option) {
                         $rules[$option['name']] = ['sometimes', 'boolean'];
                     }
+
                     continue;
                 }
 
                 $fieldName = $field['name'] ?? null;
-                if (!$fieldName) {
+                if (! $fieldName) {
                     continue;
                 }
 
@@ -531,22 +533,23 @@ class AuthController extends Controller
                             static fn (string $extension): string => ltrim($extension, '.'),
                             explode(',', $field['accept'])
                         );
-                        $fileRules[] = 'mimes:' . implode(',', $extensions);
+                        $fileRules[] = 'mimes:'.implode(',', $extensions);
                         $isImageField = array_diff($extensions, ['png', 'jpg', 'jpeg']) === [];
                     }
                     if ($isImageField) {
                         $fileRules[] = 'dimensions:max_width=1800,max_height=1200';
                     }
-                    if (!empty($field['multiple'])) {
+                    if (! empty($field['multiple'])) {
                         $rules[$fieldName] = ['nullable', 'array', 'max:10'];
-                        $rules[$fieldName . '.*'] = $fileRules;
+                        $rules[$fieldName.'.*'] = $fileRules;
                     } else {
                         $rules[$fieldName] = array_merge(['nullable'], $fileRules);
                     }
+
                     continue;
                 }
 
-                $fieldRules = !empty($field['required']) ? ['required'] : ['nullable'];
+                $fieldRules = ! empty($field['required']) ? ['required'] : ['nullable'];
                 $fieldRules[] = ($field['type'] ?? null) === 'number' ? 'numeric' : 'string';
                 if (($field['type'] ?? null) === 'number') {
                     $fieldRules[] = 'min:0';
@@ -597,7 +600,7 @@ class AuthController extends Controller
         string $profileKey,
         mixed $now
     ): array {
-        $columns = Schema::getColumnListing($profile['table']);
+        $columns = SchemaCache::getColumnListing($profile['table']);
         $values = [
             $profile['key'] => $profileKey,
             'user_id' => $userId,
@@ -617,11 +620,12 @@ class AuthController extends Controller
                             $values[$fieldName] = (int) ($validated[$fieldName] ?? 0);
                         }
                     }
+
                     continue;
                 }
 
                 $fieldName = $field['name'] ?? null;
-                if (!$fieldName || !array_key_exists($fieldName, $validated)) {
+                if (! $fieldName || ! array_key_exists($fieldName, $validated)) {
                     continue;
                 }
 
@@ -630,14 +634,14 @@ class AuthController extends Controller
                     continue;
                 }
 
-                if (!in_array($fieldName, $columns, true)) {
+                if (! in_array($fieldName, $columns, true)) {
                     continue;
                 }
 
-                $columnType = Schema::getColumnType($profile['table'], $fieldName);
+                $columnType = SchemaCache::getColumnType($profile['table'], $fieldName);
                 if (in_array($columnType, ['integer', 'bigint', 'smallint', 'tinyint'], true)
                     && ($field['type'] ?? null) === 'select'
-                    && !is_numeric($value)
+                    && ! is_numeric($value)
                     && isset($field['options'])) {
                     $value = array_search($value, array_map('strval', $field['options']), true);
                 }
@@ -690,7 +694,7 @@ class AuthController extends Controller
         }
 
         foreach ($requiredTables as $table) {
-            if (!Schema::hasTable($table)) {
+            if (! SchemaCache::hasTable($table)) {
                 throw new RuntimeException("Registration requires the imported BusinessX table [{$table}]. Import the database schema before creating accounts.");
             }
         }
@@ -701,34 +705,33 @@ class AuthController extends Controller
         array $steps,
         string $type,
         array &$storedFiles
-    ): array
-    {
+    ): array {
         $uploads = [];
         foreach ($steps as $step) {
             foreach ($step['fields'] as $field) {
                 $name = $field['name'] ?? null;
-                if (($field['type'] ?? null) !== 'file' || !$name || !isset($validated[$name])) {
+                if (($field['type'] ?? null) !== 'file' || ! $name || ! isset($validated[$name])) {
                     continue;
                 }
 
-                $files = !empty($field['multiple']) ? $validated[$name] : [$validated[$name]];
+                $files = ! empty($field['multiple']) ? $validated[$name] : [$validated[$name]];
                 foreach ($files as $index => $file) {
-                    if (!$file instanceof UploadedFile) {
+                    if (! $file instanceof UploadedFile) {
                         continue;
                     }
 
                     $isImage = str_starts_with((string) $file->getMimeType(), 'image/');
                     $kind = $isImage ? 'images' : 'documents';
-                    $directory = 'profiles/' . $type . '/' . $kind . '/' . now()->format('Y/m');
+                    $directory = 'profiles/'.$type.'/'.$kind.'/'.now()->format('Y/m');
                     $extension = $file->guessExtension() ?: 'bin';
-                    $filename = Str::uuid()->toString() . '.' . $extension;
+                    $filename = Str::uuid()->toString().'.'.$extension;
                     $path = Storage::disk('s3')->putFileAs(
                         $directory,
                         $file,
                         $filename,
                         ['visibility' => $isImage ? 'public' : 'private']
                     );
-                    if (!is_string($path) || $path === '') {
+                    if (! is_string($path) || $path === '') {
                         throw new RuntimeException("Unable to store profile upload [{$name}] in S3.");
                     }
 
@@ -759,7 +762,7 @@ class AuthController extends Controller
         array $profile
     ): array {
         $profileValues = [];
-        $columns = Schema::getColumnListing($profile['table']);
+        $columns = SchemaCache::getColumnListing($profile['table']);
 
         foreach ($uploads as $upload) {
             $mediaId = DB::table('profile_media')->insertGetId([
@@ -797,7 +800,7 @@ class AuthController extends Controller
     {
         $cdnUrl = trim((string) config('filesystems.cdn_url'));
         if ($cdnUrl !== '') {
-            return rtrim($cdnUrl, '/') . '/' . ltrim($objectKey, '/');
+            return rtrim($cdnUrl, '/').'/'.ltrim($objectKey, '/');
         }
 
         return Storage::disk('s3')->url($objectKey);

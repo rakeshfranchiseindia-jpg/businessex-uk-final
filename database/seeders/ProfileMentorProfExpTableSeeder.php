@@ -17,7 +17,7 @@ class ProfileMentorProfExpTableSeeder extends Seeder
             'mentor_profile_id' => 1,
             'user_id' => 1,
             'exp_year' => 2,
-            'exp_sector' => 1
+            'exp_sector' => 1,
         ]);
 
         DB::table('profile_mentor_prof_exp')->insert([
@@ -25,7 +25,7 @@ class ProfileMentorProfExpTableSeeder extends Seeder
             'mentor_profile_id' => 2,
             'user_id' => 2,
             'exp_year' => 3,
-            'exp_sector' => 2
+            'exp_sector' => 2,
         ]);
 
         DB::table('profile_mentor_prof_exp')->insert([
@@ -33,7 +33,7 @@ class ProfileMentorProfExpTableSeeder extends Seeder
             'mentor_profile_id' => 3,
             'user_id' => 3,
             'exp_year' => 4,
-            'exp_sector' => 3
+            'exp_sector' => 3,
         ]);
 
     }

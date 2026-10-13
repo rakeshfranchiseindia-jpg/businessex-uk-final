@@ -2,7 +2,9 @@
 
 namespace App\Models;
 
-class FiInvestor extends \Illuminate\Database\Eloquent\Model
+use Illuminate\Database\Eloquent\Model;
+
+class FiInvestor extends Model
 {
     protected $table = 'fi_investors';
 
@@ -12,5 +14,4 @@ class FiInvestor extends \Illuminate\Database\Eloquent\Model
         'name',
         'email',
     ];
-
 }

@@ -12,7 +12,9 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        $middleware->encryptCookies(except: ['intended_profile']);
+        // Razorpay cannot send a CSRF token; the webhook authenticates
+        // requests by HMAC signature instead (RazorpayWebhookController).
+        $middleware->validateCsrfTokens(except: ['webhooks/razorpay']);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

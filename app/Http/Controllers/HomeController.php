@@ -2,19 +2,35 @@
 
 namespace App\Http\Controllers;
 
+use App\Support\PublicContentCache;
+use App\Support\SchemaCache;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\View\View;
 
 class HomeController extends Controller
 {
     public function __construct(
         private readonly TestimonialController $testimonialController
-    ) {
-    }
+    ) {}
 
     public function index(): View
+    {
+        // Everything on the home page is the same for every visitor.
+        $data = PublicContentCache::home(fn (): array => $this->homeData());
+
+        return view('pages.home', [
+            'page' => 'home',
+            'showHeader' => true,
+            'showFooter' => true,
+            ...$data,
+        ]);
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function homeData(): array
     {
         $industryCategories = collect();
         $ukCities = collect();
@@ -41,9 +57,9 @@ class HomeController extends Controller
         $worldClassMentors = collect();
         $activeMentorCount = 0;
 
-        if (Schema::hasTable('industry_categories')
-            && Schema::hasTable('ind_pref_business')
-            && Schema::hasTable('profile_business')) {
+        if (SchemaCache::hasTable('industry_categories')
+            && SchemaCache::hasTable('ind_pref_business')
+            && SchemaCache::hasTable('profile_business')) {
             $opportunityCounts = DB::table('ind_pref_business as industry')
                 ->join('profile_business as business', 'business.business_id', '=', 'industry.business_profile_id')
                 ->where('industry.profile_status', 1)
@@ -65,7 +81,7 @@ class HomeController extends Controller
                 ]);
         }
 
-        if (Schema::hasTable('bx_cities') && Schema::hasTable('profile_business')) {
+        if (SchemaCache::hasTable('bx_cities') && SchemaCache::hasTable('profile_business')) {
             $cityCounts = DB::table('profile_business')
                 ->where('business_profile_status', 1)
                 ->whereRaw('LOWER(TRIM(ofc_country)) = ?', ['united kingdom'])
@@ -85,8 +101,8 @@ class HomeController extends Controller
                 ]);
         }
 
-        if (Schema::hasTable('profile_business')
-            && Schema::hasColumns('profile_business', ['business_profile_status', 'inv_asking_price'])) {
+        if (SchemaCache::hasTable('profile_business')
+            && SchemaCache::hasColumns('profile_business', ['business_profile_status', 'inv_asking_price'])) {
             $rangeExpressions = [];
             $rangeBindings = [];
 
@@ -103,12 +119,12 @@ class HomeController extends Controller
                 ->first();
 
             foreach ($investmentRanges as $index => &$range) {
-                $range['count'] = (int) ($counts->{'investment_range_' . $index} ?? 0);
+                $range['count'] = (int) ($counts->{'investment_range_'.$index} ?? 0);
             }
             unset($range);
         }
 
-        if (Schema::hasTable('bx_articles')) {
+        if (SchemaCache::hasTable('bx_articles')) {
             $articleQuery = DB::table('bx_articles')
                 ->where('bx_articles.article_status', 1)
                 ->select([
@@ -122,7 +138,7 @@ class HomeController extends Controller
                     'bx_articles.updated_at',
                 ]);
 
-            if (Schema::hasTable('bx_author')) {
+            if (SchemaCache::hasTable('bx_author')) {
                 $articleQuery
                     ->leftJoin('bx_author', 'bx_author.author_id', '=', 'bx_articles.author_id')
                     ->addSelect('bx_author.author_name');
@@ -146,7 +162,7 @@ class HomeController extends Controller
                 });
         }
 
-        if (Schema::hasTable('profile_business') && Schema::hasColumns('profile_business', [
+        if (SchemaCache::hasTable('profile_business') && SchemaCache::hasColumns('profile_business', [
             'business_id',
             'business_profile_status',
             'created_at',
@@ -178,7 +194,7 @@ class HomeController extends Controller
                     $business->display_title = $business->advmt_headline
                         ?: ($business->seller_company ?: 'Business opportunity');
                     $business->display_industry = $business->industry_sector
-                        && !is_numeric($business->industry_sector)
+                        && ! is_numeric($business->industry_sector)
                             ? $business->industry_sector
                             : 'Business opportunity';
                     $business->image_url = $this->businessImageUrl($business->seller_prof_pic);
@@ -187,7 +203,7 @@ class HomeController extends Controller
                 });
         }
 
-        if (Schema::hasTable('profile_investor') && Schema::hasColumns('profile_investor', [
+        if (SchemaCache::hasTable('profile_investor') && SchemaCache::hasColumns('profile_investor', [
             'investor_id',
             'inv_profile_status',
             'created_at',
@@ -235,7 +251,7 @@ class HomeController extends Controller
                 });
         }
 
-        if (Schema::hasTable('profile_startups') && Schema::hasColumns('profile_startups', [
+        if (SchemaCache::hasTable('profile_startups') && SchemaCache::hasColumns('profile_startups', [
             'startup_id',
             'startup_profile_status',
             'created_at',
@@ -272,7 +288,7 @@ class HomeController extends Controller
                 'profile_startups.business_pitch',
             ];
 
-            if (Schema::hasTable('industry_categories')) {
+            if (SchemaCache::hasTable('industry_categories')) {
                 $startupQuery->leftJoin(
                     'industry_categories as startup_industry',
                     'startup_industry.cat_id',
@@ -292,7 +308,7 @@ class HomeController extends Controller
                     $startup->display_title = $startup->advmt_headline
                         ?: ($startup->name_of_entity ?: 'Startup opportunity');
                     $startup->display_industry = $startup->industry_name
-                        ?: ($startup->industry_sector && !is_numeric($startup->industry_sector)
+                        ?: ($startup->industry_sector && ! is_numeric($startup->industry_sector)
                             ? $startup->industry_sector
                             : 'Startup opportunity');
                     $startup->display_summary = $startup->company_summary
@@ -303,7 +319,7 @@ class HomeController extends Controller
                 });
         }
 
-        if (Schema::hasTable('profile_mentors') && Schema::hasColumns('profile_mentors', [
+        if (SchemaCache::hasTable('profile_mentors') && SchemaCache::hasColumns('profile_mentors', [
             'mentor_id',
             'mentor_profile_status',
             'created_at',
@@ -319,7 +335,7 @@ class HomeController extends Controller
             $mentorQuery = DB::table('profile_mentors')
                 ->where('mentor_profile_status', 1);
 
-            if (Schema::hasColumn('profile_mentors', 'deleted_at')) {
+            if (SchemaCache::hasColumn('profile_mentors', 'deleted_at')) {
                 $mentorQuery->whereNull('deleted_at');
             }
 
@@ -351,10 +367,7 @@ class HomeController extends Controller
                 });
         }
 
-        return view('pages.home', [
-            'page' => 'home',
-            'showHeader' => true,
-            'showFooter' => true,
+        return [
             'industryCategories' => $industryCategories,
             'ukCities' => $ukCities,
             'investmentRanges' => $investmentRanges,
@@ -368,7 +381,7 @@ class HomeController extends Controller
             'worldClassMentors' => $worldClassMentors,
             'activeMentorCount' => $activeMentorCount,
             'testimonials' => $this->testimonialController->homepageTestimonials(),
-        ]);
+        ];
     }
 
     private function businessImageUrl(?string $path): string
@@ -379,13 +392,13 @@ class HomeController extends Controller
 
         if ($path) {
             $relativePath = ltrim(str_replace('\\', '/', $path), '/');
-            if (!str_contains($relativePath, '..')) {
+            if (! str_contains($relativePath, '..')) {
                 if (is_file(public_path($relativePath))) {
                     return asset($relativePath);
                 }
 
-                if (is_file(public_path('storage/' . $relativePath))) {
-                    return asset('storage/' . $relativePath);
+                if (is_file(public_path('storage/'.$relativePath))) {
+                    return asset('storage/'.$relativePath);
                 }
             }
         }
@@ -401,13 +414,13 @@ class HomeController extends Controller
 
         if ($path) {
             $relativePath = ltrim(str_replace('\\', '/', $path), '/');
-            if (!str_contains($relativePath, '..')) {
+            if (! str_contains($relativePath, '..')) {
                 if (is_file(public_path($relativePath))) {
                     return asset($relativePath);
                 }
 
-                if (is_file(public_path('storage/' . $relativePath))) {
-                    return asset('storage/' . $relativePath);
+                if (is_file(public_path('storage/'.$relativePath))) {
+                    return asset('storage/'.$relativePath);
                 }
             }
         }
@@ -423,13 +436,13 @@ class HomeController extends Controller
 
         if ($path) {
             $relativePath = ltrim(str_replace('\\', '/', $path), '/');
-            if (!str_contains($relativePath, '..')) {
+            if (! str_contains($relativePath, '..')) {
                 if (is_file(public_path($relativePath))) {
                     return asset($relativePath);
                 }
 
-                if (is_file(public_path('storage/' . $relativePath))) {
-                    return asset('storage/' . $relativePath);
+                if (is_file(public_path('storage/'.$relativePath))) {
+                    return asset('storage/'.$relativePath);
                 }
             }
         }
@@ -445,13 +458,13 @@ class HomeController extends Controller
 
         if ($path) {
             $relativePath = ltrim(str_replace('\\', '/', $path), '/');
-            if (!str_contains($relativePath, '..')) {
+            if (! str_contains($relativePath, '..')) {
                 if (is_file(public_path($relativePath))) {
                     return asset($relativePath);
                 }
 
-                if (is_file(public_path('storage/' . $relativePath))) {
-                    return asset('storage/' . $relativePath);
+                if (is_file(public_path('storage/'.$relativePath))) {
+                    return asset('storage/'.$relativePath);
                 }
             }
         }
@@ -467,11 +480,11 @@ class HomeController extends Controller
 
         if ($path) {
             $relativePath = ltrim(str_replace('\\', '/', $path), '/');
-            if (!str_contains($relativePath, '..') && is_file(public_path($relativePath))) {
+            if (! str_contains($relativePath, '..') && is_file(public_path($relativePath))) {
                 return asset($relativePath);
             }
         }
 
-        return asset('assets/img/article-' . ((($articleId - 1) % 4) + 1) . '.jpg');
+        return asset('assets/img/article-'.((($articleId - 1) % 4) + 1).'.jpg');
     }
 }

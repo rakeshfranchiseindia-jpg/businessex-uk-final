@@ -2,7 +2,9 @@
 
 namespace App\Models;
 
-class BusinessexRiseconference extends \Illuminate\Database\Eloquent\Model
+use Illuminate\Database\Eloquent\Model;
+
+class BusinessexRiseconference extends Model
 {
     protected $table = 'businessex_riseconference';
 
@@ -17,5 +19,4 @@ class BusinessexRiseconference extends \Illuminate\Database\Eloquent\Model
         'contact_company',
         'contact_country',
     ];
-
 }

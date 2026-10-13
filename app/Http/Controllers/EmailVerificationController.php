@@ -19,8 +19,9 @@ class EmailVerificationController extends Controller
     {
         $account = UserAccount::query()->findOrFail($id);
         abort_unless(hash_equals(sha1($account->email), $hash), 403);
+        abort_unless((bool) $account->is_active, 403);
 
-        if (!$account->hasVerifiedEmail()) {
+        if (! $account->hasVerifiedEmail()) {
             $account->forceFill([
                 'email_verified_at' => now(),
             ])->save();
@@ -46,7 +47,7 @@ class EmailVerificationController extends Controller
             'email' => ['required', 'email', 'max:255'],
         ]);
         $email = mb_strtolower(trim($validated['email']));
-        $throttleKey = 'verification-resend|' . $email . '|' . $request->ip();
+        $throttleKey = 'verification-resend|'.$email.'|'.$request->ip();
 
         if (RateLimiter::tooManyAttempts($throttleKey, 3)) {
             throw ValidationException::withMessages([
@@ -57,7 +58,7 @@ class EmailVerificationController extends Controller
         RateLimiter::hit($throttleKey, 3600);
         $account = UserAccount::query()->where('email', $email)->first();
 
-        if ($account && !$account->hasVerifiedEmail()) {
+        if ($account && ! $account->hasVerifiedEmail()) {
             try {
                 Mail::to($account->email)->queue(new VerifyAccountEmail($account));
             } catch (Throwable $exception) {

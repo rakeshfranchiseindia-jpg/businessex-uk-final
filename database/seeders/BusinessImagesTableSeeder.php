@@ -18,7 +18,7 @@ class BusinessImagesTableSeeder extends Seeder
             'type' => 1,
             'business_img_path' => 'uploads/images/sample1.jpg',
             'business_img_name' => 'uploads/images/sample1.jpg',
-            'is_active' => 0
+            'is_active' => 0,
         ]);
 
         DB::table('business_images')->insert([
@@ -27,7 +27,7 @@ class BusinessImagesTableSeeder extends Seeder
             'type' => 2,
             'business_img_path' => 'uploads/images/sample2.jpg',
             'business_img_name' => 'uploads/images/sample2.jpg',
-            'is_active' => 1
+            'is_active' => 1,
         ]);
 
         DB::table('business_images')->insert([
@@ -36,7 +36,7 @@ class BusinessImagesTableSeeder extends Seeder
             'type' => 3,
             'business_img_path' => 'uploads/images/sample3.jpg',
             'business_img_name' => 'uploads/images/sample3.jpg',
-            'is_active' => 0
+            'is_active' => 0,
         ]);
 
     }

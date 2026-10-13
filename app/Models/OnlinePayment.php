@@ -2,7 +2,9 @@
 
 namespace App\Models;
 
-class OnlinePayment extends \Illuminate\Database\Eloquent\Model
+use Illuminate\Database\Eloquent\Model;
+
+class OnlinePayment extends Model
 {
     protected $table = 'online_payments';
 
@@ -21,9 +23,6 @@ class OnlinePayment extends \Illuminate\Database\Eloquent\Model
         'country',
         'product_details',
         'membership_plan',
-        'amount',
-        'udf',
-        'payment_status',
         'payment_mode',
         'addon_one',
         'addon_two',
@@ -34,15 +33,24 @@ class OnlinePayment extends \Illuminate\Database\Eloquent\Model
         'status_message',
     ];
 
+    // amount, udf (Razorpay order id), razorpay_payment_id and
+    // payment_status are deliberately not fillable: only the payment flow
+    // (PricingPaymentController / MembershipPaymentService) sets them.
+
+    protected $casts = [
+        'user_id' => 'integer',
+        'profile_type' => 'integer',
+        'profile_id' => 'integer',
+        'payment_status' => 'integer',
+    ];
 
     public function user()
     {
-        return $this->belongsTo(User::class, 'user_id', 'user_id');
+        return $this->belongsTo(UserAccount::class, 'user_id', 'user_id');
     }
 
     public function coupon()
     {
         return $this->belongsTo(BxCoupon::class, 'coupon_id', 'id');
     }
-
 }

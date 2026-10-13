@@ -2,7 +2,9 @@
 
 namespace App\Models;
 
-class ProfileStartupFundRaising extends \Illuminate\Database\Eloquent\Model
+use Illuminate\Database\Eloquent\Model;
+
+class ProfileStartupFundRaising extends Model
 {
     protected $table = 'profile_startup_fund_raising';
 
@@ -15,7 +17,6 @@ class ProfileStartupFundRaising extends \Illuminate\Database\Eloquent\Model
         'fund_amount',
     ];
 
-
     public function startupProfile()
     {
         return $this->belongsTo(ProfileStartup::class, 'startup_profile_id', 'startup_id');
@@ -25,5 +26,4 @@ class ProfileStartupFundRaising extends \Illuminate\Database\Eloquent\Model
     {
         return $this->belongsTo(User::class, 'user_id', 'user_id');
     }
-
 }

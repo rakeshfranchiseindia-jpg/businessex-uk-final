@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Support\SchemaCache;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
 
@@ -24,7 +24,7 @@ abstract class AbstractListingController extends Controller
             'sort' => ['nullable', 'in:newest,oldest,name_asc,amount_asc,amount_desc'],
         ];
         if ($allowedIntents !== []) {
-            $rules['intent'] = ['nullable', 'in:' . implode(',', $allowedIntents)];
+            $rules['intent'] = ['nullable', 'in:'.implode(',', $allowedIntents)];
         }
 
         return $request->validate($rules);
@@ -39,8 +39,8 @@ abstract class AbstractListingController extends Controller
 
         $query->where(function (Builder $nested) use ($columns, $term): void {
             foreach ($columns as $column) {
-                if (Schema::hasColumn($this->tableName($nested), $column)) {
-                    $nested->orWhere($column, 'like', '%' . $term . '%');
+                if (SchemaCache::hasColumn($this->tableName($nested), $column)) {
+                    $nested->orWhere($column, 'like', '%'.$term.'%');
                 }
             }
         });
@@ -56,7 +56,7 @@ abstract class AbstractListingController extends Controller
         $query->where(function (Builder $nested) use ($columns, $cities): void {
             foreach ($columns as $column) {
                 foreach ($cities as $city) {
-                    $nested->orWhere($column, 'like', '%' . $city . '%');
+                    $nested->orWhere($column, 'like', '%'.$city.'%');
                 }
             }
         });
@@ -88,7 +88,7 @@ abstract class AbstractListingController extends Controller
 
             foreach ($categoryNames as $name) {
                 foreach ($textColumns as $column) {
-                    $nested->orWhere($column, 'like', '%' . $name . '%');
+                    $nested->orWhere($column, 'like', '%'.$name.'%');
                 }
             }
         });
@@ -105,11 +105,11 @@ abstract class AbstractListingController extends Controller
     ): void {
         $minimum = $request->query($minimumParameter);
         $maximum = $request->query($maximumParameter);
-        if ($minimum !== null && $minimum !== '' && Schema::hasColumn($this->tableName($query), $minimumColumn)) {
+        if ($minimum !== null && $minimum !== '' && SchemaCache::hasColumn($this->tableName($query), $minimumColumn)) {
             $column = $maximumColumn ?: $minimumColumn;
             $query->whereRaw("CAST({$column} AS DECIMAL(20, 4)) >= ?", [(float) $minimum]);
         }
-        if ($maximum !== null && $maximum !== '' && Schema::hasColumn($this->tableName($query), $minimumColumn)) {
+        if ($maximum !== null && $maximum !== '' && SchemaCache::hasColumn($this->tableName($query), $minimumColumn)) {
             $operator = $maximumExclusiveParameter && $request->query($maximumExclusiveParameter) === '1'
                 ? '<'
                 : '<=';
@@ -138,7 +138,7 @@ abstract class AbstractListingController extends Controller
             }
         }
 
-        if (Schema::hasTable('industry_categories')) {
+        if (SchemaCache::hasTable('industry_categories')) {
             $categories = Cache::remember(
                 'listing.industry-categories.v1',
                 now()->addMinutes(10),
@@ -186,7 +186,7 @@ abstract class AbstractListingController extends Controller
      */
     protected function applyMembershipPriority(Builder $query, string $table): void
     {
-        if (! Schema::hasColumns($table, ['membership_paid', 'membership_plan'])) {
+        if (! SchemaCache::hasColumns($table, ['membership_paid', 'membership_plan'])) {
             return;
         }
 
@@ -212,12 +212,12 @@ abstract class AbstractListingController extends Controller
         } elseif ($sort === 'amount_desc' && $amountColumn) {
             $query->orderByRaw("CAST({$amountColumn} AS DECIMAL(20, 4)) DESC")->orderByDesc($idColumn);
         } elseif ($sort === 'oldest') {
-            if (Schema::hasColumn($table, 'created_at')) {
+            if (SchemaCache::hasColumn($table, 'created_at')) {
                 $query->orderBy("{$table}.created_at");
             }
             $query->orderBy($idColumn);
         } else {
-            if (Schema::hasColumn($table, 'created_at')) {
+            if (SchemaCache::hasColumn($table, 'created_at')) {
                 $query->orderByDesc("{$table}.created_at");
             }
             $query->orderByDesc($idColumn);
@@ -280,12 +280,12 @@ abstract class AbstractListingController extends Controller
 
         if ($path) {
             $relativePath = ltrim(str_replace('\\', '/', $path), '/');
-            if (!str_contains($relativePath, '..')) {
+            if (! str_contains($relativePath, '..')) {
                 if (is_file(public_path($relativePath))) {
                     return asset($relativePath);
                 }
-                if (is_file(public_path('storage/' . $relativePath))) {
-                    return asset('storage/' . $relativePath);
+                if (is_file(public_path('storage/'.$relativePath))) {
+                    return asset('storage/'.$relativePath);
                 }
             }
         }

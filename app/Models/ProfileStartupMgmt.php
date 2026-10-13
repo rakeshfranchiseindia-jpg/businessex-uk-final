@@ -2,7 +2,9 @@
 
 namespace App\Models;
 
-class ProfileStartupMgmt extends \Illuminate\Database\Eloquent\Model
+use Illuminate\Database\Eloquent\Model;
+
+class ProfileStartupMgmt extends Model
 {
     protected $table = 'profile_startup_mgmt';
 
@@ -16,7 +18,6 @@ class ProfileStartupMgmt extends \Illuminate\Database\Eloquent\Model
         'mgmt_email',
     ];
 
-
     public function startupProfile()
     {
         return $this->belongsTo(ProfileStartup::class, 'startup_profile_id', 'startup_id');
@@ -26,5 +27,4 @@ class ProfileStartupMgmt extends \Illuminate\Database\Eloquent\Model
     {
         return $this->belongsTo(User::class, 'user_id', 'user_id');
     }
-
 }

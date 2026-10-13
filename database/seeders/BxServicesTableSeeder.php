@@ -33,7 +33,7 @@ class BxServicesTableSeeder extends Seeder
             'payment_status' => 0,
             'payment_mode' => 'online',
             'contact_response' => 5,
-            'contact_status' => 0
+            'contact_status' => 0,
         ]);
 
         DB::table('bx_services')->insert([
@@ -57,7 +57,7 @@ class BxServicesTableSeeder extends Seeder
             'payment_status' => 1,
             'payment_mode' => 'offline',
             'contact_response' => 15,
-            'contact_status' => 1
+            'contact_status' => 1,
         ]);
 
         DB::table('bx_services')->insert([
@@ -81,7 +81,7 @@ class BxServicesTableSeeder extends Seeder
             'payment_status' => 0,
             'payment_mode' => 'upi',
             'contact_response' => 25,
-            'contact_status' => 0
+            'contact_status' => 0,
         ]);
 
     }

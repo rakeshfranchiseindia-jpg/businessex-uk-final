@@ -17,7 +17,7 @@ class BusinessexContactusTableSeeder extends Seeder
             'contact_name' => 'Rajesh Kumar',
             'contact_email' => 'admin@businessex.com',
             'contact_mobile' => '9876543210',
-            'contact_comment' => 'Sample description text.'
+            'contact_comment' => 'Sample description text.',
         ]);
 
         DB::table('businessex_contactus')->insert([
@@ -25,7 +25,7 @@ class BusinessexContactusTableSeeder extends Seeder
             'contact_name' => 'Priya Sharma',
             'contact_email' => 'john.doe@example.com',
             'contact_mobile' => '8765432109',
-            'contact_comment' => 'Another sample description.'
+            'contact_comment' => 'Another sample description.',
         ]);
 
         DB::table('businessex_contactus')->insert([
@@ -33,7 +33,7 @@ class BusinessexContactusTableSeeder extends Seeder
             'contact_name' => 'Amit Patel',
             'contact_email' => 'priya.sharma@example.com',
             'contact_mobile' => '7654321098',
-            'contact_comment' => 'Third sample description.'
+            'contact_comment' => 'Third sample description.',
         ]);
 
     }

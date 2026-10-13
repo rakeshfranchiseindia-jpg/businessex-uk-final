@@ -2,7 +2,9 @@
 
 namespace App\Models;
 
-class ProfileIncubatorProfExp extends \Illuminate\Database\Eloquent\Model
+use Illuminate\Database\Eloquent\Model;
+
+class ProfileIncubatorProfExp extends Model
 {
     protected $table = 'profile_incubator_prof_exp';
 
@@ -15,7 +17,6 @@ class ProfileIncubatorProfExp extends \Illuminate\Database\Eloquent\Model
         'exp_sector',
     ];
 
-
     public function incubatorProfile()
     {
         return $this->belongsTo(ProfileIncubator::class, 'incubator_profile_id', 'incubator_id');
@@ -25,5 +26,4 @@ class ProfileIncubatorProfExp extends \Illuminate\Database\Eloquent\Model
     {
         return $this->belongsTo(User::class, 'user_id', 'user_id');
     }
-
 }

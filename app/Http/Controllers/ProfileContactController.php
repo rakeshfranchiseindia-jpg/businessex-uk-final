@@ -4,11 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Models\UserAccount;
 use App\Notifications\DashboardActivityNotification;
+use App\Support\SchemaCache;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
 
@@ -118,19 +118,19 @@ class ProfileContactController extends Controller
         foreach ((array) $profile as $name => $value) {
             $isLockedField = in_array($name, $lockedFields, true);
             if (in_array($name, $excludedFields, true) || $value === null || $value === ''
-                || (!$isLockedField && preg_match('/(?:email|mobile|phone|document|attachment|password|token|_pic|_path|membership|mailer|activated|utm_|trackid|contact_)/i', $name))) {
+                || (! $isLockedField && preg_match('/(?:email|mobile|phone|document|attachment|password|token|_pic|_path|membership|mailer|activated|utm_|trackid|contact_)/i', $name))) {
                 continue;
             }
             if (is_numeric($value) && $name === 'industry_sector'
-                && Schema::hasTable('industry_categories')
-                && Schema::hasColumns('industry_categories', ['cat_id', 'category_name'])) {
+                && SchemaCache::hasTable('industry_categories')
+                && SchemaCache::hasColumns('industry_categories', ['cat_id', 'category_name'])) {
                 $value = DB::table('industry_categories')->where('cat_id', $value)->value('category_name') ?: $value;
             }
-            $locked = $isLockedField && !$isUnlocked;
+            $locked = $isLockedField && ! $isUnlocked;
             $item = [
                 'label' => $fieldLabels[$name] ?? Str::headline($name),
                 'value' => $locked ? '' : (string) $value,
-                'is_url' => !$locked && (bool) preg_match('#^https?://#i', (string) $value),
+                'is_url' => ! $locked && (bool) preg_match('#^https?://#i', (string) $value),
                 'locked' => $locked,
             ];
 
@@ -148,7 +148,7 @@ class ProfileContactController extends Controller
             : array_values(array_diff($columns, $lockedFields));
 
         $profile->display_title = $this->firstValue($profile, $visibleColumns($definition['title']))
-            ?: $definition['label'] . ' profile';
+            ?: $definition['label'].' profile';
         $profile->display_summary = $this->firstValue($profile, $visibleColumns($definition['summary']));
         $profile->display_location = collect($visibleColumns($definition['location']))
             ->map(fn (string $column): ?string => $profile->{$column} ?? null)
@@ -157,7 +157,7 @@ class ProfileContactController extends Controller
             ->implode(', ');
         $profile->display_image = $this->imageUrl($profile->{$definition['image']} ?? null, $definition['fallback']);
 
-        $owner = Schema::hasTable('user_account') && isset($profile->user_id)
+        $owner = SchemaCache::hasTable('user_account') && isset($profile->user_id)
             ? DB::table('user_account')->where('user_id', $profile->user_id)->first(['user_id'])
             : null;
 
@@ -171,7 +171,7 @@ class ProfileContactController extends Controller
             'profileId' => $id,
             'profileItems' => $items,
             'profileSections' => $sections,
-            'canContact' => $owner !== null && (!Auth::check() || (int) Auth::id() !== (int) $profile->user_id),
+            'canContact' => $owner !== null && (! Auth::check() || (int) Auth::id() !== (int) $profile->user_id),
             'isUnlocked' => $isUnlocked,
             'isOwner' => $isOwner,
             'contactDefaults' => Auth::user() ? [
@@ -189,7 +189,7 @@ class ProfileContactController extends Controller
      */
     private function recordSearchHistory(array $definition, object $profile): void
     {
-        if (!Auth::check() || !Schema::hasTable('profile_visitors') || !isset($definition['legacy_type'])) {
+        if (! Auth::check() || ! SchemaCache::hasTable('profile_visitors') || ! isset($definition['legacy_type'])) {
             return;
         }
 
@@ -217,7 +217,7 @@ class ProfileContactController extends Controller
      */
     private function viewerHasReply(string $type, int $profileId, int $ownerUserId): bool
     {
-        if (!Auth::check() || !Schema::hasTable('profile_contact_conversations') || !Schema::hasTable('profile_contact_messages')) {
+        if (! Auth::check() || ! SchemaCache::hasTable('profile_contact_conversations') || ! SchemaCache::hasTable('profile_contact_messages')) {
             return false;
         }
 
@@ -242,7 +242,7 @@ class ProfileContactController extends Controller
     {
         [$definition, $profile] = $this->activeProfile($type, $id);
         abort_if((int) $profile->user_id === (int) $request->user()->user_id, 403);
-        abort_unless(Schema::hasTable('user_account')
+        abort_unless(SchemaCache::hasTable('user_account')
             && DB::table('user_account')->where('user_id', $profile->user_id)->exists(), 404);
 
         $validated = $request->validate([
@@ -275,7 +275,7 @@ class ProfileContactController extends Controller
             UserAccount::query()->findOrFail((int) $profile->user_id)
                 ->notify(new DashboardActivityNotification(
                     'message',
-                    'New message from ' . trim($validated['name']),
+                    'New message from '.trim($validated['name']),
                     Str::limit($initialMessage, 180),
                     route('dashboard.inbox.conversation', $conversationId),
                     (int) $conversationId,
@@ -321,13 +321,13 @@ class ProfileContactController extends Controller
     {
         abort_unless(isset(self::PROFILES[$type]), 404);
         $definition = self::PROFILES[$type];
-        abort_unless(Schema::hasTable($definition['table'])
-            && Schema::hasColumns($definition['table'], [$definition['id'], 'user_id', $definition['status']]), 404);
+        abort_unless(SchemaCache::hasTable($definition['table'])
+            && SchemaCache::hasColumns($definition['table'], [$definition['id'], 'user_id', $definition['status']]), 404);
         $profile = DB::table($definition['table'])
             ->where($definition['id'], $id)
             ->where($definition['status'], 1)
             ->first();
-        abort_unless($profile, 404);
+        abort_if($profile === null, 404);
 
         return [$definition, $profile];
     }
@@ -351,7 +351,7 @@ class ProfileContactController extends Controller
         }
         if ($path) {
             $relativePath = ltrim(str_replace('\\', '/', $path), '/');
-            if (!str_contains($relativePath, '..') && is_file(public_path($relativePath))) {
+            if (! str_contains($relativePath, '..') && is_file(public_path($relativePath))) {
                 return asset($relativePath);
             }
         }

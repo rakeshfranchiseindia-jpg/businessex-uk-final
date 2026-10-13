@@ -46,7 +46,7 @@ class HomeLatestArticlesTest extends TestCase
         parent::tearDown();
     }
 
-    public function test_homepage_shows_the_latest_twelve_published_articles(): void
+    public function test_homepage_shows_the_latest_four_published_articles(): void
     {
         for ($id = 1; $id <= 14; $id++) {
             $this->insertArticle($id, sprintf('Published Home Article %02d', $id), true);
@@ -58,12 +58,13 @@ class HomeLatestArticlesTest extends TestCase
             ->assertSee('Insights, Articles & News')
             ->assertSee('BusinessX Editorial');
 
-        for ($id = 3; $id <= 14; $id++) {
+        // HomeController shows the four most recent published articles.
+        for ($id = 11; $id <= 14; $id++) {
             $response->assertSee(sprintf('Published Home Article %02d', $id));
         }
 
-        $response->assertDontSee('Published Home Article 01')
-            ->assertDontSee('Published Home Article 02')
+        $response->assertDontSee('Published Home Article 10')
+            ->assertDontSee('Published Home Article 01')
             ->assertDontSee('Draft Home Article')
             ->assertSee(route('articles.show', 14), false);
     }
@@ -73,8 +74,8 @@ class HomeLatestArticlesTest extends TestCase
         DB::table('bx_articles')->insert([
             'article_id' => $id,
             'article_title' => $title,
-            'short_desc' => 'Summary for ' . $title,
-            'article_content' => '<p>Content for ' . $title . '</p>',
+            'short_desc' => 'Summary for '.$title,
+            'article_content' => '<p>Content for '.$title.'</p>',
             'author_id' => 1,
             'image_path' => null,
             'listing_image_path' => null,

@@ -60,17 +60,17 @@ class HomeHighGrowthStartupsTest extends TestCase
             DB::table('profile_startups')->insert([
                 'startup_profile_status' => $id === 15 ? 0 : 1,
                 'created_at' => now()->subDays(15 - $id),
-                'startup_name' => 'Startup Founder ' . $id,
-                'startup_email' => 'founder' . $id . '@example.test',
+                'startup_name' => 'Startup Founder '.$id,
+                'startup_email' => 'founder'.$id.'@example.test',
                 'startup_mobile' => '07700900000',
                 'startup_designation' => 'Founder',
-                'advmt_headline' => 'Homepage Startup ' . str_pad((string) $id, 2, '0', STR_PAD_LEFT),
-                'name_of_entity' => 'Startup Company ' . $id,
+                'advmt_headline' => 'Homepage Startup '.str_pad((string) $id, 2, '0', STR_PAD_LEFT),
+                'name_of_entity' => 'Startup Company '.$id,
                 'industry_sector' => 3,
                 'inv_asking_price' => 150000 + ($id * 10000),
                 'ofc_city' => 'London',
                 'startup_prof_pic' => null,
-                'company_summary' => 'Summary for startup ' . $id,
+                'company_summary' => 'Summary for startup '.$id,
                 'startup_intro' => null,
                 'business_pitch' => null,
             ]);
@@ -87,7 +87,7 @@ class HomeHighGrowthStartupsTest extends TestCase
             ->assertSee(asset('assets/img/default-startup-profile.png'));
 
         for ($id = 3; $id <= 14; $id++) {
-            $response->assertSee('Homepage Startup ' . str_pad((string) $id, 2, '0', STR_PAD_LEFT));
+            $response->assertSee('Homepage Startup '.str_pad((string) $id, 2, '0', STR_PAD_LEFT));
         }
 
         $response->assertDontSee('Homepage Startup 01')

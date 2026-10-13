@@ -2,8 +2,9 @@
 
 namespace Tests\Feature;
 
-use Carbon\CarbonImmutable;
 use App\Models\UserAccount;
+use Carbon\CarbonImmutable;
+use Database\Seeders\BxArticlesTableSeeder;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
@@ -144,7 +145,7 @@ class ArticlePagesTest extends TestCase
     public function test_authenticated_user_can_submit_a_comment_for_a_published_article(): void
     {
         $this->insertArticle(12, 'Commentable article', 'business');
-        $user = new UserAccount();
+        $user = new UserAccount;
         $user->setRawAttributes([
             'user_id' => 42,
             'name' => 'Signed In Member',
@@ -209,6 +210,30 @@ class ArticlePagesTest extends TestCase
             ->assertSee('Comments (1)');
     }
 
+    public function test_detail_shows_the_newest_fifty_comments_and_the_total_count(): void
+    {
+        $this->insertArticle(14, 'Busy article', 'business');
+        for ($i = 1; $i <= 55; $i++) {
+            DB::table('articles_comments')->insert([
+                'article_id' => 14,
+                'comment_name' => sprintf('Commenter %02d', $i),
+                'comment_email' => 'c@example.test',
+                'comment_detail' => sprintf('Comment body %02d.', $i),
+                'comment_status' => 1,
+                'created_at' => now()->addMinutes($i),
+                'updated_at' => now(),
+            ]);
+        }
+
+        $this->get(route('articles.show', 14))
+            ->assertOk()
+            ->assertSee('Comments (55)')
+            ->assertSee('Comment body 55.')
+            ->assertSee('Comment body 06.')
+            ->assertDontSee('Comment body 05.')
+            ->assertViewHas('comments', fn ($comments): bool => $comments->count() === 50);
+    }
+
     public function test_date_filter_and_legacy_detail_url_work(): void
     {
         $this->insertArticle(10, 'Old date-filter article', 'trade', true, '<p>Old article body.</p>', CarbonImmutable::now()->subDays(45)->toDateTimeString());
@@ -225,7 +250,7 @@ class ArticlePagesTest extends TestCase
 
     public function test_article_seeder_adds_ten_published_articles_and_is_safe_to_rerun(): void
     {
-        $seeder = new \Database\Seeders\BxArticlesTableSeeder();
+        $seeder = new BxArticlesTableSeeder;
         $seeder->run();
 
         $this->assertSame(10, DB::table('bx_articles')->where('article_status', 1)->count());
@@ -248,7 +273,7 @@ class ArticlePagesTest extends TestCase
         DB::table('bx_articles')->insert([
             'article_id' => $id,
             'article_title' => $title,
-            'short_desc' => 'A summary of ' . $title,
+            'short_desc' => 'A summary of '.$title,
             'article_content' => $content,
             'author_id' => 1,
             'image_path' => '',
@@ -257,7 +282,7 @@ class ArticlePagesTest extends TestCase
             'article_status' => $published,
             'seo_title' => $title,
             'seo_keywords' => $tags,
-            'seo_desc' => 'Description for ' . $title,
+            'seo_desc' => 'Description for '.$title,
             'article_views' => $id,
             'article_comments' => 0,
             'created_at' => $publishedAt ?? '2026-08-24 06:31:29',

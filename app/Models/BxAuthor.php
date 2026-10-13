@@ -2,7 +2,9 @@
 
 namespace App\Models;
 
-class BxAuthor extends \Illuminate\Database\Eloquent\Model
+use Illuminate\Database\Eloquent\Model;
+
+class BxAuthor extends Model
 {
     protected $table = 'bx_author';
 
@@ -15,7 +17,6 @@ class BxAuthor extends \Illuminate\Database\Eloquent\Model
         'author_dept',
         'is_active',
     ];
-
 
     public function articles()
     {
@@ -36,5 +37,4 @@ class BxAuthor extends \Illuminate\Database\Eloquent\Model
     {
         return $this->hasMany(BexShort::class, 'author_id', 'author_id');
     }
-
 }

@@ -2,7 +2,9 @@
 
 namespace App\Models;
 
-class RequestContact extends \Illuminate\Database\Eloquent\Model
+use Illuminate\Database\Eloquent\Model;
+
+class RequestContact extends Model
 {
     protected $table = 'request_contact';
 
@@ -20,7 +22,6 @@ class RequestContact extends \Illuminate\Database\Eloquent\Model
         'timestamp',
     ];
 
-
     public function receiver()
     {
         return $this->belongsTo(User::class, 'receiver', 'user_id');
@@ -35,5 +36,4 @@ class RequestContact extends \Illuminate\Database\Eloquent\Model
     {
         return $this->hasMany(ConversationReply::class, 'request_id', 'request_id');
     }
-
 }

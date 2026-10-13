@@ -3,12 +3,13 @@
 namespace Tests\Feature;
 
 use App\Models\UserAccount;
+use App\Notifications\DashboardActivityNotification;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Http\UploadedFile;
 use Tests\TestCase;
 
 class ProfileContactFlowTest extends TestCase
@@ -446,9 +447,12 @@ class ProfileContactFlowTest extends TestCase
             ->assertOk()
             ->assertSee('Strategic acquisition proposal')
             ->assertSee('Accepted');
+        // The header notification menu may still mention the proposal, so
+        // check the filtered list itself rather than the whole page.
         $this->get(route('dashboard.proposals.received', ['status' => 'declined']))
             ->assertOk()
-            ->assertDontSee('Strategic acquisition proposal');
+            ->assertViewHas('selectedProposalStatus', 'declined')
+            ->assertViewHas('proposals', fn ($proposals): bool => $proposals->isEmpty());
 
         $this->actingAs($owner)
             ->get(route('dashboard.inbox.conversation', $conversationId))
@@ -486,7 +490,7 @@ class ProfileContactFlowTest extends TestCase
             ->assertSee('Northstar Growth Opportunity');
 
         $this->post(route('dashboard.proposals.store'), [
-            'profile' => 'business:' . $profileId,
+            'profile' => 'business:'.$profileId,
             'recipient_user_id' => $recipientId,
             'title' => 'Acquisition proposal with terms',
             'description' => 'Please review the attached terms.',
@@ -541,7 +545,7 @@ class ProfileContactFlowTest extends TestCase
         $this->actingAs(UserAccount::query()->findOrFail($ownerId))
             ->from(route('dashboard.proposals.sent'))
             ->post(route('dashboard.proposals.store'), [
-                'profile' => 'business:' . $profileId,
+                'profile' => 'business:'.$profileId,
                 'recipient_user_id' => $recipientId,
                 'title' => 'Proposal requiring an attachment',
                 'description' => 'Please review the attached terms.',
@@ -598,14 +602,14 @@ class ProfileContactFlowTest extends TestCase
 
         $this->actingAs(UserAccount::query()->findOrFail($ownerId))
             ->post(route('dashboard.proposals.store'), [
-                'profile' => 'business:' . $otherProfileId,
+                'profile' => 'business:'.$otherProfileId,
                 'recipient_user_id' => $recipientId,
                 'title' => 'Unauthorized profile proposal',
                 'description' => 'This must not be sent.',
             ])
             ->assertNotFound();
         $this->post(route('dashboard.proposals.store'), [
-            'profile' => 'business:' . $profileId,
+            'profile' => 'business:'.$profileId,
             'recipient_user_id' => $otherOwnerId,
             'title' => 'Uninterested recipient proposal',
             'description' => 'This must not be sent.',
@@ -658,6 +662,149 @@ class ProfileContactFlowTest extends TestCase
             'id' => $proposalId,
             'status' => 'declined',
         ]);
+    }
+
+    public function test_double_submitted_proposal_is_stored_and_announced_once(): void
+    {
+        [$ownerId, $conversationId, $recipientId] = $this->conversationWithInterestedMember();
+        $proposal = [
+            'title' => 'Strategic acquisition proposal',
+            'description' => 'We would like to acquire the business.',
+        ];
+
+        $this->actingAs(UserAccount::query()->findOrFail($ownerId));
+        $this->post(route('dashboard.inbox.proposals.store', $conversationId), $proposal)->assertRedirect();
+        $this->post(route('dashboard.inbox.proposals.store', $conversationId), $proposal)->assertRedirect();
+
+        $this->assertSame(1, DB::table('profile_proposals')->count());
+        $this->assertSame(1, DB::table('notifications')->where('notifiable_id', $recipientId)->count());
+
+        $this->travel(2)->minutes();
+        $this->post(route('dashboard.inbox.proposals.store', $conversationId), $proposal)->assertRedirect();
+        $this->assertSame(2, DB::table('profile_proposals')->count(), 'A deliberate resend later is a new proposal.');
+    }
+
+    public function test_racing_accept_and_decline_only_applies_and_announces_the_first(): void
+    {
+        [$ownerId, $conversationId, $recipientId] = $this->conversationWithInterestedMember();
+        $proposalId = DB::table('profile_proposals')->insertGetId([
+            'conversation_id' => $conversationId,
+            'profile_type' => 'business',
+            'profile_id' => 1,
+            'sender_user_id' => $ownerId,
+            'recipient_user_id' => $recipientId,
+            'title' => 'Offer',
+            'description' => 'Details',
+            'status' => 'pending',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        // Simulate a concurrent "decline" committing right after this
+        // request's pending-check read the proposal.
+        $raced = false;
+        DB::listen(function ($query) use (&$raced, $proposalId): void {
+            if (! $raced && str_starts_with($query->sql, 'select') && str_contains($query->sql, 'profile_proposals')) {
+                $raced = true;
+                DB::table('profile_proposals')->where('id', $proposalId)->update(['status' => 'declined']);
+            }
+        });
+
+        $this->actingAs(UserAccount::query()->findOrFail($recipientId))
+            ->put(route('dashboard.proposals.status', $proposalId), ['status' => 'accepted'])
+            ->assertRedirect(route('dashboard.inbox.conversation', $conversationId))
+            ->assertSessionHas('status', 'This proposal has already been answered.');
+
+        $this->assertTrue($raced);
+        $this->assertSame('declined', DB::table('profile_proposals')->where('id', $proposalId)->value('status'));
+        $this->assertSame(0, DB::table('notifications')->where('notifiable_id', $ownerId)->count());
+    }
+
+    public function test_instant_response_settings_are_upserted_per_user(): void
+    {
+        [$ownerId] = $this->createBusinessProfile();
+        $this->actingAs(UserAccount::query()->findOrFail($ownerId));
+
+        $this->post(route('dashboard.instant-response.save'), ['enabled' => '1', 'message' => 'First reply'])->assertRedirect();
+        $this->post(route('dashboard.instant-response.save'), ['message' => 'Second reply'])->assertRedirect();
+
+        $this->assertSame(1, DB::table('profile_instant_responses')->count());
+        $this->assertDatabaseHas('profile_instant_responses', [
+            'user_id' => $ownerId,
+            'enabled' => 0,
+            'message' => 'Second reply',
+        ]);
+    }
+
+    public function test_attachment_with_a_non_ascii_file_name_can_be_downloaded(): void
+    {
+        Storage::fake('s3');
+        Storage::disk('s3')->buildTemporaryUrlsUsing(
+            fn (string $path, $expiration, array $options): string => 'https://files.example.test/'.$path.'?'.http_build_query($options)
+        );
+        [$ownerId, $conversationId, $recipientId] = $this->conversationWithInterestedMember();
+        $proposalId = DB::table('profile_proposals')->insertGetId([
+            'conversation_id' => $conversationId,
+            'profile_type' => 'business',
+            'profile_id' => 1,
+            'sender_user_id' => $ownerId,
+            'recipient_user_id' => $recipientId,
+            'title' => 'Offer',
+            'description' => 'Details',
+            'status' => 'pending',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+        $attachmentId = DB::table('profile_proposal_attachments')->insertGetId([
+            'proposal_id' => $proposalId,
+            'uploaded_by_user_id' => $ownerId,
+            'disk' => 's3',
+            'object_key' => 'proposals/plan.pdf',
+            'original_name' => 'Geschäftsplan 100% – 2026.pdf',
+            'mime_type' => 'application/pdf',
+            'file_size' => 100,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $location = $this->actingAs(UserAccount::query()->findOrFail($recipientId))
+            ->get(route('dashboard.proposals.attachments.download', [$proposalId, $attachmentId]))
+            ->assertRedirect()
+            ->headers->get('Location');
+
+        $disposition = [];
+        parse_str((string) parse_url($location, PHP_URL_QUERY), $disposition);
+        $this->assertStringContainsString('filename="Geschaftsplan 100_ - 2026.pdf"', $disposition['ResponseContentDisposition']);
+        $this->assertStringContainsString("filename*=utf-8''Gesch%C3%A4ftsplan", $disposition['ResponseContentDisposition']);
+    }
+
+    public function test_activity_notifications_are_queued_only_after_commit(): void
+    {
+        $notification = new DashboardActivityNotification('proposal', 'Title', 'Message', '/dashboard');
+
+        $this->assertTrue($notification->afterCommit);
+    }
+
+    /**
+     * @return array{0: int, 1: int, 2: int} owner id, conversation id, interested member id
+     */
+    private function conversationWithInterestedMember(): array
+    {
+        [$ownerId, $profileId] = $this->createBusinessProfile();
+        $recipientId = $this->createUser('Interested Member', 'member@example.test', '07700123456', 'Member Company');
+        $conversationId = DB::table('profile_contact_conversations')->insertGetId([
+            'profile_type' => 'business',
+            'profile_id' => $profileId,
+            'owner_user_id' => $ownerId,
+            'sender_user_id' => $recipientId,
+            'sender_name' => 'Interested Member',
+            'sender_email' => 'member@example.test',
+            'sender_phone' => '07700123456',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        return [$ownerId, $conversationId, $recipientId];
     }
 
     private function createBusinessProfile(): array

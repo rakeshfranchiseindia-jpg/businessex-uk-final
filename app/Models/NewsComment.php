@@ -2,7 +2,9 @@
 
 namespace App\Models;
 
-class NewsComment extends \Illuminate\Database\Eloquent\Model
+use Illuminate\Database\Eloquent\Model;
+
+class NewsComment extends Model
 {
     protected $table = 'news_comments';
 
@@ -16,10 +18,8 @@ class NewsComment extends \Illuminate\Database\Eloquent\Model
         'comment_status',
     ];
 
-
     public function news()
     {
         return $this->belongsTo(News::class, 'news_id', 'newsID');
     }
-
 }

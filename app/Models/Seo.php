@@ -21,7 +21,7 @@ class Seo extends Model
     {
         $seo = [];
 
-        if (is_array($industrymainType) && !empty($industrymainType) && count($industrymainType) === 1) {
+        if (is_array($industrymainType) && ! empty($industrymainType) && count($industrymainType) === 1) {
             $catId = (count($industrysubType) === 1) ? $industrysubType[0] : $industrymainType[0];
 
             $seoContent = self::query()

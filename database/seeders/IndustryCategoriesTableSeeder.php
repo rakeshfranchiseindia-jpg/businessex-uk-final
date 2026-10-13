@@ -3211,6 +3211,6 @@ class IndustryCategoriesTableSeeder extends Seeder
             DB::table('industry_categories')->insert($category);
         }
 
-        $this->command->info('Industry Categories seeded successfully! Total: ' . count($categories));
+        $this->command->info('Industry Categories seeded successfully! Total: '.count($categories));
     }
 }

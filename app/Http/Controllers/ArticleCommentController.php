@@ -2,23 +2,23 @@
 
 namespace App\Http\Controllers;
 
+use App\Support\SchemaCache;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Schema;
 
 class ArticleCommentController extends Controller
 {
     public function store(Request $request, int $article): RedirectResponse
     {
-        abort_unless(Schema::hasTable('articles_comments'), 500, 'Article comments are not configured.');
+        abort_unless(SchemaCache::hasTable('articles_comments'), 500, 'Article comments are not configured.');
 
         $record = DB::table('bx_articles')
             ->where('article_id', $article)
             ->where('article_status', 1)
             ->first(['article_id']);
 
-        abort_unless($record, 404);
+        abort_if($record === null, 404);
 
         $validated = $request->validate([
             'comment_detail' => ['required', 'string', 'min:3', 'max:3000'],

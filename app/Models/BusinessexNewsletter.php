@@ -2,7 +2,9 @@
 
 namespace App\Models;
 
-class BusinessexNewsletter extends \Illuminate\Database\Eloquent\Model
+use Illuminate\Database\Eloquent\Model;
+
+class BusinessexNewsletter extends Model
 {
     protected $table = 'businessex_newsletter';
 
@@ -22,5 +24,4 @@ class BusinessexNewsletter extends \Illuminate\Database\Eloquent\Model
     {
         return $this->belongsTo(User::class, 'user_id', 'user_id');
     }
-
 }

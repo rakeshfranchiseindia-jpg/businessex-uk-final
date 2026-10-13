@@ -2,10 +2,11 @@
 
 namespace App\Models;
 
-class ArticleNewsImage extends \Illuminate\Database\Eloquent\Model
+use Illuminate\Database\Eloquent\Model;
+
+class ArticleNewsImage extends Model
 {
     protected $table = 'article_news_images';
-
 
     protected $fillable = [
         'content_id',
@@ -13,5 +14,4 @@ class ArticleNewsImage extends \Illuminate\Database\Eloquent\Model
         'img_path',
         'is_active',
     ];
-
 }

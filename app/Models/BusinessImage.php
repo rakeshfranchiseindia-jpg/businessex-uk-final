@@ -2,10 +2,13 @@
 
 namespace App\Models;
 
-class BusinessImage extends \Illuminate\Database\Eloquent\Model
+use Illuminate\Database\Eloquent\Model;
+
+class BusinessImage extends Model
 {
     // The 'type' column is a tinyint, not a string — must match StartupImage's convention.
     public const TYPE_IMAGE = 1;
+
     public const TYPE_DOCUMENT = 2;
 
     protected $table = 'business_images';
@@ -20,10 +23,8 @@ class BusinessImage extends \Illuminate\Database\Eloquent\Model
         'is_active',
     ];
 
-
     public function business()
     {
         return $this->belongsTo(ProfileBusiness::class, 'business_id', 'business_id');
     }
-
 }

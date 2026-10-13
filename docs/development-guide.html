@@ -1,0 +1,831 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>BusinessX Development Guide</title>
+<style>
+  @page {
+    size: A4;
+    margin: 18mm 16mm 20mm 16mm;
+    @bottom-left { content: "BusinessX Development Guide"; font: 8pt 'Segoe UI', Arial, sans-serif; color: #7a8599; }
+    @bottom-right { content: "Page " counter(page) " of " counter(pages); font: 8pt 'Segoe UI', Arial, sans-serif; color: #7a8599; }
+  }
+  @page :first { margin: 0; @bottom-left { content: none; } @bottom-right { content: none; } }
+
+  :root {
+    --navy: #0a1628; --navy-2: #13294b; --gold: #c9962b; --ink: #1d2433; --muted: #5b6577;
+    --line: #dfe3ea; --soft: #f4f6f9; --ok: #1f7a4d; --warn: #9a5b00; --bad: #a2261d;
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; font-size: 9.6pt; line-height: 1.5; color: var(--ink); margin: 0; }
+
+  /* Cover */
+  .cover { height: 296mm; width: 210mm; display: flex; flex-direction: column; justify-content: space-between; page-break-after: always;
+           background: var(--navy); color: #fff; margin: 0; padding: 34mm 24mm 26mm; overflow: hidden; }
+  .cover .brand { font-size: 30pt; font-weight: 800; letter-spacing: -.5pt; }
+  .cover .brand span { color: var(--gold); }
+  .cover h1 { font-size: 34pt; line-height: 1.1; margin: 22mm 0 6mm; font-weight: 800; color: #fff; }
+  .cover .sub { font-size: 13pt; color: #c6d0e0; max-width: 140mm; }
+  .cover .meta { border-top: 1px solid #2c3f60; padding-top: 6mm; font-size: 10pt; color: #c6d0e0; display: grid; grid-template-columns: 38mm 1fr; row-gap: 2mm; }
+  .cover .meta b { color: #fff; font-weight: 600; }
+
+  h1, h2, h3, h4 { color: var(--navy); line-height: 1.25; }
+  h2 { font-size: 16pt; margin: 0 0 4mm; padding-bottom: 2mm; border-bottom: 2.5px solid var(--gold); page-break-after: avoid; }
+  h3 { font-size: 11.5pt; margin: 6mm 0 2mm; page-break-after: avoid; }
+  h4 { font-size: 10pt; margin: 4mm 0 1.5mm; page-break-after: avoid; }
+  /* Chapters flow on; a chapter heading never sits alone at the bottom of a page. */
+  section.chapter { margin-top: 9mm; }
+  section.chapter.newpage { page-break-before: always; margin-top: 0; }
+  section.chapter > h2 { break-after: avoid; }
+  section.chapter > h2 + * { break-before: avoid; }
+  p { margin: 0 0 2.5mm; }
+  ul, ol { margin: 0 0 3mm; padding-left: 5.5mm; }
+  li { margin-bottom: 1mm; }
+  code, .mono { font-family: Consolas, 'Cascadia Mono', monospace; font-size: 8.6pt; }
+  code { background: var(--soft); border: 1px solid var(--line); border-radius: 3px; padding: 0 3px; }
+  pre { font-family: Consolas, 'Cascadia Mono', monospace; font-size: 8.4pt; background: var(--navy); color: #e8edf5; border-radius: 5px;
+        padding: 3mm 4mm; margin: 0 0 3.5mm; white-space: pre-wrap; page-break-inside: avoid; line-height: 1.45; }
+  pre .c { color: #8fa3c2; }
+
+  table { width: 100%; border-collapse: collapse; margin: 0 0 4mm; font-size: 8.8pt; page-break-inside: auto; }
+  thead { display: table-header-group; }
+  tr { page-break-inside: avoid; }
+  th { background: var(--navy-2); color: #fff; text-align: left; font-weight: 600; padding: 1.6mm 2.2mm; }
+  td { border-bottom: 1px solid var(--line); padding: 1.5mm 2.2mm; vertical-align: top; }
+  tbody tr:nth-child(even) td { background: #fafbfc; }
+  td code { white-space: nowrap; }
+  .wrap code { white-space: normal; }
+
+  .note, .warn, .tip { border-left: 4px solid; border-radius: 3px; padding: 2.5mm 4mm; margin: 0 0 4mm; page-break-inside: avoid; }
+  .note { background: #eef3fb; border-color: #2f5fa8; }
+  .warn { background: #fff6e8; border-color: var(--warn); }
+  .tip  { background: #edf7f1; border-color: var(--ok); }
+  .note b:first-child, .warn b:first-child, .tip b:first-child { display: block; margin-bottom: .8mm; }
+
+  .toc { columns: 2; column-gap: 10mm; font-size: 10pt; }
+  .toc ol { padding-left: 6mm; margin: 0; }
+  .toc li { margin-bottom: 1.8mm; break-inside: avoid; }
+
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 4mm; margin-bottom: 4mm; }
+  .card { border: 1px solid var(--line); border-radius: 5px; padding: 3mm 4mm; page-break-inside: avoid; }
+  .card h4 { margin-top: 0; }
+
+  /* Diagrams */
+  .flow { display: flex; align-items: stretch; gap: 0; margin: 2mm 0 5mm; page-break-inside: avoid; }
+  .flow .box { flex: 1; border: 1.5px solid var(--navy-2); border-radius: 5px; padding: 2.2mm 2.5mm; font-size: 8.3pt; background: #fff; }
+  .flow .box b { display: block; color: var(--navy); font-size: 8.8pt; margin-bottom: .6mm; }
+  .flow .arrow { width: 7mm; display: flex; align-items: center; justify-content: center; color: var(--gold); font-weight: 800; font-size: 13pt; }
+  .layers { margin: 2mm 0 5mm; page-break-inside: avoid; }
+  .layer { display: grid; grid-template-columns: 34mm 1fr; border: 1px solid var(--line); border-radius: 4px; margin-bottom: 1.6mm; overflow: hidden; }
+  .layer > div:first-child { background: var(--navy-2); color: #fff; font-weight: 600; padding: 2mm 3mm; font-size: 8.8pt; }
+  .layer > div:last-child { padding: 2mm 3mm; font-size: 8.6pt; }
+  .pill { display: inline-block; border-radius: 10px; padding: 0 2.2mm; font-size: 7.8pt; font-weight: 600; }
+  .p-ok { background: #e1f3e9; color: var(--ok); }
+  .p-warn { background: #fdf0d9; color: var(--warn); }
+  .p-bad { background: #fbe4e1; color: var(--bad); }
+  .small { font-size: 8.4pt; color: var(--muted); }
+</style>
+</head>
+<body>
+
+<!-- ============================== COVER ============================== -->
+<div class="cover">
+  <div>
+    <div class="brand">Business<span>X</span></div>
+    <h1>Development Guide</h1>
+    <div class="sub">Architecture, setup, modules, data model, security, performance, testing and deployment for the BusinessX UK platform (Laravel 12).</div>
+  </div>
+  <div class="meta">
+    <span>Version</span><b>1.0 &mdash; 13 October 2026</b>
+    <span>Codebase</span><b>businessX-uk-html-mockup &middot; branch <span class="mono">development</span></b>
+    <span>Framework</span><b>Laravel 12.68 &middot; PHP 8.2 &middot; MySQL</b>
+    <span>Status</span><b>128 automated tests passing &middot; PHPStan level 5 clean &middot; Pint clean</b>
+  </div>
+</div>
+
+<!-- ============================== CONTENTS ============================== -->
+<h2>Contents</h2>
+<div class="toc">
+<ol>
+  <li>Project overview</li>
+  <li>Technology stack</li>
+  <li>Architecture</li>
+  <li>Repository layout</li>
+  <li>Local development setup</li>
+  <li>Configuration &amp; environment variables</li>
+  <li>Functional modules</li>
+  <li>Payments (Razorpay)</li>
+  <li>Data model</li>
+  <li>Routes reference</li>
+  <li>Security model</li>
+  <li>Performance &amp; caching</li>
+  <li>Testing &amp; code quality</li>
+  <li>Coding conventions</li>
+  <li>Deployment checklist</li>
+  <li>Troubleshooting</li>
+  <li>Known issues &amp; open decisions</li>
+  <li>Audit change log (October 2026)</li>
+</ol>
+</div>
+
+<div class="note" style="margin-top:8mm">
+  <b>Who this is for</b>
+  Developers joining the project, reviewers, and whoever deploys or operates BusinessX. It describes the code as it stands on the
+  <span class="mono">development</span> branch after the October 2026 security, performance and quality audit. Where something is a
+  recommendation rather than current behaviour, it is marked as such.
+</div>
+
+<!-- ============================== 1. OVERVIEW ============================== -->
+<section class="chapter newpage">
+<h2>1. Project overview</h2>
+<p><b>BusinessX</b> (BusinessX &ndash; World Trade Council) is a UK marketplace that connects four kinds of members:</p>
+<table>
+  <thead><tr><th style="width:22%">Profile type</th><th>Purpose</th><th style="width:16%">Legacy code</th><th style="width:20%">Table</th></tr></thead>
+  <tbody>
+    <tr><td><b>Business</b></td><td>Businesses for sale, seeking investors or loans</td><td>1</td><td><code>profile_business</code></td></tr>
+    <tr><td><b>Investor</b></td><td>Individuals and firms looking to invest or acquire</td><td>2</td><td><code>profile_investor</code></td></tr>
+    <tr><td><b>Mentor</b></td><td>Advisers offering expertise</td><td>4</td><td><code>profile_mentors</code></td></tr>
+    <tr><td><b>Startup</b></td><td>Early-stage companies raising funds</td><td>7</td><td><code>profile_startups</code></td></tr>
+  </tbody>
+</table>
+<p>Visitors browse public directory listings and profile pages. Members register one or more profiles, contact other profiles,
+hold conversations (with real-time live chat), exchange proposals with attachments, and can buy a paid membership
+(Premium or Gold) through Razorpay to gain priority placement.</p>
+
+<h3>Main capabilities</h3>
+<div class="grid2">
+  <div class="card"><h4>Public site</h4>Home page with sliders and counters, four directory listings with filters, public profile pages,
+  articles and comments, static pages, pricing, newsletter with double opt-in, keyword chatbot.</div>
+  <div class="card"><h4>Accounts &amp; registration</h4>Multi-step registration wizard per profile type, quick registration, email
+  verification, first-time password setup, login, password reset.</div>
+  <div class="card"><h4>Member dashboard</h4>Account details, password, profile management, inbox and live chat, proposals sent and
+  received, instant auto-response, activity notifications, My Plan.</div>
+  <div class="card"><h4>Payments</h4>Guest checkout from the pricing page (claimed at registration), and My Plan upgrades for existing
+  profiles. Server-side verification plus a signed webhook.</div>
+</div>
+
+<div class="warn">
+  <b>Legacy schema</b>
+  The database descends from an older PHP system. Most tables keep their legacy names and columns (for example
+  <code>user_account</code> with primary key <code>user_id</code>, numeric profile-type codes, and tinyint status flags). Code therefore
+  uses the query builder (<code>DB::table()</code>) far more than Eloquent models. Keep this in mind before renaming anything.
+</div>
+</section>
+
+<!-- ============================== 2. STACK ============================== -->
+<section class="chapter">
+<h2>2. Technology stack</h2>
+<table>
+  <thead><tr><th style="width:24%">Layer</th><th style="width:30%">Technology</th><th>Notes</th></tr></thead>
+  <tbody>
+    <tr><td>Language</td><td>PHP 8.2+</td><td>Local XAMPP ships PHP 8.2.12.</td></tr>
+    <tr><td>Framework</td><td>Laravel 12.68 (pinned <code>12.68.*</code>)</td><td>Slim Laravel 11+ structure: <code>bootstrap/app.php</code> configures routing, middleware and exceptions.</td></tr>
+    <tr><td>Database</td><td>MySQL / MariaDB (XAMPP)</td><td>Tests run on in-memory SQLite; every migration runs on both.</td></tr>
+    <tr><td>Sessions, cache, queue</td><td>Database drivers</td><td><code>SESSION_DRIVER</code>, <code>CACHE_STORE</code>, <code>QUEUE_CONNECTION</code> = <code>database</code>. Redis recommended for cache in production.</td></tr>
+    <tr><td>Real-time</td><td>Laravel Reverb 1.6 + Laravel Echo + pusher-js</td><td>Private channel <code>conversation.{id}</code> for live chat.</td></tr>
+    <tr><td>File storage</td><td>Amazon S3 (<code>league/flysystem-aws-s3-v3</code>)</td><td>Images public (optionally via <code>IMG_CDN</code>); documents private with 5-minute signed URLs.</td></tr>
+    <tr><td>Payments</td><td>Razorpay (REST API + HMAC signatures)</td><td>Currency GBP. SDK package is installed; orders are created with Laravel's HTTP client for timeout control.</td></tr>
+    <tr><td>Mail</td><td>SMTP, queued mailables</td><td>Verification, reset, newsletter, activity notifications.</td></tr>
+    <tr><td>Frontend</td><td>Blade, Vite 7, Tailwind 4</td><td>Most styling is hand-written CSS in <code>public/css</code>; the Vite bundle (live chat) loads on dashboard pages only.</td></tr>
+    <tr><td>Testing</td><td>PHPUnit 11</td><td>Feature tests in <code>tests/Feature</code>.</td></tr>
+    <tr><td>Quality</td><td>Laravel Pint, Larastan 3 (PHPStan 2) level 5</td><td><code>pint.json</code>, <code>phpstan.neon</code>; composer scripts below.</td></tr>
+  </tbody>
+</table>
+</section>
+
+<!-- ============================== 3. ARCHITECTURE ============================== -->
+<section class="chapter">
+<h2>3. Architecture</h2>
+<h3>Request flow</h3>
+<div class="flow">
+  <div class="box"><b>Browser</b>Blade pages, plain JS in <span class="mono">public/js</span>, Echo client on dashboard</div>
+  <div class="arrow">&rarr;</div>
+  <div class="box"><b>Apache / <span class="mono">public/index.php</span></b>Root <span class="mono">.htaccess</span> blocks source &amp; secrets</div>
+  <div class="arrow">&rarr;</div>
+  <div class="box"><b>Middleware</b>web (session, CSRF), auth, signed, throttle</div>
+  <div class="arrow">&rarr;</div>
+  <div class="box"><b>Controllers</b>Validate (Form Requests), authorise ownership, query</div>
+  <div class="arrow">&rarr;</div>
+  <div class="box"><b>Services / Support</b>Payments, schema &amp; content caches</div>
+  <div class="arrow">&rarr;</div>
+  <div class="box"><b>MySQL &middot; S3 &middot; Razorpay &middot; SMTP &middot; Reverb</b></div>
+</div>
+
+<h3>Application layers</h3>
+<div class="layers">
+  <div class="layer"><div>Routes</div><div><code>routes/web.php</code> (public, auth, payments, webhook), <code>routes/dashboard.php</code> (everything under <code>/dashboard</code>, all behind <code>auth</code>), <code>routes/channels.php</code> (broadcast authorisation).</div></div>
+  <div class="layer"><div>Controllers</div><div><code>app/Http/Controllers</code>. Listing pages share <code>AbstractListingController</code> (search, location, industry, amount ranges, membership priority, sorting, card building). <code>DashboardController</code> holds most member features.</div></div>
+  <div class="layer"><div>Form Requests</div><div><code>app/Http/Requests/Dashboard</code>: proposal, password and account-profile validation. Other controllers still validate inline.</div></div>
+  <div class="layer"><div>Services</div><div><code>app/Services/Payments</code>: <code>RazorpayGateway</code> (API + signatures) and <code>MembershipPaymentService</code> (idempotent completion, claims, membership records).</div></div>
+  <div class="layer"><div>Support</div><div><code>app/Support/SchemaCache</code> (cached <code>Schema::has*</code>), <code>app/Support/PublicContentCache</code> (home page and footer data).</div></div>
+  <div class="layer"><div>Models</div><div>Mostly thin legacy models. The ones in active use: <code>UserAccount</code> (auth model), <code>ProfileMedia</code>, plus notifications via Laravel's <code>notifications</code> table.</div></div>
+  <div class="layer"><div>Events &amp; notifications</div><div><code>ConversationMessageSent</code> (broadcast), <code>DashboardActivityNotification</code> (database + mail, queued after commit).</div></div>
+  <div class="layer"><div>Views</div><div><code>resources/views</code>: <code>layouts</code>, <code>pages</code> (public), <code>dashboard</code>, <code>static</code>, <code>emails</code>, <code>components</code>, <code>errors</code>.</div></div>
+</div>
+
+<h3>Key design decisions</h3>
+<ul>
+  <li><b>Query builder over Eloquent.</b> Legacy tables are queried with <code>DB::table()</code>. Profile types are described by arrays
+  (table, id column, status column, title columns) in <code>AuthController</code>, <code>DashboardController::PROFILE_TYPES</code>
+  and <code>MembershipPaymentService::PROFILE_TABLES</code>.</li>
+  <li><b>Optional legacy tables/columns.</b> Code checks <code>SchemaCache::hasTable()/hasColumn()</code> before using some tables, so
+  partially migrated databases (and focused tests) keep working. Use <code>SchemaCache</code>, never the <code>Schema</code> facade, in
+  request code: the facade queries <code>information_schema</code> on every call.</li>
+  <li><b>Authorization by ownership in queries.</b> Every lookup of a member-owned record filters by the signed-in user and answers
+  <b>404</b> (not 403) when nothing matches, so responses do not reveal whether a record exists.</li>
+  <li><b>Configuration-driven registration.</b> <code>config/registration_profiles.php</code> defines every wizard step and field per
+  profile type; validation rules are generated from it.</li>
+</ul>
+</section>
+
+<!-- ============================== 4. LAYOUT ============================== -->
+<section class="chapter">
+<h2>4. Repository layout</h2>
+<pre><span class="c"># Laravel application</span>
+app/
+  Events/ConversationMessageSent.php      live-chat broadcast
+  Http/Controllers/                       public, auth, dashboard, payments, webhook
+  Http/Requests/Dashboard/                Form Requests
+  Mail/                                   verification, reset, newsletter mailables
+  Models/                                 legacy table models (UserAccount = auth model)
+  Notifications/DashboardActivityNotification.php
+  Providers/AppServiceProvider.php        rate limiters, password rules, view composers, caches
+  Services/Payments/                      RazorpayGateway, MembershipPaymentService
+  Support/                                SchemaCache, PublicContentCache
+bootstrap/app.php                         routing, middleware (CSRF exception for webhook)
+config/registration_profiles.php          registration wizard definition per profile type
+database/migrations/                      legacy schema + new tables + indexes
+database/seeders/                         demo data (see README for focused seeders)
+resources/views/                          Blade templates
+resources/js/app.js                       Echo / live-chat client (Vite)
+routes/web.php, dashboard.php, channels.php
+tests/Feature/                            feature tests (PHPUnit)
+public/                                   web root: index.php, css/, js/, assets/, build/
+
+<span class="c"># Static HTML mockups (design reference, not part of Laravel)</span>
+*.php in project root, includes/, css/, js/, assets/</pre>
+
+<div class="warn">
+  <b>Mockup files at the project root</b>
+  The root-level <code>*.php</code> pages and <code>includes/</code> are the original static design mockups. They are still reachable on
+  XAMPP for reference, are excluded from Pint and PHPStan, and are <b>not</b> used by the Laravel app. Do not add application logic to them.
+</div>
+
+<h3>Supporting files</h3>
+<table>
+  <thead><tr><th style="width:30%">File</th><th>Purpose</th></tr></thead>
+  <tbody>
+    <tr><td><code>.htaccess</code> (root)</td><td>Blocks web access to dotfiles, source, config, storage, vendor and tooling files when the project root is served directly (XAMPP).</td></tr>
+    <tr><td><code>.env.example</code></td><td>Every environment variable the app reads, without secret values.</td></tr>
+    <tr><td><code>pint.json</code></td><td>Laravel preset; excludes the root mockups and <code>includes/</code>.</td></tr>
+    <tr><td><code>phpstan.neon</code></td><td>Larastan, level 5, analyses <code>app/</code>.</td></tr>
+    <tr><td><code>.git-blame-ignore-revs</code></td><td>Hides the bulk formatting commit from <code>git blame</code>.</td></tr>
+    <tr><td><code>phpunit.xml</code></td><td>Test environment: SQLite in memory, array cache/session, sync queue, array mail.</td></tr>
+  </tbody>
+</table>
+</section>
+
+<!-- ============================== 5. SETUP ============================== -->
+<section class="chapter">
+<h2>5. Local development setup</h2>
+<h3>Prerequisites</h3>
+<ul>
+  <li>XAMPP (Apache + MySQL/MariaDB) with PHP 8.2+, extensions: pdo_mysql, mbstring, openssl, gd (with WebP), fileinfo, curl.</li>
+  <li>Composer 2, Node.js 20+ and npm.</li>
+  <li>Optional: AWS S3 bucket and credentials (uploads), Razorpay test keys (payments), SMTP account (mail).</li>
+</ul>
+
+<h3>First-time setup</h3>
+<pre><span class="c"># 1. Dependencies</span>
+composer install
+npm install
+
+<span class="c"># 2. Environment</span>
+copy .env.example .env          <span class="c"># then fill in DB, mail, AWS, Reverb, Razorpay values</span>
+php artisan key:generate
+
+<span class="c"># 3. Database (create the MySQL database first)</span>
+php artisan migrate
+php artisan db:seed --class=TestimonialSeeder      <span class="c"># optional demo data</span>
+php artisan db:seed --class=ProfileRecordsSeeder   <span class="c"># optional demo profiles</span>
+
+<span class="c"># 4. Frontend assets</span>
+npm run build</pre>
+
+<h3>Running the app</h3>
+<p>On XAMPP the site is served from <code>http://localhost/businessX-uk-html-mockup/public</code> (this is <code>APP_URL</code>). For the full
+development stack (built-in server, queue worker, log tail, Vite and Reverb together) use:</p>
+<pre>composer dev
+<span class="c"># runs: php artisan serve | queue:listen | pail | npm run dev | reverb:start --port=8081</span></pre>
+<p>If you only use Apache, still run these in separate terminals when you need them:</p>
+<pre>php artisan queue:work            <span class="c"># queued mail and notifications</span>
+php artisan reverb:start --host=127.0.0.1 --port=8081   <span class="c"># live chat</span></pre>
+
+<div class="tip">
+  <b>Tip: queued jobs</b>
+  Verification emails, password resets and activity notifications are queued. Without a worker they sit in the <code>jobs</code> table.
+  Locally you can set <code>QUEUE_CONNECTION=sync</code> to send immediately.
+</div>
+</section>
+
+<!-- ============================== 6. CONFIG ============================== -->
+<section class="chapter">
+<h2>6. Configuration &amp; environment variables</h2>
+<p>All values live in <code>.env</code> (never committed). <code>.env.example</code> lists every key. The important ones:</p>
+<table class="wrap">
+  <thead><tr><th style="width:34%">Variable(s)</th><th>Purpose</th><th style="width:22%">Production value</th></tr></thead>
+  <tbody>
+    <tr><td><code>APP_ENV</code>, <code>APP_DEBUG</code>, <code>APP_URL</code></td><td>Environment, debug pages, base URL</td><td><code>production</code>, <code>false</code>, https URL</td></tr>
+    <tr><td><code>APP_KEY</code></td><td>Encryption key (sessions, signed URLs)</td><td>Unique, never shared</td></tr>
+    <tr><td><code>LOG_LEVEL</code></td><td>Log verbosity</td><td><code>warning</code></td></tr>
+    <tr><td><code>DB_*</code></td><td>MySQL connection</td><td>Dedicated least-privilege user</td></tr>
+    <tr><td><code>SESSION_DRIVER</code>, <code>SESSION_LIFETIME</code></td><td>Database sessions, 120 minutes</td><td><code>database</code> or <code>redis</code></td></tr>
+    <tr><td><code>SESSION_SECURE_COOKIE</code>, <code>SESSION_ENCRYPT</code></td><td>HTTPS-only cookie, encrypted payload</td><td><code>true</code>, <code>true</code></td></tr>
+    <tr><td><code>CACHE_STORE</code></td><td>Cache backend</td><td><code>redis</code> recommended</td></tr>
+    <tr><td><code>QUEUE_CONNECTION</code></td><td>Queue backend</td><td><code>database</code> or <code>redis</code> + supervised worker</td></tr>
+    <tr><td><code>MAIL_*</code></td><td>SMTP delivery and sender</td><td>Real SMTP provider</td></tr>
+    <tr><td><code>AWS_ACCESS_KEY_ID</code>, <code>AWS_SECRET_ACCESS_KEY</code>, <code>AWS_DEFAULT_REGION</code>, <code>AWS_BUCKET</code>, <code>AWS_URL</code>, <code>AWS_ENDPOINT</code></td><td>S3 storage for profile media and proposal attachments</td><td>IAM user limited to the bucket</td></tr>
+    <tr><td><code>IMG_CDN</code></td><td>Optional CDN base URL for public images</td><td>CDN URL or empty</td></tr>
+    <tr><td><code>BROADCAST_CONNECTION</code>, <code>REVERB_*</code>, <code>VITE_REVERB_*</code></td><td>Reverb server and the client settings baked into the Vite build</td><td><code>reverb</code>, wss on 443</td></tr>
+    <tr><td><code>RAZORPAY_KEY_ID</code>, <code>RAZORPAY_KEY_SECRET</code></td><td>Razorpay API credentials. Payments are disabled (friendly message) while blank.</td><td>Live keys</td></tr>
+    <tr><td><code>RAZORPAY_WEBHOOK_SECRET</code></td><td>Secret configured on the Razorpay webhook. The webhook answers 503 while blank.</td><td>Required</td></tr>
+  </tbody>
+</table>
+<div class="warn"><b>After changing .env in production</b>Run <code>php artisan config:cache</code> again, and rebuild assets (<code>npm run build</code>) if any <code>VITE_*</code> value changed.</div>
+
+<h3>Configuration files worth knowing</h3>
+<ul>
+  <li><code>config/registration_profiles.php</code> &ndash; wizard steps and fields per profile type (labels, types, options, required flags, upload <code>accept</code> lists). Validation rules are derived from it in <code>AuthController</code>.</li>
+  <li><code>config/services.php</code> &ndash; <code>razorpay.key</code>, <code>razorpay.secret</code>, <code>razorpay.webhook_secret</code>.</li>
+  <li><code>config/filesystems.php</code> &ndash; <code>s3</code> disk and <code>cdn_url</code>.</li>
+  <li><code>app/Providers/AppServiceProvider.php</code> &ndash; the <code>registration</code> rate limiter (10/min per IP), <code>Password::defaults()</code>, view composers, cache wiring.</li>
+</ul>
+</section>
+
+<!-- ============================== 7. MODULES ============================== -->
+<section class="chapter">
+<h2>7. Functional modules</h2>
+
+<h3>7.1 Public site</h3>
+<table>
+  <thead><tr><th style="width:26%">Feature</th><th style="width:30%">Controller</th><th>Behaviour</th></tr></thead>
+  <tbody>
+    <tr><td>Home page</td><td><code>HomeController</code></td><td>Industry and city counters, investment ranges, 4 latest articles, business/investor/startup/mentor sliders (12 each), 3 testimonials. Whole dataset cached (see section 12).</td></tr>
+    <tr><td>Directory listings</td><td><code>Business/Investor/Startup/MentorListingController</code> &rarr; <code>AbstractListingController</code></td><td>Keyword, location, industry, intent and amount filters; paid members first; 12 per page with query-preserving pagination.</td></tr>
+    <tr><td>Profile pages</td><td><code>ProfileContactController@show</code></td><td>Public detail page; private contact fields hidden; each view by a signed-in member is recorded in <code>profile_visitors</code>.</td></tr>
+    <tr><td>Articles</td><td><code>ArticleController</code>, <code>ArticleCommentController</code></td><td>Search, tag and date filters, 9 per page; detail page sanitises stored HTML with an allow-list; newest 50 approved comments; members may comment (moderated).</td></tr>
+    <tr><td>Static pages</td><td><code>StaticPageController</code></td><td>About, Disclaimer, Privacy, Terms, Contact (content defined in the controller).</td></tr>
+    <tr><td>Newsletter</td><td><code>SubscribeController</code>, <code>NewsletterVerificationController</code></td><td>Double opt-in: status <code>P</code> until the signed link (24 h) is followed, then <code>S</code> plus a confirmation email.</td></tr>
+    <tr><td>Contact form</td><td><code>ContactController</code></td><td>Stores to <code>businessex_contactus</code>.</td></tr>
+    <tr><td>Chatbot</td><td><code>ChatbotController</code></td><td>Keyword scoring against <code>chatbot_knowledge_base</code> (cached 5 min); lead capture to <code>chatbot_leads</code>.</td></tr>
+    <tr><td>City suggestions</td><td><code>CitySuggestionController</code></td><td>Autocomplete from <code>bx_cities</code> (UK = country 5).</td></tr>
+  </tbody>
+</table>
+
+<h3>7.2 Registration &amp; authentication</h3>
+<p>The auth model is <code>App\Models\UserAccount</code> (table <code>user_account</code>, key <code>user_id</code>) on the standard
+<code>web</code> session guard. Passwords use Laravel's <code>hashed</code> cast (bcrypt).</p>
+<ol>
+  <li><b>Register.</b> Full wizard (<code>/register/{type}</code>) or homepage quick registration (<code>/register/quick</code>). Creates
+  <code>user_account</code> (no password yet), the profile row, <code>user_profiles</code> mapping and stored uploads in a transaction.
+  A signed-in member can add further profiles from the dashboard without a new account.</li>
+  <li><b>Verify email.</b> A queued email carries a signed link (60 min). Verifying redirects a password-less account to the set-password page.</li>
+  <li><b>Set password.</b> Signed link, valid only while the account still has no password (single use). Inactive accounts are refused.</li>
+  <li><b>Login.</b> Throttled 5 attempts per email+IP; requires a verified email and an active account; session regenerated.</li>
+  <li><b>Password reset.</b> Laravel password broker (hashed, single-use, 60-minute tokens). A successful reset ends every stored session of the account.</li>
+</ol>
+<div class="note"><b>Validation rules to know</b>
+Full registration requires UK mobiles in <code>07XXXXXXXXX</code> format, rejects <code>example.com</code>, <code>sample.com</code> and <code>test.com</code>
+addresses, requires city fields to match <code>bx_cities</code>, and validates UK postcodes. Uploads: max 1 MB, extension allow-list from the
+config, image dimension limits. Passwords (reset/setup): at least 8 characters with letters and numbers; the dashboard change form also requires a symbol.</div>
+
+<h3>7.3 Profiles &amp; media</h3>
+<ul>
+  <li>Uploads are stored on S3 under <code>profiles/{type}/images|documents/Y/m/{uuid}.{ext}</code>. The extension comes from the file content, never the client name.</li>
+  <li>Images are public (served from S3 or <code>IMG_CDN</code>). Documents are private and only served through
+  <code>/profile-media/{id}/download</code> (owner only) as a 5-minute signed S3 URL.</li>
+  <li>Every upload is recorded in <code>profile_media</code>; the profile row keeps the current URL in its legacy column (for example <code>seller_prof_pic</code>).</li>
+  <li>Owners edit profiles at <code>/dashboard/profiles/{type}/{id}/edit</code>; ownership is enforced in the query.</li>
+</ul>
+
+<h3>7.4 Messaging, live chat &amp; proposals</h3>
+<div class="flow">
+  <div class="box"><b>Contact</b>Member sends the contact form on a profile page &rarr; new conversation + first message (+ instant response if enabled)</div>
+  <div class="arrow">&rarr;</div>
+  <div class="box"><b>Inbox</b>Both parties reply; newest 100 messages shown; read markers per user</div>
+  <div class="arrow">&rarr;</div>
+  <div class="box"><b>Live chat</b><span class="mono">ConversationMessageSent</span> broadcast on private <span class="mono">conversation.{id}</span></div>
+  <div class="arrow">&rarr;</div>
+  <div class="box"><b>Proposals</b>Owner sends a proposal (up to 5 private attachments, 10 MB each); recipient accepts or declines</div>
+</div>
+<ul>
+  <li>Tables: <code>profile_contact_conversations</code>, <code>profile_contact_messages</code>, <code>profile_contact_conversation_reads</code>,
+  <code>profile_proposals</code>, <code>profile_proposal_attachments</code>, <code>profile_instant_responses</code>.</li>
+  <li>Channel authorisation (<code>routes/channels.php</code>) admits only the two participants of a conversation.</li>
+  <li>Accept/decline uses a conditional update in a transaction, so only one response wins and notifies. An identical proposal resubmitted
+  within a minute is treated as a double submit.</li>
+  <li><code>DashboardActivityNotification</code> (database + mail) is queued <b>after commit</b> and feeds the header notification menu.</li>
+</ul>
+
+<h3>7.5 Member dashboard</h3>
+<table>
+  <thead><tr><th style="width:30%">Page</th><th>What it does</th></tr></thead>
+  <tbody>
+    <tr><td><code>/dashboard</code></td><td>Account summary, owned profiles with view counts, quick actions.</td></tr>
+    <tr><td><code>/dashboard/profile</code></td><td>Edit name, location, designation, company. Email and mobile are locked.</td></tr>
+    <tr><td><code>/dashboard/password</code></td><td>Change password; signs the user out everywhere afterwards.</td></tr>
+    <tr><td><code>/dashboard/profiles/...</code></td><td>Create, view and edit owned profiles.</td></tr>
+    <tr><td><code>/dashboard/inbox</code>, <code>/live-chat/...</code></td><td>Conversations, replies, live-chat JSON endpoints.</td></tr>
+    <tr><td><code>/dashboard/proposals/sent|received</code></td><td>Proposal lists with status filter (15 per page), composer, attachment downloads.</td></tr>
+    <tr><td><code>/dashboard/instant-response</code></td><td>Automatic first reply to new contacts.</td></tr>
+    <tr><td><code>/dashboard/my-plan</code></td><td>Membership details and upgrade checkout (Premium / Gold; Free and Platinum are informational).</td></tr>
+    <tr><td><code>/dashboard/activity</code></td><td>Notification history; mark one or all as read.</td></tr>
+  </tbody>
+</table>
+</section>
+
+<!-- ============================== 8. PAYMENTS ============================== -->
+<section class="chapter">
+<h2>8. Payments (Razorpay)</h2>
+<p>Prices are fixed on the server in <code>MembershipPaymentService::PLAN_AMOUNTS</code> (pence, GBP). The client never supplies an amount.</p>
+<table>
+  <thead><tr><th>Plan</th><th>Monthly</th><th>Annual</th><th>Profile <code>membership_plan</code> code</th></tr></thead>
+  <tbody>
+    <tr><td>Premium</td><td>&pound;29.00</td><td>&pound;299.00</td><td>1</td></tr>
+    <tr><td>Gold</td><td>&pound;89.00</td><td>&pound;999.00</td><td>2</td></tr>
+  </tbody>
+</table>
+
+<h3>Flow</h3>
+<div class="flow">
+  <div class="box"><b>1. Initiate</b><span class="mono">POST .../payment/initiate</span> creates a Razorpay order (15 s timeout) and an <span class="mono">online_payments</span> row, status 0</div>
+  <div class="arrow">&rarr;</div>
+  <div class="box"><b>2. Checkout</b>Razorpay Checkout in the browser (card / UPI)</div>
+  <div class="arrow">&rarr;</div>
+  <div class="box"><b>3. Verify</b><span class="mono">POST .../payment/verify</span> checks the HMAC signature, then <span class="mono">complete()</span></div>
+  <div class="arrow">&rarr;</div>
+  <div class="box"><b>4. Webhook</b><span class="mono">POST /webhooks/razorpay</span> (<span class="mono">payment.captured</span>, <span class="mono">order.paid</span>) as the safety net</div>
+</div>
+
+<h3>Two entry points</h3>
+<ul>
+  <li><b>Guest checkout</b> (<code>/pricing</code>): the payment is created with <code>profile_id = 0</code>. After verification the browser is
+  sent to the registration wizard with <code>payment_order_no</code>. Registration claims the payment for the new profile only if the order
+  was verified in the same session <b>or</b> the account email equals the payer email. The claim is atomic (row lock + <code>profile_id = 0</code> guard).</li>
+  <li><b>My Plan upgrade</b> (<code>/dashboard/my-plan</code>): ownership of the profile is checked first; on completion the profile gets
+  <code>membership_paid = 1</code> and its plan code, the previous active <code>profile_memberships</code> row is deactivated and a new one
+  (1 month or 1 year) is inserted.</li>
+</ul>
+
+<h3>Guarantees</h3>
+<table>
+  <thead><tr><th style="width:34%">Risk</th><th>How it is handled</th></tr></thead>
+  <tbody>
+    <tr><td>Replay of a valid signature</td><td><code>complete()</code> locks the payment row and returns early if it is already SUCCESS; <code>razorpay_payment_id</code> is unique.</td></tr>
+    <tr><td>Webhook and browser both arrive</td><td>Same idempotent <code>complete()</code>; whichever is second is a no-op.</td></tr>
+    <tr><td>Browser closed after capture</td><td>Webhook activates the plan.</td></tr>
+    <tr><td>Forged or wrong amount in webhook</td><td>HMAC check with <code>RAZORPAY_WEBHOOK_SECRET</code>; amount and currency must match the stored order.</td></tr>
+    <tr><td>Bad signature on a paid order</td><td>Only INITIATED payments can be marked FAILED.</td></tr>
+    <tr><td>Partial writes</td><td>Status, profile and membership updates run in one transaction.</td></tr>
+  </tbody>
+</table>
+<p class="small">Statuses in <code>online_payments.payment_status</code>: 0 initiated, 1 success, 2 failed. <code>udf</code> holds the Razorpay order id.
+The webhook route is exempt from CSRF in <code>bootstrap/app.php</code> because Razorpay cannot send a token; its HMAC signature replaces it.</p>
+
+<div class="warn"><b>Razorpay dashboard setup</b>Create a webhook pointing to <code>https://&lt;your-domain&gt;/webhooks/razorpay</code> with events
+<code>payment.captured</code> and <code>order.paid</code>, and put its secret in <code>RAZORPAY_WEBHOOK_SECRET</code>.</div>
+</section>
+
+<!-- ============================== 9. DATA MODEL ============================== -->
+<section class="chapter">
+<h2>9. Data model</h2>
+<p>About 90 tables. The ones the application actively uses, grouped by area:</p>
+<table class="wrap">
+  <thead><tr><th style="width:22%">Area</th><th style="width:40%">Tables</th><th>Notes</th></tr></thead>
+  <tbody>
+    <tr><td>Accounts</td><td><code>user_account</code>, <code>user_profiles</code>, <code>password_reset_tokens</code>, <code>sessions</code></td><td><code>user_profiles</code> maps users to profiles (legacy type code + profile key).</td></tr>
+    <tr><td>Profiles</td><td><code>profile_business</code>, <code>profile_business_mgmt</code>, <code>profile_investor</code>, <code>profile_mentors</code>, <code>profile_startups</code>, <code>profile_media</code>, <code>profile_visitors</code></td><td>Status columns: <code>business_profile_status</code>, <code>inv_profile_status</code>, <code>mentor_profile_status</code>, <code>startup_profile_status</code> (1 = active).</td></tr>
+    <tr><td>Reference data</td><td><code>industry_categories</code>, <code>ind_pref_business</code>, <code>bx_cities</code>, <code>country</code></td><td>Category tree via <code>parent_id</code>; UK cities have <code>country = 5</code>.</td></tr>
+    <tr><td>Messaging</td><td><code>profile_contact_conversations</code>, <code>profile_contact_messages</code>, <code>profile_contact_conversation_reads</code>, <code>profile_instant_responses</code></td><td>Read markers keyed by (conversation, user).</td></tr>
+    <tr><td>Proposals</td><td><code>profile_proposals</code>, <code>profile_proposal_attachments</code></td><td>Status: pending / accepted / declined.</td></tr>
+    <tr><td>Payments</td><td><code>online_payments</code>, <code>profile_memberships</code>, <code>membership_plans</code>, <code>bx_coupon</code></td><td>Unique <code>order_no</code> and <code>razorpay_payment_id</code>. Coupons exist in the schema but are not implemented.</td></tr>
+    <tr><td>Content</td><td><code>bx_articles</code>, <code>bx_author</code>, <code>articles_comments</code>, <code>testimonials</code></td><td>Maintained outside this app (admin), except comments.</td></tr>
+    <tr><td>Marketing</td><td><code>businessex_newsletter</code>, <code>businessex_contactus</code>, <code>chatbot_knowledge_base</code>, <code>chatbot_leads</code></td><td>Newsletter status: P pending, S subscribed, U unsubscribed.</td></tr>
+    <tr><td>Framework</td><td><code>notifications</code>, <code>jobs</code>, <code>failed_jobs</code>, <code>job_batches</code>, <code>cache</code>, <code>cache_locks</code>, <code>migrations</code></td><td>Standard Laravel.</td></tr>
+  </tbody>
+</table>
+
+<h3>Indexes added for the workload</h3>
+<ul>
+  <li>Listings and search: status + created_at + id per profile table, <code>user_id</code>, startup industry, category parent, article status orders.</li>
+  <li>Messaging: conversation owner/sender + updated_at, messages by conversation, proposals by sender/recipient + status + created_at.</li>
+  <li>Payments: unique <code>order_no</code>, unique <code>razorpay_payment_id</code>, index on <code>udf</code>, membership owner index.</li>
+  <li>Comments (<code>article_id, comment_status, created_at</code>) and profile visitors (<code>profile_type, profile_id</code>).</li>
+</ul>
+
+<h3>Migration rules</h3>
+<ul>
+  <li>Never edit a migration that has run anywhere; add a new one. Every migration must run on MySQL <b>and</b> SQLite (tests run all of them).</li>
+  <li>Provide a working <code>down()</code>. Check data before adding unique keys (see <code>2026_10_13_000001</code> for the pattern).</li>
+  <li>Running migrations automatically clears the schema cache (<code>SchemaCache</code> listens to <code>MigrationsEnded</code>).</li>
+  <li>There are no foreign keys in the legacy schema; integrity is enforced in code. Add constraints only after cleaning orphaned data.</li>
+</ul>
+</section>
+
+<!-- ============================== 10. ROUTES ============================== -->
+<section class="chapter">
+<h2>10. Routes reference</h2>
+<p class="small">Run <code>php artisan route:list --except-vendor</code> for the live list (90 routes). Legacy <code>.php</code>-style URLs redirect to their new routes.</p>
+
+<h3>Public</h3>
+<table class="wrap">
+  <thead><tr><th style="width:45%">Route</th><th>Purpose</th><th style="width:18%">Middleware</th></tr></thead>
+  <tbody>
+    <tr><td><code>GET /</code></td><td>Home</td><td>&ndash;</td></tr>
+    <tr><td><code>GET /{business|investor|startup|mentor}-listing</code></td><td>Directory listings</td><td>&ndash;</td></tr>
+    <tr><td><code>GET /profile-details/{type}/{id}</code></td><td>Public profile page</td><td>&ndash;</td></tr>
+    <tr><td><code>GET|POST /profile-details/{type}/{id}/contact</code></td><td>Contact a profile (starts a conversation)</td><td>auth, throttle 5/min</td></tr>
+    <tr><td><code>GET /article</code>, <code>GET /article/{article}</code></td><td>Articles</td><td>&ndash;</td></tr>
+    <tr><td><code>POST /article/{article}/comments</code></td><td>Comment</td><td>auth, throttle 5/min</td></tr>
+    <tr><td><code>GET /about-us</code>, <code>/disclaimer</code>, <code>/privacy-policy</code>, <code>/terms-and-conditions</code>, <code>/contact-us</code>, <code>/pricing</code></td><td>Static pages</td><td>&ndash;</td></tr>
+    <tr><td><code>POST /newsletter/subscribe</code>, <code>GET /newsletter/verify/{id}/{hash}</code></td><td>Newsletter</td><td>throttle / signed</td></tr>
+    <tr><td><code>POST /chatbot/message</code>, <code>POST /chatbot/leads</code></td><td>Chatbot</td><td>throttle 20 / 5 per min</td></tr>
+    <tr><td><code>GET /uk-cities/suggest</code></td><td>City autocomplete</td><td>throttle 60/min</td></tr>
+  </tbody>
+</table>
+
+<h3>Accounts</h3>
+<table class="wrap">
+  <thead><tr><th style="width:45%">Route</th><th>Purpose</th><th style="width:18%">Middleware</th></tr></thead>
+  <tbody>
+    <tr><td><code>GET /{type}-registration</code>, <code>POST /register/{type}</code>, <code>POST /register/quick</code></td><td>Registration</td><td>throttle:registration</td></tr>
+    <tr><td><code>GET|POST /login</code>, <code>POST /logout</code></td><td>Session</td><td>throttle 5/min; auth</td></tr>
+    <tr><td><code>GET /email/verify/{id}/{hash}</code>, <code>POST /email/verification-notification</code></td><td>Email verification</td><td>signed; throttle 3/hour</td></tr>
+    <tr><td><code>GET|POST /account/set-password/{id}/{hash}</code></td><td>First-time password</td><td>signed, throttle</td></tr>
+    <tr><td><code>GET|POST /forgot-password</code>, <code>GET /reset-password/{token}</code>, <code>POST /reset-password</code></td><td>Password reset</td><td>throttle 5/min</td></tr>
+    <tr><td><code>GET /profile-media/{media}/download</code></td><td>Private document download</td><td>auth (owner)</td></tr>
+  </tbody>
+</table>
+
+<h3>Payments</h3>
+<table class="wrap">
+  <thead><tr><th style="width:45%">Route</th><th>Purpose</th><th style="width:18%">Middleware</th></tr></thead>
+  <tbody>
+    <tr><td><code>POST /pricing/payment/initiate|verify</code></td><td>Guest checkout</td><td>throttle 10/min</td></tr>
+    <tr><td><code>POST /dashboard/my-plan/payment/initiate|verify</code></td><td>Upgrade checkout</td><td>auth, throttle 10/min</td></tr>
+    <tr><td><code>POST /webhooks/razorpay</code></td><td>Razorpay webhook (no CSRF; HMAC)</td><td>throttle 120/min</td></tr>
+  </tbody>
+</table>
+
+<h3>Dashboard (all behind <code>auth</code>)</h3>
+<table class="wrap">
+  <thead><tr><th style="width:52%">Route</th><th>Purpose</th></tr></thead>
+  <tbody>
+    <tr><td><code>GET /dashboard</code>, <code>/activity</code>, <code>POST /notifications/{id}/read</code>, <code>/notifications/read-all</code></td><td>Home, notifications</td></tr>
+    <tr><td><code>GET|PUT /dashboard/profile</code>, <code>GET|PUT /dashboard/password</code></td><td>Account details, password</td></tr>
+    <tr><td><code>GET /dashboard/profiles/create[/{type}]</code>, <code>POST /dashboard/profiles/create/{type}</code></td><td>Add a profile</td></tr>
+    <tr><td><code>GET /dashboard/profiles/{type}/{id}[/edit]</code>, <code>PUT /dashboard/profiles/{type}/{id}</code></td><td>View / edit owned profile</td></tr>
+    <tr><td><code>GET /dashboard/inbox[/{conversation}]</code>, <code>POST .../reply</code> (30/min), <code>POST .../proposals</code> (10/min)</td><td>Inbox, replies, proposals</td></tr>
+    <tr><td><code>GET /dashboard/live-chat/conversations[/{id}/messages]</code></td><td>Live-chat JSON</td></tr>
+    <tr><td><code>GET /dashboard/proposals/sent|received</code>, <code>POST /dashboard/proposals</code>, <code>PUT .../{proposal}/status</code>, <code>GET .../attachments/{attachment}</code></td><td>Proposals</td></tr>
+    <tr><td><code>GET|POST /dashboard/instant-response</code></td><td>Auto-reply settings</td></tr>
+    <tr><td><code>GET /dashboard/my-plan</code></td><td>Membership</td></tr>
+  </tbody>
+</table>
+</section>
+
+<!-- ============================== 11. SECURITY ============================== -->
+<section class="chapter">
+<h2>11. Security model</h2>
+<table class="wrap">
+  <thead><tr><th style="width:28%">Concern</th><th>Implementation</th></tr></thead>
+  <tbody>
+    <tr><td>Web root exposure</td><td>Production must serve <code>public/</code> only. On XAMPP the root <code>.htaccess</code> denies <code>.env</code>, <code>.git</code>, <code>storage</code>, <code>vendor</code>, <code>app</code>, <code>config</code> and tooling files (verified 403).</td></tr>
+    <tr><td>Authentication</td><td>Session guard, bcrypt via the <code>hashed</code> cast, login throttling, session regeneration on login, invalidation on logout, verified + active account required.</td></tr>
+    <tr><td>Account recovery</td><td>Broker tokens (hashed, single-use, 60 min); single-use set-password link; reset and password change end all sessions; no user enumeration in messages.</td></tr>
+    <tr><td>Authorization / IDOR</td><td>Every member-owned lookup is filtered by the signed-in user and returns 404 otherwise; broadcast channel limited to conversation participants; media downloads owner-only.</td></tr>
+    <tr><td>CSRF</td><td>Enabled for all web routes; the only exception is the HMAC-verified Razorpay webhook.</td></tr>
+    <tr><td>Validation &amp; mass assignment</td><td>Validated arrays only; no <code>$request-&gt;all()</code>; status/amount/activation fields are not fillable on models.</td></tr>
+    <tr><td>SQL injection</td><td>Query builder bindings everywhere; raw fragments use hard-coded column names; sort and filter values are allow-listed.</td></tr>
+    <tr><td>XSS</td><td>Blade escaping; the only unescaped output is article HTML passed through a DOM allow-list sanitiser and hard-coded static-page content.</td></tr>
+    <tr><td>Uploads</td><td>Size limits, extension allow-lists, image dimension limits, UUID names, extension from content, private documents via short-lived signed URLs.</td></tr>
+    <tr><td>Rate limiting</td><td>Login, reset, verification, registration, contact, comments, replies, proposals, payments, chatbot, newsletter, city suggestions.</td></tr>
+    <tr><td>Payments</td><td>Server-side amounts, HMAC signature checks with <code>hash_equals</code>, idempotent completion, webhook amount/currency check.</td></tr>
+    <tr><td>Secrets</td><td>Only in <code>.env</code> (untracked); no secrets in logs or responses; Razorpay errors logged by message only.</td></tr>
+  </tbody>
+</table>
+<div class="warn"><b>Rules for new code</b>
+<ul style="margin-bottom:0">
+  <li>Never disable CSRF, validation or ownership checks to make something work.</li>
+  <li>Scope every query for member data by <code>Auth::id()</code> and answer 404 when nothing matches.</li>
+  <li>Add a <code>throttle</code> middleware to any new endpoint that sends email, writes data publicly or calls an external API.</li>
+  <li>Store uploads on S3 with generated names; never trust the client filename or MIME type.</li>
+</ul></div>
+</section>
+
+<!-- ============================== 12. PERFORMANCE ============================== -->
+<section class="chapter">
+<h2>12. Performance &amp; caching</h2>
+<h3>Caches</h3>
+<table class="wrap">
+  <thead><tr><th style="width:24%">Cache</th><th style="width:18%">Key / TTL</th><th>Invalidation</th></tr></thead>
+  <tbody>
+    <tr><td><code>SchemaCache</code> (table/column metadata)</td><td><code>schema-cache:v1</code>, 24 h; memoised per request</td><td>Automatic on every <code>migrate</code> / rollback; or <code>php artisan cache:clear</code>.</td></tr>
+    <tr><td>Home page data</td><td><code>public:home:v1</code>, 5 min</td><td>Cleared by every profile write in the app (registration, quick registration, dashboard profile edit, payment claim/activation). Articles and testimonials rely on the TTL.</td></tr>
+    <tr><td>Footer / listing reference data (industry tree, UK cities)</td><td><code>public:layout:v1</code>, 1 h</td><td>TTL, or <code>cache:clear</code> after editing categories or cities.</td></tr>
+    <tr><td>Chatbot knowledge base</td><td><code>chatbot.active-knowledge-base.v1</code>, 5 min</td><td>TTL.</td></tr>
+    <tr><td>Listing industry categories</td><td>in <code>AbstractListingController</code></td><td>TTL.</td></tr>
+  </tbody>
+</table>
+
+<h3>Measured results (dev database, warm cache, queries per request)</h3>
+<table>
+  <thead><tr><th>Page</th><th>Before audit</th><th>After</th></tr></thead>
+  <tbody>
+    <tr><td>Home</td><td>40</td><td>0 (+1 cache read)</td></tr>
+    <tr><td>Directory listing / search</td><td>9&ndash;10 / 16</td><td>2 / 1</td></tr>
+    <tr><td>Static pages, login, pricing, registration forms</td><td>2</td><td>0</td></tr>
+    <tr><td>Article index / detail</td><td>9 / 14</td><td>4 / 7</td></tr>
+    <tr><td>Dashboard / My Plan</td><td>31 / 20</td><td>15 / 9</td></tr>
+    <tr><td>Inbox and proposal lists</td><td>grew with rows (52&ndash;82 at 24 rows)</td><td>constant</td></tr>
+  </tbody>
+</table>
+
+<h3>Performance rules for new code</h3>
+<ul>
+  <li>No queries inside loops: batch with <code>whereIn()</code> + <code>keyBy()</code> (see <code>profileConversationLabels()</code>). <code>DashboardQueryCountTest</code> fails if list pages start growing with their rows.</li>
+  <li>Paginate or cap every list (listings 12, articles 9, proposals 15, comments 50, thread messages 100).</li>
+  <li>Use <code>SchemaCache</code>, not <code>Schema</code>, in request code.</li>
+  <li>Select the columns you need on large tables; check new filters with <code>EXPLAIN</code> before adding indexes.</li>
+  <li>Call external APIs with explicit timeouts, and queue slow work (mail is already queued).</li>
+  <li>If you add public, visitor-independent data to the home page, it is cached; clear <code>PublicContentCache</code> wherever that data is written.</li>
+</ul>
+
+<h3>Frontend</h3>
+<ul>
+  <li>Vite bundles only <code>resources/js/app.js</code> (live chat, about 81 KB / 23 KB gzip) and <code>resources/css/app.css</code>; loaded on dashboard pages.</li>
+  <li>Page styles and scripts are plain files in <code>public/css</code> and <code>public/js</code>, cache-busted with <code>?v=</code> query strings.</li>
+  <li>Keep images at display size (default profile images are 600 px wide).</li>
+</ul>
+</section>
+
+<!-- ============================== 13. TESTING ============================== -->
+<section class="chapter">
+<h2>13. Testing &amp; code quality</h2>
+<h3>Commands</h3>
+<pre>composer test                  <span class="c"># or: php artisan test           (128 tests)</span>
+php artisan test --filter=MembershipPaymentTest
+composer analyse               <span class="c"># PHPStan / Larastan level 5</span>
+composer format                <span class="c"># apply Laravel Pint</span>
+composer format:check          <span class="c"># CI-style formatting check</span>
+php artisan route:list --except-vendor</pre>
+
+<div class="tip"><b>Definition of done for a change</b>
+<code>composer test</code>, <code>composer analyse</code> and <code>composer format:check</code> all pass, new behaviour has a feature test (including the
+unauthorised / invalid case), and migrations run up and down.</div>
+
+<h3>How the tests are built</h3>
+<ul>
+  <li>Environment from <code>phpunit.xml</code>: SQLite in memory, array cache and session, sync queue, array mailer, broadcasting off.</li>
+  <li>Many older tests create only the tables they need with <code>Schema::create()</code> in <code>setUp()</code>. Newer tests run the real
+  migrations (<code>$this-&gt;artisan('migrate')</code>), which is preferred because hand-written schemas drift from production.</li>
+  <li>Use <code>Mail::fake()</code>, <code>Http::fake()</code> (Razorpay API) and <code>Storage::fake('s3')</code>; never call real services.</li>
+  <li>Payment tests sign callbacks with a test secret through <code>hash_hmac('sha256', ...)</code>.</li>
+</ul>
+
+<h3>Notable test files</h3>
+<table class="wrap">
+  <thead><tr><th style="width:36%">File</th><th>Covers</th></tr></thead>
+  <tbody>
+    <tr><td><code>AuthenticationTest</code>, <code>AccountSecurityTest</code></td><td>Registration rules, verification, login, reset, set-password link, session termination, inactive accounts</td></tr>
+    <tr><td><code>MembershipPaymentTest</code></td><td>Replay protection, ownership, signature failures, guest claims, webhook, server pricing</td></tr>
+    <tr><td><code>ProfileContactFlowTest</code></td><td>Contact, inbox, proposals, races, double submits, attachment downloads</td></tr>
+    <tr><td><code>DashboardRoutesTest</code>, <code>DashboardQueryCountTest</code></td><td>Dashboard pages and N+1 regression guard</td></tr>
+    <tr><td><code>SchemaCacheTest</code>, <code>PublicContentCacheTest</code></td><td>Cache behaviour and invalidation paths</td></tr>
+    <tr><td><code>Home*Test</code>, <code>ListingControllersTest</code>, <code>ArticlePagesTest</code>, <code>NewsletterSubscriptionTest</code></td><td>Public pages</td></tr>
+  </tbody>
+</table>
+</section>
+
+<!-- ============================== 14. CONVENTIONS ============================== -->
+<section class="chapter">
+<h2>14. Coding conventions</h2>
+<ul>
+  <li><b>Formatting:</b> Laravel Pint (PSR-12 based Laravel preset). Run <code>composer format</code> before committing.</li>
+  <li><b>Types:</b> parameter and return types on new methods; generics in docblocks for collections (<code>Collection&lt;int, \stdClass&gt;</code>).</li>
+  <li><b>Controllers stay thin:</b> HTTP concerns only. Put multi-step business logic in <code>app/Services</code> (see payments) and validation in Form Requests (<code>app/Http/Requests</code>).</li>
+  <li><b>Transactions:</b> wrap multi-table writes in <code>DB::transaction()</code>; use conditional updates or <code>lockForUpdate()</code> for anything that can race; use <code>upsert()</code> instead of exists-then-insert.</li>
+  <li><b>Notifications and mail</b> are queued; notifications sent inside transactions must use <code>afterCommit()</code> (already set on <code>DashboardActivityNotification</code>).</li>
+  <li><b>Profile type handling:</b> reuse the existing type maps; do not hard-code table names in new places.</li>
+  <li><b>Comments</b> explain <i>why</i> (constraints, legacy quirks), not what the next line does.</li>
+  <li><b>Commits:</b> small, one concern each, imperative subject line, body explaining the reason and any behaviour change. Formatting-only changes go in their own commit.</li>
+  <li><b>Branches:</b> work on feature branches off <code>development</code>; merge to <code>main</code> through pull requests.</li>
+</ul>
+</section>
+
+<!-- ============================== 15. DEPLOYMENT ============================== -->
+<section class="chapter">
+<h2>15. Deployment checklist</h2>
+<h3>Server</h3>
+<ul>
+  <li>Web server document root points to <code>public/</code> (do not rely on the root <code>.htaccess</code> in production).</li>
+  <li>HTTPS everywhere; <code>APP_DEBUG=false</code>; <code>SESSION_SECURE_COOKIE=true</code>; <code>LOG_LEVEL=warning</code>.</li>
+  <li><code>storage/</code> and <code>bootstrap/cache/</code> writable by the web user; nothing else writable.</li>
+  <li>Supervised queue worker (<code>php artisan queue:work --tries=3</code>) and Reverb (<code>php artisan reverb:start</code>) behind TLS.</li>
+  <li>Scheduler cron if scheduled tasks are added: <code>* * * * * php artisan schedule:run</code>.</li>
+</ul>
+<h3>Each release</h3>
+<pre>git pull
+composer install --no-dev --optimize-autoloader
+npm ci &amp;&amp; npm run build
+php artisan migrate --force
+php artisan config:cache
+php artisan route:cache
+php artisan view:cache
+php artisan cache:clear        <span class="c"># refresh home/footer/schema caches</span>
+php artisan queue:restart</pre>
+<h3>First production release after the October 2026 audit</h3>
+<ol>
+  <li>Rotate every secret in <code>.env</code> (DB, SMTP, AWS, Reverb, Razorpay) if the project root was ever web-accessible.</li>
+  <li>Set <code>RAZORPAY_KEY_ID</code>, <code>RAZORPAY_KEY_SECRET</code>, <code>RAZORPAY_WEBHOOK_SECRET</code> and create the webhook in Razorpay.</li>
+  <li>Run the pending migrations: <code>2026_10_10_072734</code> (document/image columns), <code>2026_10_13_000001</code> (payment keys,
+  membership history) and <code>2026_10_13_000002</code> (comment and visitor indexes). The first of the new ones stops with a clear
+  message if duplicate order numbers exist.</li>
+  <li>Prefer Redis for cache (and optionally sessions/queue) in production.</li>
+</ol>
+</section>
+
+<!-- ============================== 16. TROUBLESHOOTING ============================== -->
+<section class="chapter">
+<h2>16. Troubleshooting</h2>
+<table class="wrap">
+  <thead><tr><th style="width:34%">Symptom</th><th>Likely cause and fix</th></tr></thead>
+  <tbody>
+    <tr><td>Verification / reset emails never arrive</td><td>No queue worker running. Start <code>php artisan queue:work</code> or set <code>QUEUE_CONNECTION=sync</code> locally. Check <code>failed_jobs</code>.</td></tr>
+    <tr><td>"Online payment is not available yet"</td><td>Razorpay keys missing from <code>.env</code> (then <code>config:clear</code>).</td></tr>
+    <tr><td>Webhook returns 503 / 400</td><td>503: <code>RAZORPAY_WEBHOOK_SECRET</code> not set. 400: secret differs from the one configured in Razorpay.</td></tr>
+    <tr><td>Paid but plan not active</td><td>Check <code>online_payments</code> status and webhook delivery logs in Razorpay; a guest payment is attached only when the payer registers.</td></tr>
+    <tr><td>Live chat says "Connecting..." forever</td><td>Reverb not running, or <code>VITE_REVERB_*</code> differ from the server; rebuild assets after changing them.</td></tr>
+    <tr><td>Uploads fail with storage error</td><td>AWS credentials or bucket missing; run <code>config:clear</code> after fixing.</td></tr>
+    <tr><td>New column or table "not found" by the app after a manual DB change</td><td>Schema metadata is cached; run <code>php artisan cache:clear</code> (migrations clear it automatically).</td></tr>
+    <tr><td>Home page shows old profiles/articles</td><td>Articles/testimonials refresh within 5 minutes; run <code>cache:clear</code> to publish immediately.</td></tr>
+    <tr><td>Registration rejects a valid-looking city</td><td>Cities must exist in <code>bx_cities</code>; add the city there.</td></tr>
+    <tr><td>Tests fail with "no such table/column"</td><td>The test's hand-written schema lacks it; add it, or switch the test to <code>$this-&gt;artisan('migrate')</code>.</td></tr>
+  </tbody>
+</table>
+</section>
+
+<!-- ============================== 17. KNOWN ISSUES ============================== -->
+<section class="chapter">
+<h2>17. Known issues &amp; open decisions</h2>
+<table class="wrap">
+  <thead><tr><th style="width:8%">Prio</th><th style="width:30%">Item</th><th>Detail / suggestion</th></tr></thead>
+  <tbody>
+    <tr><td><span class="pill p-warn">Decide</span></td><td>Quick vs full registration rules</td><td>Quick registration accepts <code>+44</code> numbers and <code>example.com</code> emails; full registration rejects both. Align them.</td></tr>
+    <tr><td><span class="pill p-warn">Decide</span></td><td>Guest payments in My Plan</td><td>A claimed guest payment marks the profile as paid but does not create a <code>profile_memberships</code> row, so "Membership Details" stays empty and no expiry is tracked.</td></tr>
+    <tr><td><span class="pill p-warn">Decide</span></td><td>Home page counts</td><td>4 articles and 3 testimonials are shown; earlier documentation said 12 and 6. Confirm the intended numbers.</td></tr>
+    <tr><td><span class="pill p-warn">Decide</span></td><td>Replaced media files</td><td>Replacing a profile image or document keeps the old S3 object and <code>profile_media</code> row forever. Add cleanup after a successful replace.</td></tr>
+    <tr><td><span class="pill p-warn">Decide</span></td><td>Profile view counting</td><td>Every view inserts a row; refreshing inflates counts. Count one view per viewer per profile per day.</td></tr>
+    <tr><td><span class="pill p-warn">Decide</span></td><td>Contact form identity</td><td>Sender name/email are free text and each submit starts a new conversation and email. Prefill from the account and reuse open conversations.</td></tr>
+    <tr><td><span class="pill p-ok">Improve</span></td><td><code>DashboardController</code> size</td><td>About 1,700 lines. Continue splitting into focused controllers (Inbox, Proposals, Profiles, Plan) with Form Requests.</td></tr>
+    <tr><td><span class="pill p-ok">Improve</span></td><td>Article lists load full bodies</td><td>Needed for reading time; store a word count column and select only listing columns.</td></tr>
+    <tr><td><span class="pill p-ok">Improve</span></td><td>Search</td><td>Leading-wildcard <code>LIKE</code> across many columns cannot use indexes; consider FULLTEXT indexes or Laravel Scout as data grows.</td></tr>
+    <tr><td><span class="pill p-ok">Improve</span></td><td>Foreign keys</td><td>None in the legacy schema; add after cleaning orphans, starting with payments and memberships.</td></tr>
+    <tr><td><span class="pill p-ok">Improve</span></td><td>Static analysis level</td><td>Level 5 is clean; level 6 reports about 200 missing type annotations to work through gradually.</td></tr>
+    <tr><td><span class="pill p-ok">Improve</span></td><td>Coupons</td><td>Schema exists but no logic. When implemented, increment redemptions atomically inside the payment transaction.</td></tr>
+    <tr><td><span class="pill p-ok">Improve</span></td><td>CI</td><td>Add a pipeline running <code>composer test</code>, <code>composer analyse</code> and <code>composer format:check</code> on every pull request.</td></tr>
+  </tbody>
+</table>
+</section>
+
+<!-- ============================== 18. CHANGE LOG ============================== -->
+<section class="chapter">
+<h2>18. Audit change log (October 2026)</h2>
+<p>Commits on <code>development</code> after <code>3355d37</code>, oldest first.</p>
+<table class="wrap">
+  <thead><tr><th style="width:13%">Commit</th><th style="width:13%">Phase</th><th>Change</th></tr></thead>
+  <tbody>
+    <tr><td><code>ef199bf</code></td><td>Security</td><td>Block web access to secrets and source at the project root; add <code>.env.example</code>.</td></tr>
+    <tr><td><code>241e8f2</code></td><td>Payments</td><td>Idempotent Razorpay completion, signed webhook, atomic guest claims, HTTP timeouts, payment keys migration, throttles.</td></tr>
+    <tr><td><code>4a8c9cf</code></td><td>Accounts</td><td>Single-use set-password link, sessions ended on reset, shared password rules, inactive-account checks.</td></tr>
+    <tr><td><code>327d7b9</code></td><td>Tests</td><td>Test suite brought back to green (20 outdated tests aligned with the application).</td></tr>
+    <tr><td><code>579942b</code></td><td>Performance</td><td>Schema introspection cache; dashboard N+1 queries removed with a regression test.</td></tr>
+    <tr><td><code>30b1137</code></td><td>Performance</td><td>Home page and footer reference data cached with invalidation on profile writes.</td></tr>
+    <tr><td><code>c7fb9ca</code></td><td>Performance</td><td>Comment and profile-visitor indexes (verified with <code>EXPLAIN</code>); capped comments and threads.</td></tr>
+    <tr><td><code>a8d93f4</code></td><td>Frontend</td><td>JS bundle 133 &rarr; 81 KB, duplicate WebSocket connection removed, placeholder images 1.3 MB &rarr; 360 KB.</td></tr>
+    <tr><td><code>acc5bb9</code></td><td>Performance</td><td>Skip batched lookups on empty lists.</td></tr>
+    <tr><td><code>f687eac</code></td><td>Integrity</td><td>Proposal races, double submits, atomic upserts, non-ASCII attachment downloads, notifications after commit, model fixes.</td></tr>
+    <tr><td><code>9c652ef</code>, <code>d326111</code></td><td>Quality</td><td>Laravel Pint formatting (no behaviour change) and blame-ignore file.</td></tr>
+    <tr><td><code>ff54d66</code></td><td>Quality</td><td>Larastan level 5 with all findings fixed (no baseline); composer scripts.</td></tr>
+    <tr><td><code>fd31aea</code></td><td>Quality</td><td>Dashboard validation moved into Form Requests.</td></tr>
+  </tbody>
+</table>
+
+<div class="note" style="margin-top:6mm"><b>Keeping this document current</b>
+Update this guide in the same pull request as any change to setup steps, environment variables, routes, payment flow, caching or
+deployment. Outdated documentation is treated as a bug.</div>
+</section>
+
+</body>
+</html>

@@ -17,7 +17,7 @@ class BusinessexNewsletterTableSeeder extends Seeder
             'user_id' => 1,
             'email' => 'admin@businessex.com',
             'status' => 'S',
-            'unsubscribe_reason' => 'Sample description text.'
+            'unsubscribe_reason' => 'Sample description text.',
         ]);
 
         DB::table('businessex_newsletter')->insert([
@@ -25,7 +25,7 @@ class BusinessexNewsletterTableSeeder extends Seeder
             'user_id' => 2,
             'email' => 'john.doe@example.com',
             'status' => 'P',
-            'unsubscribe_reason' => 'Another sample description.'
+            'unsubscribe_reason' => 'Another sample description.',
         ]);
 
         DB::table('businessex_newsletter')->insert([
@@ -33,7 +33,7 @@ class BusinessexNewsletterTableSeeder extends Seeder
             'user_id' => 3,
             'email' => 'priya.sharma@example.com',
             'status' => 'U',
-            'unsubscribe_reason' => 'Third sample description.'
+            'unsubscribe_reason' => 'Third sample description.',
         ]);
 
     }

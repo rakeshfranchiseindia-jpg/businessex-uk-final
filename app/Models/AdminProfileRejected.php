@@ -2,7 +2,9 @@
 
 namespace App\Models;
 
-class AdminProfileRejected extends \Illuminate\Database\Eloquent\Model
+use Illuminate\Database\Eloquent\Model;
+
+class AdminProfileRejected extends Model
 {
     protected $table = 'admin_profile_rejected';
 
@@ -14,5 +16,4 @@ class AdminProfileRejected extends \Illuminate\Database\Eloquent\Model
         'admin_email',
         'rejected_reason',
     ];
-
 }

@@ -2,10 +2,11 @@
 
 namespace App\Models;
 
-class BxDfpBanner extends \Illuminate\Database\Eloquent\Model
+use Illuminate\Database\Eloquent\Model;
+
+class BxDfpBanner extends Model
 {
     protected $table = 'bx_dfp_banner';
-
 
     protected $fillable = [
         'dfp_id',
@@ -16,5 +17,4 @@ class BxDfpBanner extends \Illuminate\Database\Eloquent\Model
         'height',
         'is_active',
     ];
-
 }

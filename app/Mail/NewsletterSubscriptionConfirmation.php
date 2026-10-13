@@ -16,8 +16,7 @@ class NewsletterSubscriptionConfirmation extends Mailable implements ShouldQueue
 
     public function __construct(
         public readonly string $name
-    ) {
-    }
+    ) {}
 
     public function envelope(): Envelope
     {

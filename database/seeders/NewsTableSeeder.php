@@ -28,7 +28,7 @@ class NewsTableSeeder extends Seeder
             'seoTitle' => 'Getting Started with Business Growth',
             'seoKeywords' => 'business, startup, investment',
             'seoDescription' => '192.168.1.1',
-            'news_date' => '2025-01-01 10:30:00'
+            'news_date' => '2025-01-01 10:30:00',
         ]);
 
         DB::table('news')->insert([
@@ -47,7 +47,7 @@ class NewsTableSeeder extends Seeder
             'seoTitle' => 'Top Investment Strategies for 2025',
             'seoKeywords' => 'funding, growth, strategy',
             'seoDescription' => '10.0.0.55',
-            'news_date' => '2025-02-02 10:30:00'
+            'news_date' => '2025-02-02 10:30:00',
         ]);
 
         DB::table('news')->insert([
@@ -66,7 +66,7 @@ class NewsTableSeeder extends Seeder
             'seoTitle' => 'How to Scale Your Startup',
             'seoKeywords' => 'technology, innovation, market',
             'seoDescription' => '172.16.0.100',
-            'news_date' => '2025-03-03 10:30:00'
+            'news_date' => '2025-03-03 10:30:00',
         ]);
 
     }

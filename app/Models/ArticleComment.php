@@ -2,7 +2,9 @@
 
 namespace App\Models;
 
-class ArticleComment extends \Illuminate\Database\Eloquent\Model
+use Illuminate\Database\Eloquent\Model;
+
+class ArticleComment extends Model
 {
     protected $table = 'articles_comments';
 
@@ -16,10 +18,8 @@ class ArticleComment extends \Illuminate\Database\Eloquent\Model
         'comment_status',
     ];
 
-
     public function article()
     {
         return $this->belongsTo(BxArticle::class, 'article_id', 'article_id');
     }
-
 }

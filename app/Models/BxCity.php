@@ -2,15 +2,15 @@
 
 namespace App\Models;
 
-class BxCity extends \Illuminate\Database\Eloquent\Model
+use Illuminate\Database\Eloquent\Model;
+
+class BxCity extends Model
 {
     protected $table = 'bx_cities';
-
 
     protected $fillable = [
         'city',
         'state',
         'country',
     ];
-
 }

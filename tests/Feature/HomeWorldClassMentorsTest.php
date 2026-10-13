@@ -41,13 +41,13 @@ class HomeWorldClassMentorsTest extends TestCase
         for ($id = 1; $id <= 15; $id++) {
             DB::table('profile_mentors')->insert([
                 'mentor_profile_status' => $id === 15 ? 0 : 1,
-                'mentor_name' => 'Homepage Mentor ' . str_pad((string) $id, 2, '0', STR_PAD_LEFT),
-                'mentor_company' => 'Mentor Company ' . $id,
+                'mentor_name' => 'Homepage Mentor '.str_pad((string) $id, 2, '0', STR_PAD_LEFT),
+                'mentor_company' => 'Mentor Company '.$id,
                 'mentor_designation' => 'Growth Adviser',
                 'mentor_city' => 'London',
-                'mentor_adv_headline' => 'Headline for mentor ' . $id,
-                'mentor_intro' => 'Introduction for mentor ' . $id,
-                'mentor_profile_summary' => 'Summary for mentor ' . $id,
+                'mentor_adv_headline' => 'Headline for mentor '.$id,
+                'mentor_intro' => 'Introduction for mentor '.$id,
+                'mentor_profile_summary' => 'Summary for mentor '.$id,
                 'mentor_profile_pic' => null,
                 'created_at' => now()->subDays(15 - $id),
                 'updated_at' => now(),

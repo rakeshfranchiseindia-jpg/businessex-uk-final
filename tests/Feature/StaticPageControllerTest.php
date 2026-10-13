@@ -9,13 +9,13 @@ class StaticPageControllerTest extends TestCase
     public function test_static_pages_render_with_businessx_theme_content(): void
     {
         foreach ([
-            ['about-us', 'About BusinessX'],
+            ['about-us', 'About Us'],
             ['disclaimer', 'Disclaimer'],
             ['privacy-policy', 'Privacy Policy'],
-            ['terms-and-conditions', 'Terms of Use'],
-            ['contact-us', 'Contact BusinessX'],
+            ['terms-and-conditions', 'Terms Of Use'],
+            ['contact-us', 'Contact'],
         ] as [$path, $title]) {
-            $this->get('/' . $path)
+            $this->get('/'.$path)
                 ->assertOk()
                 ->assertSee($title)
                 ->assertSee('static-page__content')

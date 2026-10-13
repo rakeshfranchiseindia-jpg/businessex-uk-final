@@ -24,7 +24,7 @@ class IndPrefInvestorsFihlTableSeeder extends Seeder
             'sub_category_id3' => 1,
             'email' => 'admin@businessex.com',
             'invest_min' => 1000.0000,
-            'invest_max' => 1000.0000
+            'invest_max' => 1000.0000,
         ]);
 
         DB::table('ind_pref_investors_fihl')->insert([
@@ -39,7 +39,7 @@ class IndPrefInvestorsFihlTableSeeder extends Seeder
             'sub_category_id3' => 2,
             'email' => 'john.doe@example.com',
             'invest_min' => 1250.0000,
-            'invest_max' => 1250.0000
+            'invest_max' => 1250.0000,
         ]);
 
         DB::table('ind_pref_investors_fihl')->insert([
@@ -54,7 +54,7 @@ class IndPrefInvestorsFihlTableSeeder extends Seeder
             'sub_category_id3' => 3,
             'email' => 'priya.sharma@example.com',
             'invest_min' => 1500.0000,
-            'invest_max' => 1500.0000
+            'invest_max' => 1500.0000,
         ]);
 
     }

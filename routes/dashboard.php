@@ -16,8 +16,8 @@ Route::prefix('dashboard')
         Route::get('/password', 'password')->name('password');
         Route::put('/password', 'updatePassword')->name('password.update');
         Route::get('/my-plan', 'myPlan')->name('my-plan');
-        Route::post('/my-plan/payment/initiate', [PricingPaymentController::class, 'initiateUpgrade'])->name('my-plan.payment.initiate');
-        Route::post('/my-plan/payment/verify', [PricingPaymentController::class, 'verifyUpgrade'])->name('my-plan.payment.verify');
+        Route::post('/my-plan/payment/initiate', [PricingPaymentController::class, 'initiateUpgrade'])->middleware('throttle:10,1')->name('my-plan.payment.initiate');
+        Route::post('/my-plan/payment/verify', [PricingPaymentController::class, 'verifyUpgrade'])->middleware('throttle:10,1')->name('my-plan.payment.verify');
         Route::get('/activity', 'activity')->name('activity');
         Route::post('/notifications/read-all', 'markNotificationsRead')->name('notifications.read-all');
         Route::post('/notifications/{notification}/read', 'markNotificationRead')->name('notifications.read');
@@ -42,8 +42,8 @@ Route::prefix('dashboard')
             ->whereNumber('conversation')
             ->middleware('throttle:30,1')
             ->name('inbox.reply');
-        Route::post('/inbox/{conversation}/proposals', 'sendProposal')->whereNumber('conversation')->name('inbox.proposals.store');
-        Route::post('/proposals', 'sendSelectedProfileProposal')->name('proposals.store');
+        Route::post('/inbox/{conversation}/proposals', 'sendProposal')->whereNumber('conversation')->middleware('throttle:10,1')->name('inbox.proposals.store');
+        Route::post('/proposals', 'sendSelectedProfileProposal')->middleware('throttle:10,1')->name('proposals.store');
         Route::get('/proposals/{proposal}/attachments/{attachment}', 'downloadProposalAttachment')
             ->whereNumber('proposal')
             ->whereNumber('attachment')

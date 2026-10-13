@@ -19,7 +19,7 @@ return new class extends Migration
             $table->string('file_name', 255)->nullable(false);
             $table->string('file_size', 100)->nullable(false);
             $table->text('file_path')->nullable(false);
-            $table->enum('is_active', ['1','2'])->nullable(false)->default('1');
+            $table->enum('is_active', ['1', '2'])->nullable(false)->default('1');
             $table->timestamps();
         });
 

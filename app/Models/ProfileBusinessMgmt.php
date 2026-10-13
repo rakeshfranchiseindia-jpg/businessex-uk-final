@@ -2,7 +2,9 @@
 
 namespace App\Models;
 
-class ProfileBusinessMgmt extends \Illuminate\Database\Eloquent\Model
+use Illuminate\Database\Eloquent\Model;
+
+class ProfileBusinessMgmt extends Model
 {
     protected $table = 'profile_business_mgmt';
 
@@ -16,7 +18,6 @@ class ProfileBusinessMgmt extends \Illuminate\Database\Eloquent\Model
         'mgmt_email',
     ];
 
-
     public function businessProfile()
     {
         return $this->belongsTo(ProfileBusiness::class, 'business_profile_id', 'business_id');
@@ -26,5 +27,4 @@ class ProfileBusinessMgmt extends \Illuminate\Database\Eloquent\Model
     {
         return $this->belongsTo(User::class, 'user_id', 'user_id');
     }
-
 }

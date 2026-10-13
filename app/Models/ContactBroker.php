@@ -2,7 +2,9 @@
 
 namespace App\Models;
 
-class ContactBroker extends \Illuminate\Database\Eloquent\Model
+use Illuminate\Database\Eloquent\Model;
+
+class ContactBroker extends Model
 {
     protected $table = 'contact_broker';
 
@@ -22,10 +24,8 @@ class ContactBroker extends \Illuminate\Database\Eloquent\Model
         'contact_viewed',
     ];
 
-
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id', 'user_id');
     }
-
 }

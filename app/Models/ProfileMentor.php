@@ -2,9 +2,10 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class ProfileMentor extends \Illuminate\Database\Eloquent\Model
+class ProfileMentor extends Model
 {
     use SoftDeletes;
 
@@ -50,7 +51,6 @@ class ProfileMentor extends \Illuminate\Database\Eloquent\Model
         'last_login_at' => 'datetime',
     ];
 
-
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id', 'user_id');
@@ -75,5 +75,4 @@ class ProfileMentor extends \Illuminate\Database\Eloquent\Model
     {
         return $this->hasMany(ContactMentor::class, 'profile_id', 'mentor_id');
     }
-
 }

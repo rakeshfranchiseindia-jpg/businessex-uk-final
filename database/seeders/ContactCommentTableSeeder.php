@@ -24,7 +24,7 @@ class ContactCommentTableSeeder extends Seeder
             'comment' => 'This is a sample description providing enough detail to be realistic for testing and development purposes.',
             'comment_date' => now(),   // ✅ current date
             'updated_date' => now(),   // ✅ current date
-            'status' => 0
+            'status' => 0,
         ]);
 
         DB::table('contact_comment')->insert([
@@ -39,7 +39,7 @@ class ContactCommentTableSeeder extends Seeder
             'comment' => 'A comprehensive overview of business strategies, growth opportunities, and market trends in the current landscape.',
             'comment_date' => now(),   // ✅ current date
             'updated_date' => now(),
-            'status' => 1
+            'status' => 1,
         ]);
 
         DB::table('contact_comment')->insert([
@@ -54,7 +54,7 @@ class ContactCommentTableSeeder extends Seeder
             'comment' => 'Detailed analysis covering key aspects of business operations, market competition, and potential areas for expansion.',
             'comment_date' => now(),   // ✅ current date
             'updated_date' => now(),
-            'status' => 0
+            'status' => 0,
         ]);
     }
 }

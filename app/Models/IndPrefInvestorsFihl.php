@@ -2,7 +2,9 @@
 
 namespace App\Models;
 
-class IndPrefInvestorsFihl extends \Illuminate\Database\Eloquent\Model
+use Illuminate\Database\Eloquent\Model;
+
+class IndPrefInvestorsFihl extends Model
 {
     protected $table = 'ind_pref_investors_fihl';
 
@@ -26,5 +28,4 @@ class IndPrefInvestorsFihl extends \Illuminate\Database\Eloquent\Model
         'invest_min' => 'decimal:2',
         'invest_max' => 'decimal:2',
     ];
-
 }

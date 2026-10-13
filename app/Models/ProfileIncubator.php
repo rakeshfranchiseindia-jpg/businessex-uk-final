@@ -2,9 +2,10 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class ProfileIncubator extends \Illuminate\Database\Eloquent\Model
+class ProfileIncubator extends Model
 {
     use SoftDeletes;
 
@@ -54,7 +55,6 @@ class ProfileIncubator extends \Illuminate\Database\Eloquent\Model
         'last_login_at' => 'datetime',
     ];
 
-
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id', 'user_id');
@@ -84,5 +84,4 @@ class ProfileIncubator extends \Illuminate\Database\Eloquent\Model
     {
         return $this->hasMany(ContactIncubator::class, 'profile_id', 'incubator_id');
     }
-
 }

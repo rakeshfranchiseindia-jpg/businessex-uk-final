@@ -3,11 +3,9 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Cookie;
-use Illuminate\Http\Request;
-use Illuminate\Support\Str;
 use Illuminate\View\View;
 
 class PageController extends Controller
@@ -42,11 +40,11 @@ class PageController extends Controller
             $type = str_replace('-registration', '', $routeName);
 
             return $this->render(
-                'pages.' . $type . '-registration',
+                'pages.'.$type.'-registration',
                 'registration',
                 true,
                 [
-                    'registrationProfile' => config('registration_profiles.' . $type),
+                    'registrationProfile' => config('registration_profiles.'.$type),
                     'registrationType' => $type,
                 ]
             );

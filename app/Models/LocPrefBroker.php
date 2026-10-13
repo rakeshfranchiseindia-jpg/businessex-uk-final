@@ -2,7 +2,9 @@
 
 namespace App\Models;
 
-class LocPrefBroker extends \Illuminate\Database\Eloquent\Model
+use Illuminate\Database\Eloquent\Model;
+
+class LocPrefBroker extends Model
 {
     protected $table = 'loc_pref_broker';
 
@@ -17,10 +19,8 @@ class LocPrefBroker extends \Illuminate\Database\Eloquent\Model
         'profile_status',
     ];
 
-
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id', 'user_id');
     }
-
 }

@@ -2,7 +2,9 @@
 
 namespace App\Models;
 
-class ProfileInvestor extends \Illuminate\Database\Eloquent\Model
+use Illuminate\Database\Eloquent\Model;
+
+class ProfileInvestor extends Model
 {
     protected $table = 'profile_investor';
 
@@ -67,7 +69,6 @@ class ProfileInvestor extends \Illuminate\Database\Eloquent\Model
         'last_login_at' => 'datetime',
     ];
 
-
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id', 'user_id');
@@ -87,5 +88,4 @@ class ProfileInvestor extends \Illuminate\Database\Eloquent\Model
     {
         return $this->hasMany(ContactInvestor::class, 'profile_id', 'investor_id');
     }
-
 }

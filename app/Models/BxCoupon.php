@@ -2,10 +2,11 @@
 
 namespace App\Models;
 
-class BxCoupon extends \Illuminate\Database\Eloquent\Model
+use Illuminate\Database\Eloquent\Model;
+
+class BxCoupon extends Model
 {
     protected $table = 'bx_coupon';
-
 
     protected $fillable = [
         'coupon_code',
@@ -26,5 +27,4 @@ class BxCoupon extends \Illuminate\Database\Eloquent\Model
         'start_date' => 'datetime',
         'end_date' => 'datetime',
     ];
-
 }

@@ -24,7 +24,7 @@ class MembershipPlansTableSeeder extends Seeder
             'interaction_credits' => 5,
             'instant_responses' => 5,
             'is_active' => 0,
-            'deactivated_at' => '2025-01-01 10:30:00'
+            'deactivated_at' => '2025-01-01 10:30:00',
         ]);
 
         DB::table('membership_plans')->insert([
@@ -39,7 +39,7 @@ class MembershipPlansTableSeeder extends Seeder
             'interaction_credits' => 15,
             'instant_responses' => 15,
             'is_active' => 1,
-            'deactivated_at' => '2025-02-02 10:30:00'
+            'deactivated_at' => '2025-02-02 10:30:00',
         ]);
 
         DB::table('membership_plans')->insert([
@@ -54,7 +54,7 @@ class MembershipPlansTableSeeder extends Seeder
             'interaction_credits' => 25,
             'instant_responses' => 25,
             'is_active' => 0,
-            'deactivated_at' => '2025-03-03 10:30:00'
+            'deactivated_at' => '2025-03-03 10:30:00',
         ]);
 
     }

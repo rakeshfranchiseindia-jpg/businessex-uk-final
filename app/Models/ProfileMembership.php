@@ -2,7 +2,9 @@
 
 namespace App\Models;
 
-class ProfileMembership extends \Illuminate\Database\Eloquent\Model
+use Illuminate\Database\Eloquent\Model;
+
+class ProfileMembership extends Model
 {
     protected $table = 'profile_memberships';
 
@@ -26,14 +28,16 @@ class ProfileMembership extends \Illuminate\Database\Eloquent\Model
     ];
 
     protected $casts = [
+        'user_id' => 'integer',
+        'profile_type' => 'integer',
+        'profile_id' => 'integer',
         'activation_date' => 'datetime',
         'expiry_date' => 'datetime',
+        'is_active' => 'boolean',
     ];
-
 
     public function user()
     {
-        return $this->belongsTo(User::class, 'user_id', 'user_id');
+        return $this->belongsTo(UserAccount::class, 'user_id', 'user_id');
     }
-
 }

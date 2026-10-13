@@ -17,7 +17,7 @@ class MentorCategoriesTableSeeder extends Seeder
             'mentor_category_name' => 'Sample string data',
             'category_slug' => 'sample-slug-1',
             'mentor_parent_id' => 1,
-            'mentor_category_status' => 0
+            'mentor_category_status' => 0,
         ]);
 
         DB::table('mentor_categories')->insert([
@@ -25,7 +25,7 @@ class MentorCategoriesTableSeeder extends Seeder
             'mentor_category_name' => 'Another sample entry',
             'category_slug' => 'sample-slug-2',
             'mentor_parent_id' => 2,
-            'mentor_category_status' => 1
+            'mentor_category_status' => 1,
         ]);
 
         DB::table('mentor_categories')->insert([
@@ -33,7 +33,7 @@ class MentorCategoriesTableSeeder extends Seeder
             'mentor_category_name' => 'Third sample value',
             'category_slug' => 'sample-slug-3',
             'mentor_parent_id' => 3,
-            'mentor_category_status' => 0
+            'mentor_category_status' => 0,
         ]);
 
     }

@@ -229,9 +229,9 @@ class ListingControllersTest extends TestCase
             DB::table('profile_business')->insert([
                 'business_profile_status' => 1,
                 'created_at' => now()->subDays($id),
-                'advmt_headline' => 'Extra Business ' . $id,
-                'seller_company' => 'Company ' . $id,
-                'seller_name' => 'Seller ' . $id,
+                'advmt_headline' => 'Extra Business '.$id,
+                'seller_company' => 'Company '.$id,
+                'seller_name' => 'Seller '.$id,
                 'ofc_city' => 'London',
                 'annual_sales' => 1000,
             ]);

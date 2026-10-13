@@ -27,7 +27,7 @@ class ContactBusinessTableSeeder extends Seeder
             'contact_comment' => 'Sample description text.',
             'contact_viewed' => 1,
             'contact_response' => 5,
-            'contact_status' => 0
+            'contact_status' => 0,
         ]);
 
         DB::table('contact_business')->insert([
@@ -45,7 +45,7 @@ class ContactBusinessTableSeeder extends Seeder
             'contact_comment' => 'Another sample description.',
             'contact_viewed' => 2,
             'contact_response' => 15,
-            'contact_status' => 1
+            'contact_status' => 1,
         ]);
 
         DB::table('contact_business')->insert([
@@ -63,7 +63,7 @@ class ContactBusinessTableSeeder extends Seeder
             'contact_comment' => 'Third sample description.',
             'contact_viewed' => 3,
             'contact_response' => 25,
-            'contact_status' => 0
+            'contact_status' => 0,
         ]);
 
     }

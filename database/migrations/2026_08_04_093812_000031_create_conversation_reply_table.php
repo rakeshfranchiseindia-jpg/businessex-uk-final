@@ -20,7 +20,7 @@ return new class extends Migration
             $table->integer('to_id')->nullable(false);
             $table->timestamp('timestamp')->useCurrent();
             $table->integer('request_id')->nullable(false);
-            $table->enum('readstatus', ['1','2'])->nullable(false)->default('1');
+            $table->enum('readstatus', ['1', '2'])->nullable(false)->default('1');
             $table->timestamps();
         });
 

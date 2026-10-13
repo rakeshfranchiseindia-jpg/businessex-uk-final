@@ -2,7 +2,9 @@
 
 namespace App\Models;
 
-class ContactStartup extends \Illuminate\Database\Eloquent\Model
+use Illuminate\Database\Eloquent\Model;
+
+class ContactStartup extends Model
 {
     protected $table = 'contact_startup';
 
@@ -25,10 +27,8 @@ class ContactStartup extends \Illuminate\Database\Eloquent\Model
         'contact_status',
     ];
 
-
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id', 'user_id');
     }
-
 }

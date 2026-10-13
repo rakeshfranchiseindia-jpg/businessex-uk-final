@@ -2,7 +2,9 @@
 
 namespace App\Models;
 
-class BusinessexContact extends \Illuminate\Database\Eloquent\Model
+use Illuminate\Database\Eloquent\Model;
+
+class BusinessexContact extends Model
 {
     protected $table = 'businessex_contactus';
 
@@ -14,5 +16,4 @@ class BusinessexContact extends \Illuminate\Database\Eloquent\Model
         'contact_mobile',
         'contact_comment',
     ];
-
 }

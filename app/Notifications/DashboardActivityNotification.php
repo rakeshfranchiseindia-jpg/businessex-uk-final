@@ -17,7 +17,11 @@ class DashboardActivityNotification extends Notification implements ShouldQueue
         private readonly string $message,
         private readonly string $url,
         private readonly ?int $conversationId = null,
-    ) {}
+    ) {
+        // Callers notify from inside DB transactions; queue the database row
+        // and email only once the message/proposal they announce is committed.
+        $this->afterCommit();
+    }
 
     public function via(object $notifiable): array
     {
@@ -44,7 +48,7 @@ class DashboardActivityNotification extends Notification implements ShouldQueue
             'actionUrl' => url($this->url),
         ];
 
-        return (new MailMessage())
+        return (new MailMessage)
             ->subject($this->title)
             ->view(['html' => 'emails.dashboard.activity', 'text' => 'emails.dashboard.activity-text'], $data);
     }

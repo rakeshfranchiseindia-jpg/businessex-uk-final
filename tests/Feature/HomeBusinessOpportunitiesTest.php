@@ -38,11 +38,11 @@ class HomeBusinessOpportunitiesTest extends TestCase
     {
         for ($id = 1; $id <= 15; $id++) {
             DB::table('profile_business')->insert([
-                'business_profile_str' => 'HOME-BUSINESS-' . $id,
+                'business_profile_str' => 'HOME-BUSINESS-'.$id,
                 'business_profile_status' => $id === 15 ? 0 : 1,
                 'created_at' => now()->subDays(15 - $id),
-                'advmt_headline' => 'Homepage Opportunity ' . str_pad((string) $id, 2, '0', STR_PAD_LEFT),
-                'seller_company' => 'Opportunity Company ' . $id,
+                'advmt_headline' => 'Homepage Opportunity '.str_pad((string) $id, 2, '0', STR_PAD_LEFT),
+                'seller_company' => 'Opportunity Company '.$id,
                 'industry_sector' => 'Manufacturing',
                 'inv_asking_price' => 250000 + ($id * 10000),
                 'ofc_city' => 'London',
@@ -65,7 +65,7 @@ class HomeBusinessOpportunitiesTest extends TestCase
             ->assertSee(asset('assets/img/default-business-profile.png'));
 
         for ($id = 3; $id <= 14; $id++) {
-            $response->assertSee('Homepage Opportunity ' . str_pad((string) $id, 2, '0', STR_PAD_LEFT));
+            $response->assertSee('Homepage Opportunity '.str_pad((string) $id, 2, '0', STR_PAD_LEFT));
         }
 
         $response->assertDontSee('Homepage Opportunity 01')

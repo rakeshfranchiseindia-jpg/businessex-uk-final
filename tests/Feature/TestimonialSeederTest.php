@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use Database\Seeders\TestimonialSeeder;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
@@ -35,7 +36,7 @@ class TestimonialSeederTest extends TestCase
 
     public function test_seeder_inserts_five_display_ready_testimonials_and_is_safe_to_rerun(): void
     {
-        $seeder = new \Database\Seeders\TestimonialSeeder();
+        $seeder = new TestimonialSeeder;
         $seeder->run();
 
         $this->assertDatabaseCount('testimonials', 5);

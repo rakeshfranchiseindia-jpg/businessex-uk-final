@@ -13,7 +13,7 @@ class NewsletterVerificationController extends Controller
     public function verify(Request $request, int $id, string $hash): RedirectResponse
     {
         $subscription = DB::table('businessex_newsletter')->where('newsletter_id', $id)->first();
-        abort_unless($subscription, 404);
+        abort_if($subscription === null, 404);
         abort_unless(hash_equals(sha1($subscription->email), $hash), 403);
 
         if ($subscription->status !== 'S') {

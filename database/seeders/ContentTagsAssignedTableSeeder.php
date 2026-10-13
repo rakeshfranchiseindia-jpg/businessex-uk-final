@@ -16,21 +16,21 @@ class ContentTagsAssignedTableSeeder extends Seeder
             'assigned_id' => 1,
             'content_type' => 1,
             'content_id' => 2,
-            'tag_id' => 1
+            'tag_id' => 1,
         ]);
 
         DB::table('content_tags_assigned')->insert([
             'assigned_id' => 2,
             'content_type' => 2,
             'content_id' => 2,
-            'tag_id' => 2
+            'tag_id' => 2,
         ]);
 
         DB::table('content_tags_assigned')->insert([
             'assigned_id' => 3,
             'content_type' => 1,
             'content_id' => 3,
-            'tag_id' => 2
+            'tag_id' => 2,
         ]);
 
     }

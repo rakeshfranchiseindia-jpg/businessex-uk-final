@@ -19,7 +19,7 @@ class ConversationReplyTableSeeder extends Seeder
             'to_id' => 1,
             'timestamp' => date('Y-m-d H:i:s', 1720000000),
             'request_id' => 1,
-            'readstatus' => '1'
+            'readstatus' => '1',
         ]);
 
         DB::table('conversation_reply')->insert([
@@ -29,7 +29,7 @@ class ConversationReplyTableSeeder extends Seeder
             'to_id' => 2,
             'timestamp' => date('Y-m-d H:i:s', 1720000000),
             'request_id' => 2,
-            'readstatus' => '2'
+            'readstatus' => '2',
         ]);
 
         DB::table('conversation_reply')->insert([
@@ -39,7 +39,7 @@ class ConversationReplyTableSeeder extends Seeder
             'to_id' => 3,
             'timestamp' => date('Y-m-d H:i:s', 1720000000),
             'request_id' => 3,
-            'readstatus' => '1'
+            'readstatus' => '1',
         ]);
 
     }

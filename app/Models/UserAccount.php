@@ -4,8 +4,9 @@ namespace App\Models;
 
 use App\Mail\ResetAccountPasswordEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Support\Facades\Mail;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
 
 class UserAccount extends Authenticatable
 {
@@ -22,7 +23,6 @@ class UserAccount extends Authenticatable
         'password',
         'mobile',
         'company_name',
-        'is_active',
         'reg_profile',
     ];
 
@@ -43,6 +43,22 @@ class UserAccount extends Authenticatable
     public function hasVerifiedEmail(): bool
     {
         return $this->email_verified_at !== null;
+    }
+
+    /**
+     * Ends every stored session for this account (all devices/browsers).
+     * Only the database session driver keeps sessions addressable by user.
+     */
+    public function terminateSessions(): void
+    {
+        if (config('session.driver') !== 'database') {
+            return;
+        }
+
+        DB::connection(config('session.connection'))
+            ->table(config('session.table', 'sessions'))
+            ->where('user_id', $this->getKey())
+            ->delete();
     }
 
     public function sendPasswordResetNotification($token): void

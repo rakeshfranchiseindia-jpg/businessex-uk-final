@@ -20,7 +20,7 @@ class BxDfpBannerTableSeeder extends Seeder
             'location' => 1,
             'width' => 300,
             'height' => 250,
-            'is_active' => 0
+            'is_active' => 0,
         ]);
 
         DB::table('bx_dfp_banner')->insert([
@@ -31,7 +31,7 @@ class BxDfpBannerTableSeeder extends Seeder
             'location' => 2,
             'width' => 350,
             'height' => 275,
-            'is_active' => 1
+            'is_active' => 1,
         ]);
 
         DB::table('bx_dfp_banner')->insert([
@@ -42,7 +42,7 @@ class BxDfpBannerTableSeeder extends Seeder
             'location' => 3,
             'width' => 400,
             'height' => 300,
-            'is_active' => 0
+            'is_active' => 0,
         ]);
 
     }

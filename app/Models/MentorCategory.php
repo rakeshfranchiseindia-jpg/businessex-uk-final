@@ -2,7 +2,9 @@
 
 namespace App\Models;
 
-class MentorCategory extends \Illuminate\Database\Eloquent\Model
+use Illuminate\Database\Eloquent\Model;
+
+class MentorCategory extends Model
 {
     protected $table = 'mentor_categories';
 
@@ -15,10 +17,8 @@ class MentorCategory extends \Illuminate\Database\Eloquent\Model
         'mentor_category_status',
     ];
 
-
     public function children()
     {
         return $this->hasMany(MentorCategory::class, 'mentor_parent_id', 'mentor_category_id');
     }
-
 }

@@ -21,8 +21,7 @@ class ConversationMessageSent implements ShouldBroadcastNow
         public readonly string $senderName,
         public readonly string $message,
         public readonly string $createdAt,
-    ) {
-    }
+    ) {}
 
     public function broadcastOn(): array
     {

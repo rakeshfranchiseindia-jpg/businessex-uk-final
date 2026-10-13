@@ -2,7 +2,9 @@
 
 namespace App\Models;
 
-class ContentTag extends \Illuminate\Database\Eloquent\Model
+use Illuminate\Database\Eloquent\Model;
+
+class ContentTag extends Model
 {
     protected $table = 'content_tags';
 
@@ -14,10 +16,8 @@ class ContentTag extends \Illuminate\Database\Eloquent\Model
         'tag_status',
     ];
 
-
     public function assignments()
     {
         return $this->hasMany(ContentTagAssigned::class, 'tag_id', 'tag_id');
     }
-
 }

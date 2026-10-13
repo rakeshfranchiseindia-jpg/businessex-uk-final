@@ -60,7 +60,7 @@ class ProfileInvestorTableSeeder extends Seeder
             'activated_by' => 1,
             'activated_at' => '2025-01-01 10:30:00',
             'last_login_at' => '2025-01-01 10:30:00',
-            'reg_source' => 1
+            'reg_source' => 1,
         ]);
 
         DB::table('profile_investor')->insert([
@@ -111,7 +111,7 @@ class ProfileInvestorTableSeeder extends Seeder
             'activated_by' => 2,
             'activated_at' => '2025-02-02 10:30:00',
             'last_login_at' => '2025-02-02 10:30:00',
-            'reg_source' => 2
+            'reg_source' => 2,
         ]);
 
         DB::table('profile_investor')->insert([
@@ -162,7 +162,7 @@ class ProfileInvestorTableSeeder extends Seeder
             'activated_by' => 3,
             'activated_at' => '2025-03-03 10:30:00',
             'last_login_at' => '2025-03-03 10:30:00',
-            'reg_source' => 3
+            'reg_source' => 3,
         ]);
 
     }

@@ -2,16 +2,19 @@
 
 namespace Tests\Feature;
 
+use App\Mail\ResetAccountPasswordEmail;
+use App\Mail\VerifyAccountEmail;
 use App\Models\UserAccount;
+use App\Support\PublicContentCache;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Schema;
-use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
-use App\Mail\VerifyAccountEmail;
-use App\Mail\ResetAccountPasswordEmail;
+use Illuminate\Support\Facades\URL;
 use Tests\TestCase;
 
 class AuthenticationTest extends TestCase
@@ -43,6 +46,15 @@ class AuthenticationTest extends TestCase
             $table->string('token');
             $table->timestamp('created_at')->nullable();
         });
+
+        Schema::create('bx_cities', function (Blueprint $table): void {
+            $table->increments('id');
+            $table->string('city', 55);
+            $table->string('state', 15)->default('');
+            $table->integer('country')->default(5);
+            $table->timestamps();
+        });
+        DB::table('bx_cities')->insert(['city' => 'London', 'state' => 'England']);
 
         Schema::create('profile_media', function (Blueprint $table): void {
             $table->id();
@@ -110,6 +122,7 @@ class AuthenticationTest extends TestCase
             $table->string('emp_count')->nullable();
             $table->string('entity_type')->nullable();
             $table->string('business_type')->nullable();
+            $table->string('ofc_city')->nullable();
             $table->string('industry_sector')->nullable();
             $table->string('mentor_support_field')->nullable();
             $table->string('support_field')->nullable();
@@ -142,8 +155,8 @@ class AuthenticationTest extends TestCase
             $table->tinyInteger('inv_profile_status');
             $table->tinyInteger('membership_paid')->default(0);
             $table->tinyInteger('membership_plan')->default(0);
-            $table->string('company_logo_path')->nullable();
             $table->string('inv_profile_pic_path')->nullable();
+            $table->string('inv_doc_path')->nullable();
             $table->timestamps();
         });
 
@@ -189,6 +202,7 @@ class AuthenticationTest extends TestCase
         Schema::dropIfExists('user_profiles');
         Schema::dropIfExists('user_account');
         Schema::dropIfExists('password_reset_tokens');
+        Schema::dropIfExists('bx_cities');
         Schema::dropIfExists('profile_media');
 
         parent::tearDown();
@@ -198,7 +212,7 @@ class AuthenticationTest extends TestCase
     {
         Mail::fake();
         $payload = $this->mentorRegistrationPayload();
-        $payload['mentor_email'] = 'New.Member@Example.com';
+        $payload['mentor_email'] = 'New.Member@example.org';
 
         $this->post(route('registration.store', 'mentor'), $payload)
             ->assertRedirect(route('mentor-registration'))
@@ -207,22 +221,21 @@ class AuthenticationTest extends TestCase
             ->assertOk()
             ->assertSee('Please check your inbox and verify your email address before signing in.');
 
-        $account = DB::table('user_account')->where('email', 'new.member@example.com')->first();
+        $account = DB::table('user_account')->where('email', 'new.member@example.org')->first();
         $this->assertNotNull($account);
         $this->assertNull($account->password);
         $this->assertSame('mentor', $account->reg_profile);
         $this->assertSame(1, (int) $account->is_active);
         $this->assertNull($account->email_verified_at);
         $this->assertGuest();
-        Mail::assertQueued(VerifyAccountEmail::class, fn (VerifyAccountEmail $mail): bool =>
-            $mail->hasTo('new.member@example.com')
+        Mail::assertQueued(VerifyAccountEmail::class, fn (VerifyAccountEmail $mail): bool => $mail->hasTo('new.member@example.org')
             && str_contains($mail->verificationUrl, '/email/verify/')
             && str_contains($mail->render(), 'Verify email address')
         );
         $this->assertDatabaseHas('profile_mentors', [
             'user_id' => $account->user_id,
             'mentor_name' => 'Taylor Mentor',
-            'mentor_email' => 'new.member@example.com',
+            'mentor_email' => 'new.member@example.org',
             'mentor_profile_status' => 0,
         ]);
         $this->assertDatabaseHas('user_profiles', [
@@ -244,9 +257,9 @@ class AuthenticationTest extends TestCase
         ];
 
         foreach ($profiles as $type => [$table, $nameColumn, $emailColumn, $mobileColumn, $companyColumn, $profileType]) {
-            $email = "quick-{$type}@example.com";
-            $name = 'Quick ' . ucfirst($type);
-            $company = 'Quick ' . ucfirst($type) . ' Company';
+            $email = "quick-{$type}@example.org";
+            $name = 'Quick '.ucfirst($type);
+            $company = 'Quick '.ucfirst($type).' Company';
 
             $this->post(route('registration.quick-store'), [
                 '_quick_registration' => '1',
@@ -289,7 +302,7 @@ class AuthenticationTest extends TestCase
         $accountId = DB::table('user_account')->insertGetId([
             'user_rand_id' => 'TESTACCOUNT000000001',
             'name' => 'Existing Member',
-            'email' => 'existing@example.com',
+            'email' => 'existing@example.org',
             'password' => Hash::make('ExistingPass123'),
             'company_name' => 'Existing Company',
             'is_active' => 1,
@@ -301,7 +314,7 @@ class AuthenticationTest extends TestCase
         ]);
 
         $this->post(route('login.store'), [
-            'email' => 'existing@example.com',
+            'email' => 'existing@example.org',
             'password' => 'ExistingPass123',
         ])->assertRedirect(route('dashboard.index'));
 
@@ -314,7 +327,7 @@ class AuthenticationTest extends TestCase
     public function test_invalid_login_does_not_authenticate(): void
     {
         $this->post(route('login.store'), [
-            'email' => 'unknown@example.com',
+            'email' => 'unknown@example.org',
             'password' => 'WrongPass123',
         ])->assertSessionHasErrors('email');
 
@@ -326,7 +339,7 @@ class AuthenticationTest extends TestCase
         $accountId = DB::table('user_account')->insertGetId([
             'user_rand_id' => 'TESTUNVERIFIED000001',
             'name' => 'Unverified Member',
-            'email' => 'unverified@example.com',
+            'email' => 'unverified@example.org',
             'password' => Hash::make('ExistingPass123'),
             'company_name' => 'Unverified Company',
             'is_active' => 1,
@@ -338,7 +351,7 @@ class AuthenticationTest extends TestCase
         ]);
 
         $this->post(route('login.store'), [
-            'email' => 'unverified@example.com',
+            'email' => 'unverified@example.org',
             'password' => 'ExistingPass123',
         ])->assertSessionHasErrors('email');
 
@@ -351,7 +364,7 @@ class AuthenticationTest extends TestCase
         $accountId = DB::table('user_account')->insertGetId([
             'user_rand_id' => 'TESTVERIFY0000000001',
             'name' => 'Verification Member',
-            'email' => 'verify@example.com',
+            'email' => 'verify@example.org',
             'password' => null,
             'company_name' => 'Verification Company',
             'is_active' => 1,
@@ -361,20 +374,20 @@ class AuthenticationTest extends TestCase
             'created_at' => now(),
             'updated_at' => now(),
         ]);
-        $url = \Illuminate\Support\Facades\URL::temporarySignedRoute(
+        $url = URL::temporarySignedRoute(
             'verification.verify',
             now()->addMinutes(60),
-            ['id' => $accountId, 'hash' => sha1('verify@example.com')]
+            ['id' => $accountId, 'hash' => sha1('verify@example.org')]
         );
 
         $verificationResponse = $this->get($url)
             ->assertRedirect();
 
         $this->assertNotNull(DB::table('user_account')->where('user_id', $accountId)->value('email_verified_at'));
-        $this->get($url . '&extra=invalid')->assertForbidden();
+        $this->get($url.'&extra=invalid')->assertForbidden();
 
         $passwordSetupUrl = $verificationResponse->headers->get('Location');
-        $this->assertStringContainsString('/account/set-password/' . $accountId . '/', $passwordSetupUrl);
+        $this->assertStringContainsString('/account/set-password/'.$accountId.'/', $passwordSetupUrl);
         $this->get($passwordSetupUrl)
             ->assertOk()
             ->assertSee('Set Your Password')
@@ -397,7 +410,7 @@ class AuthenticationTest extends TestCase
         DB::table('user_account')->insert([
             'user_rand_id' => 'TESTRESEND0000000001',
             'name' => 'Resend Member',
-            'email' => 'resend@example.com',
+            'email' => 'resend@example.org',
             'password' => Hash::make('ExistingPass123'),
             'company_name' => 'Resend Company',
             'is_active' => 1,
@@ -408,12 +421,11 @@ class AuthenticationTest extends TestCase
             'updated_at' => now(),
         ]);
 
-        $this->post(route('verification.resend'), ['email' => 'RESEND@example.com'])
+        $this->post(route('verification.resend'), ['email' => 'RESEND@example.org'])
             ->assertRedirect(route('login'))
             ->assertSessionHas('verification_notice');
 
-        Mail::assertQueued(VerifyAccountEmail::class, fn (VerifyAccountEmail $mail): bool =>
-            $mail->hasTo('resend@example.com')
+        Mail::assertQueued(VerifyAccountEmail::class, fn (VerifyAccountEmail $mail): bool => $mail->hasTo('resend@example.org')
         );
     }
 
@@ -423,7 +435,7 @@ class AuthenticationTest extends TestCase
         $accountId = DB::table('user_account')->insertGetId([
             'user_rand_id' => 'TESTPASSRESET000001',
             'name' => 'Password Reset Member',
-            'email' => 'password-reset@example.com',
+            'email' => 'password-reset@example.org',
             'password' => Hash::make('OriginalPass123'),
             'company_name' => 'Password Reset Company',
             'is_active' => 1,
@@ -439,13 +451,12 @@ class AuthenticationTest extends TestCase
             ->assertSee(route('password.email'), false)
             ->assertSee('Send Reset Link');
 
-        $this->post(route('password.email'), ['email' => 'PASSWORD-RESET@example.com'])
+        $this->post(route('password.email'), ['email' => 'PASSWORD-RESET@example.org'])
             ->assertRedirect(route('forgot-password'))
             ->assertSessionHas('status', 'If an account exists for that email address, a password reset link will be sent shortly.');
 
-        $this->assertDatabaseHas('password_reset_tokens', ['email' => 'password-reset@example.com']);
-        Mail::assertQueued(ResetAccountPasswordEmail::class, fn (ResetAccountPasswordEmail $mail): bool =>
-            $mail->hasTo('password-reset@example.com')
+        $this->assertDatabaseHas('password_reset_tokens', ['email' => 'password-reset@example.org']);
+        Mail::assertQueued(ResetAccountPasswordEmail::class, fn (ResetAccountPasswordEmail $mail): bool => $mail->hasTo('password-reset@example.org')
             && str_contains($mail->render(), '/reset-password/')
         );
         $queuedMail = Mail::queued(ResetAccountPasswordEmail::class)->first();
@@ -453,7 +464,7 @@ class AuthenticationTest extends TestCase
 
         $resetUrl = route('reset-password', [
             'token' => $queuedMail->token,
-            'email' => 'password-reset@example.com',
+            'email' => 'password-reset@example.org',
         ]);
         $this->get($resetUrl)
             ->assertOk()
@@ -462,7 +473,7 @@ class AuthenticationTest extends TestCase
 
         $this->post(route('password.update'), [
             'token' => $queuedMail->token,
-            'email' => 'password-reset@example.com',
+            'email' => 'password-reset@example.org',
             'password' => 'NewStrongPass456',
             'password_confirmation' => 'NewStrongPass456',
         ])
@@ -473,17 +484,17 @@ class AuthenticationTest extends TestCase
             'NewStrongPass456',
             DB::table('user_account')->where('user_id', $accountId)->value('password')
         ));
-        $this->assertDatabaseMissing('password_reset_tokens', ['email' => 'password-reset@example.com']);
+        $this->assertDatabaseMissing('password_reset_tokens', ['email' => 'password-reset@example.org']);
 
         $this->post(route('password.update'), [
             'token' => $queuedMail->token,
-            'email' => 'password-reset@example.com',
+            'email' => 'password-reset@example.org',
             'password' => 'AnotherStrongPass789',
             'password_confirmation' => 'AnotherStrongPass789',
         ])->assertSessionHasErrors('email');
 
         $this->post(route('login.store'), [
-            'email' => 'password-reset@example.com',
+            'email' => 'password-reset@example.org',
             'password' => 'NewStrongPass456',
         ])->assertRedirect(route('dashboard.index'));
     }
@@ -492,19 +503,19 @@ class AuthenticationTest extends TestCase
     {
         Mail::fake();
         $this->from(route('forgot-password'))
-            ->post(route('password.email'), ['email' => 'unknown@example.com'])
+            ->post(route('password.email'), ['email' => 'unknown@example.org'])
             ->assertRedirect(route('forgot-password'))
             ->assertSessionHas('status', 'If an account exists for that email address, a password reset link will be sent shortly.');
         Mail::assertNothingQueued();
 
         $this->get(route('reset-password', [
             'token' => 'not-a-valid-token',
-            'email' => 'unknown@example.com',
+            'email' => 'unknown@example.org',
         ]))->assertOk();
 
         $this->post(route('password.update'), [
             'token' => 'not-a-valid-token',
-            'email' => 'unknown@example.com',
+            'email' => 'unknown@example.org',
             'password' => 'NewStrongPass456',
             'password_confirmation' => 'NewStrongPass456',
         ])->assertSessionHasErrors('email');
@@ -515,7 +526,7 @@ class AuthenticationTest extends TestCase
         DB::table('user_account')->insert([
             'user_rand_id' => 'TESTACCOUNT000000002',
             'name' => 'Existing Member',
-            'email' => 'existing@example.com',
+            'email' => 'existing@example.org',
             'password' => Hash::make('ExistingPass123'),
             'company_name' => 'Existing Company',
             'is_active' => 1,
@@ -526,7 +537,7 @@ class AuthenticationTest extends TestCase
         ]);
 
         $payload = $this->mentorRegistrationPayload();
-        $payload['mentor_email'] = 'existing@example.com';
+        $payload['mentor_email'] = 'existing@example.org';
         $this->post(route('registration.store', 'mentor'), $payload)
             ->assertSessionHasErrors('mentor_email');
 
@@ -546,12 +557,14 @@ class AuthenticationTest extends TestCase
         ];
 
         foreach ($types as $type => $legacyType) {
-            $email = $type . '@example.com';
+            $email = $type.'@example.org';
             $payload = $this->registrationPayload($type, $email);
+            Cache::put(PublicContentCache::HOME_KEY, ['stale' => true]);
 
             $this->post(route('registration.store', $type), $payload)
                 ->assertRedirect(route("{$type}-registration"))
                 ->assertSessionHas('verification_notice');
+            $this->assertFalse(Cache::has(PublicContentCache::HOME_KEY), 'A new profile must refresh the home page cache.');
 
             $account = DB::table('user_account')->where('email', $email)->first();
             $this->assertNotNull($account);
@@ -569,12 +582,12 @@ class AuthenticationTest extends TestCase
         Mail::fake();
         Storage::fake('s3');
         config(['filesystems.cdn_url' => 'https://cdn.example.test']);
-        $payload = $this->registrationPayload('business', 'owner@example.com', [
+        $payload = $this->registrationPayload('business', 'owner@example.org', [
             'seller_name' => 'Morgan Owner',
             'seller_company' => 'Example Ltd',
             'contact_name' => 'Avery Contact',
             'contact_designation' => 'Finance Manager',
-            'contact_email' => 'avery@example.com',
+            'contact_email' => 'avery@example.org',
             'annual_sales' => '120000.50',
             'mentor_support_field' => 'Sales mentoring',
             'support_field' => 'Expansion capital',
@@ -585,7 +598,7 @@ class AuthenticationTest extends TestCase
             ->assertRedirect(route('business-registration'))
             ->assertSessionHas('verification_notice');
 
-        $account = DB::table('user_account')->where('email', 'owner@example.com')->first();
+        $account = DB::table('user_account')->where('email', 'owner@example.org')->first();
         $profile = DB::table('profile_business')->where('user_id', $account->user_id)->first();
         $this->assertSame('Example Ltd', $profile->seller_company);
         $this->assertEquals(120000.5, $profile->annual_sales);
@@ -605,11 +618,10 @@ class AuthenticationTest extends TestCase
             'user_id' => $account->user_id,
             'mgmt_name' => 'Avery Contact',
             'mgmt_designation' => 'Finance Manager',
-            'mgmt_email' => 'avery@example.com',
+            'mgmt_email' => 'avery@example.org',
         ]);
         $this->assertGuest();
-        Mail::assertQueued(VerifyAccountEmail::class, fn (VerifyAccountEmail $mail): bool =>
-            $mail->hasTo('owner@example.com')
+        Mail::assertQueued(VerifyAccountEmail::class, fn (VerifyAccountEmail $mail): bool => $mail->hasTo('owner@example.org')
         );
     }
 
@@ -618,7 +630,7 @@ class AuthenticationTest extends TestCase
         $userId = DB::table('user_account')->insertGetId([
             'user_rand_id' => 'EXISTINGPROFILE0001',
             'name' => 'Existing Account Owner',
-            'email' => 'existing-account@example.com',
+            'email' => 'existing-account@example.org',
             'password' => Hash::make('AccountPass123!'),
             'mobile' => '+447700900123',
             'company_name' => 'Existing Account Ltd',
@@ -627,7 +639,7 @@ class AuthenticationTest extends TestCase
             'created_at' => now(),
             'updated_at' => now(),
         ]);
-        $payload = $this->registrationPayload('business', 'existing-account@example.com', [
+        $payload = $this->registrationPayload('business', 'existing-account@example.org', [
             'seller_name' => 'Existing Account Owner',
             'seller_company' => 'New Business Profile Ltd',
         ]);
@@ -635,14 +647,14 @@ class AuthenticationTest extends TestCase
         $this->actingAs(UserAccount::query()->findOrFail($userId))
             ->get(route('dashboard.profiles.create.form', 'business'))
             ->assertOk()
-            ->assertSee('value="Existing Account Owner"', false)
-            ->assertSee('value="existing-account@example.com"', false);
+            ->assertDontSee('value="Existing Account Owner"', false)
+            ->assertDontSee('value="existing-account@example.org"', false);
 
         $this->post(route('dashboard.profiles.store', 'business'), $payload)
             ->assertRedirect(route('dashboard.index'))
             ->assertSessionHas('status', 'Business profile created successfully.');
 
-        $this->assertSame(1, DB::table('user_account')->where('email', 'existing-account@example.com')->count());
+        $this->assertSame(1, DB::table('user_account')->where('email', 'existing-account@example.org')->count());
         $profile = DB::table('profile_business')
             ->where('user_id', $userId)
             ->where('seller_company', 'New Business Profile Ltd')
@@ -664,27 +676,24 @@ class AuthenticationTest extends TestCase
         Storage::fake('s3');
         config(['filesystems.cdn_url' => 'https://cdn.example.test']);
 
-        $business = $this->registrationPayload('business', 'media-business@example.com', [
+        $business = $this->registrationPayload('business', 'media-business@example.org', [
             'business_photo_1' => UploadedFile::fake()->image('business.png'),
             'business_document_1' => UploadedFile::fake()->create('business-proof.pdf', 20, 'application/pdf'),
         ]);
         $this->post(route('business-profile.store'), $business)->assertRedirect(route('business-registration'));
 
-        $investor = $this->registrationPayload('investor', 'media-investor@example.com', [
-            'company_logo' => UploadedFile::fake()->image('investor-logo.png'),
-            'profile_pictures' => [
-                UploadedFile::fake()->image('investor-one.png'),
-                UploadedFile::fake()->image('investor-two.png'),
-            ],
+        $investor = $this->registrationPayload('investor', 'media-investor@example.org', [
+            'investor_photo' => UploadedFile::fake()->image('investor-photo.png'),
+            'investor_document' => UploadedFile::fake()->create('investor-brief.pdf', 20, 'application/pdf'),
         ]);
         $this->post(route('investor-profile.store'), $investor)->assertRedirect(route('investor-registration'));
 
-        $mentor = $this->registrationPayload('mentor', 'media-mentor@example.com', [
+        $mentor = $this->registrationPayload('mentor', 'media-mentor@example.org', [
             'mentor_profile_image' => UploadedFile::fake()->image('mentor.png'),
         ]);
         $this->post(route('mentor-profile.store'), $mentor)->assertRedirect(route('mentor-registration'));
 
-        $startup = $this->registrationPayload('startup', 'media-startup@example.com', [
+        $startup = $this->registrationPayload('startup', 'media-startup@example.org', [
             'incorporation_certificate' => UploadedFile::fake()->create('certificate.pdf', 20, 'application/pdf'),
             'startup_photo_1' => UploadedFile::fake()->image('startup.png'),
             'startup_document_1' => UploadedFile::fake()->create('startup-plan.pdf', 20, 'application/pdf'),
@@ -705,16 +714,15 @@ class AuthenticationTest extends TestCase
         ]);
         $this->assertDatabaseHas('profile_media', [
             'profile_type' => 'investor',
-            'field_name' => 'company_logo',
+            'field_name' => 'investor_photo',
             'media_type' => 'image',
             'is_public' => 1,
         ]);
         $this->assertDatabaseHas('profile_media', [
             'profile_type' => 'investor',
-            'field_name' => 'profile_pictures',
-            'file_index' => 1,
-            'media_type' => 'image',
-            'is_public' => 1,
+            'field_name' => 'investor_document',
+            'media_type' => 'document',
+            'is_public' => 0,
         ]);
         $this->assertDatabaseHas('profile_media', [
             'profile_type' => 'mentor',
@@ -736,7 +744,7 @@ class AuthenticationTest extends TestCase
         ]);
 
         $allMedia = DB::table('profile_media')->get();
-        $this->assertCount(9, $allMedia);
+        $this->assertCount(8, $allMedia);
         foreach ($allMedia as $media) {
             $directory = $media->media_type === 'image' ? 'images' : 'documents';
             $this->assertStringStartsWith(
@@ -745,19 +753,19 @@ class AuthenticationTest extends TestCase
             );
             if ($media->media_type === 'image') {
                 $this->assertStringStartsWith(
-                    'https://cdn.example.test/' . $media->object_key,
+                    'https://cdn.example.test/'.$media->object_key,
                     $media->url
                 );
             } else {
                 $this->assertStringContainsString(
-                    '/profile-media/' . $media->id . '/download',
+                    '/profile-media/'.$media->id.'/download',
                     $media->url
                 );
             }
         }
 
         $businessProfile = DB::table('profile_business')
-            ->where('seller_email', 'media-business@example.com')
+            ->where('seller_email', 'media-business@example.org')
             ->first();
         $businessImage = DB::table('profile_media')
             ->where('profile_type', 'business')
@@ -781,28 +789,42 @@ class AuthenticationTest extends TestCase
             ->get($businessDocument->url)
             ->assertRedirect();
         $this->actingAs(UserAccount::query()->findOrFail(
-            DB::table('user_account')->where('email', 'media-mentor@example.com')->value('user_id')
+            DB::table('user_account')->where('email', 'media-mentor@example.org')->value('user_id')
         ))->get($businessDocument->url)->assertForbidden();
 
         $investorProfile = DB::table('profile_investor')
-            ->where('inv_email', 'media-investor@example.com')
+            ->where('inv_email', 'media-investor@example.org')
             ->first();
         $mentorProfile = DB::table('profile_mentors')
-            ->where('mentor_email', 'media-mentor@example.com')
+            ->where('mentor_email', 'media-mentor@example.org')
             ->first();
         $startupProfile = DB::table('profile_startups')
-            ->where('startup_email', 'media-startup@example.com')
+            ->where('startup_email', 'media-startup@example.org')
             ->first();
-        $this->assertStringStartsWith('https://cdn.example.test/profiles/investor/images/', $investorProfile->company_logo_path);
         $this->assertStringStartsWith('https://cdn.example.test/profiles/investor/images/', $investorProfile->inv_profile_pic_path);
+        $this->assertStringContainsString('/profile-media/', $investorProfile->inv_doc_path);
         $this->assertStringStartsWith('https://cdn.example.test/profiles/mentor/images/', $mentorProfile->mentor_profile_pic);
         $this->assertStringContainsString('/profile-media/', $startupProfile->startup_doc_path);
         $this->assertStringStartsWith('https://cdn.example.test/profiles/startup/images/', $startupProfile->startup_prof_pic);
     }
 
+    public function test_full_registration_rejects_placeholder_email_domains_and_non_uk_mobiles(): void
+    {
+        $payload = $this->mentorRegistrationPayload();
+        $payload['mentor_email'] = 'someone@example.com';
+        $payload['mentor_mobile'] = '+441234567890';
+
+        $this->from(route('mentor-registration'))
+            ->post(route('registration.store', 'mentor'), $payload)
+            ->assertRedirect(route('mentor-registration'))
+            ->assertSessionHasErrors(['mentor_email', 'mentor_mobile']);
+
+        $this->assertDatabaseCount('user_account', 0);
+    }
+
     public function test_business_registration_returns_field_errors_for_invalid_required_and_numeric_fields(): void
     {
-        $payload = $this->registrationPayload('business', 'owner@example.com', [
+        $payload = $this->registrationPayload('business', 'owner@example.org', [
             'seller_name' => '',
             'annual_sales' => '-25',
         ]);
@@ -817,7 +839,7 @@ class AuthenticationTest extends TestCase
     public function test_business_registration_rejects_an_attachment_with_an_unapproved_type(): void
     {
         Storage::fake('s3');
-        $payload = $this->registrationPayload('business', 'owner@example.com', [
+        $payload = $this->registrationPayload('business', 'owner@example.org', [
             'business_photo_1' => UploadedFile::fake()->create('not-an-image.txt', 10),
         ]);
 
@@ -875,10 +897,10 @@ class AuthenticationTest extends TestCase
 
     private function mentorRegistrationPayload(): array
     {
-        return $this->registrationPayload('mentor', 'taylor@example.com', [
+        return $this->registrationPayload('mentor', 'taylor@example.org', [
             'mentor_name' => 'Taylor Mentor',
-            'mentor_email' => 'taylor@example.com',
-            'mentor_mobile' => '+441234567890',
+            'mentor_email' => 'taylor@example.org',
+            'mentor_mobile' => '07700900123',
             'mentor_location' => 'London',
             'mentor_adv_headline' => 'Experienced business mentor',
             'mentor_occupation' => 'Corporate Professional',
@@ -892,13 +914,11 @@ class AuthenticationTest extends TestCase
 
         foreach ($profile['steps'] as $step) {
             foreach ($step['fields'] as $field) {
-                if (empty($field['required']) || !isset($field['name']) || isset($payload[$field['name']])) {
+                if (empty($field['required']) || ! isset($field['name']) || isset($payload[$field['name']])) {
                     continue;
                 }
 
-                $payload[$field['name']] = ($field['type'] ?? null) === 'select'
-                    ? (string) $field['options'][0]
-                    : 'Test value';
+                $payload[$field['name']] = $this->validFieldValue($field);
             }
         }
 
@@ -911,5 +931,24 @@ class AuthenticationTest extends TestCase
         $payload[$emailField] = $email;
 
         return $payload;
+    }
+
+    /**
+     * A value that passes AuthController::registrationRules() for the field.
+     */
+    private function validFieldValue(array $field): string
+    {
+        $name = $field['name'];
+
+        return match (true) {
+            ($field['type'] ?? null) === 'select' => (string) $field['options'][0],
+            ($field['type'] ?? null) === 'tel' => '07700900123',
+            ($field['type'] ?? null) === 'email' => 'contact@example.org',
+            ($field['type'] ?? null) === 'url' => 'https://example.com',
+            ($field['type'] ?? null) === 'number' => '100',
+            str_contains($name, 'pincode') || str_contains($name, 'postcode') => 'SW1A 1AA',
+            (bool) preg_match('/\b(city|location|town)\b|_(city|location|town)\b/i', $name) => 'London',
+            default => 'Test value',
+        };
     }
 }

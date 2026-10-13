@@ -2,10 +2,11 @@
 
 namespace App\Models;
 
-class Job extends \Illuminate\Database\Eloquent\Model
+use Illuminate\Database\Eloquent\Model;
+
+class Job extends Model
 {
     protected $table = 'jobs';
-
 
     protected $fillable = [
         'queue',
@@ -14,5 +15,4 @@ class Job extends \Illuminate\Database\Eloquent\Model
         'reserved_at',
         'available_at',
     ];
-
 }
