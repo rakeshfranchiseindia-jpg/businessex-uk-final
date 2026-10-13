@@ -16,8 +16,8 @@ Route::prefix('dashboard')
         Route::get('/password', 'password')->name('password');
         Route::put('/password', 'updatePassword')->name('password.update');
         Route::get('/my-plan', 'myPlan')->name('my-plan');
-        Route::post('/my-plan/payment/initiate', [PricingPaymentController::class, 'initiateUpgrade'])->name('my-plan.payment.initiate');
-        Route::post('/my-plan/payment/verify', [PricingPaymentController::class, 'verifyUpgrade'])->name('my-plan.payment.verify');
+        Route::post('/my-plan/payment/initiate', [PricingPaymentController::class, 'initiateUpgrade'])->middleware('throttle:10,1')->name('my-plan.payment.initiate');
+        Route::post('/my-plan/payment/verify', [PricingPaymentController::class, 'verifyUpgrade'])->middleware('throttle:10,1')->name('my-plan.payment.verify');
         Route::get('/activity', 'activity')->name('activity');
         Route::post('/notifications/read-all', 'markNotificationsRead')->name('notifications.read-all');
         Route::post('/notifications/{notification}/read', 'markNotificationRead')->name('notifications.read');

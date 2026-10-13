@@ -19,6 +19,7 @@ use App\Http\Controllers\PasswordResetController;
 use App\Http\Controllers\PricingPaymentController;
 use App\Http\Controllers\ProfileContactController;
 use App\Http\Controllers\ProfileMediaController;
+use App\Http\Controllers\RazorpayWebhookController;
 use App\Http\Controllers\StartupListingController;
 use App\Http\Controllers\StartupProfileController;
 use App\Http\Controllers\StaticPageController;
@@ -153,3 +154,6 @@ Route::post('/pricing/payment/initiate', [PricingPaymentController::class, 'init
 Route::post('/pricing/payment/verify', [PricingPaymentController::class, 'verify'])
     ->middleware('throttle:10,1')
     ->name('pricing.payment.verify');
+Route::post('/webhooks/razorpay', RazorpayWebhookController::class)
+    ->middleware('throttle:120,1')
+    ->name('webhooks.razorpay');

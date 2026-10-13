@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\UserAccount;
+use App\Services\Payments\MembershipPaymentService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
@@ -281,14 +282,13 @@ class AuthController extends Controller
 
                 $paymentOrderNo = request()->string('payment_order_no')->trim()->toString();
                 if ($paymentOrderNo !== '') {
-                    PricingPaymentController::claimForProfile(
+                    app(MembershipPaymentService::class)->claimForProfile(
                         $paymentOrderNo,
                         $type,
-                        $profile['type'],
-                        $profile['table'],
-                        $profile['id'],
                         (int) $profileId,
-                        (int) $userId
+                        (int) $userId,
+                        in_array($paymentOrderNo, (array) session(PricingPaymentController::SESSION_VERIFIED_ORDERS, []), true),
+                        (string) ($authenticatedAccount?->email ?? $email)
                     );
                 }
 
