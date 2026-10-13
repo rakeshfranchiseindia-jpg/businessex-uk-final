@@ -354,7 +354,7 @@ BusinessX connects businesses, startups, investors and mentors.
     .cta-banner h3 { font-size: 22px; font-weight: 700; color: var(--white); margin-bottom: 4px; }
     .cta-banner p { font-size: 14px; color: rgba(255,255,255,0.7); }
     .cta-banner .btn-gold {
-      background: var(--gold-500); color: var(--navy-900);
+      background: var(--gold-500); color: var(--white);
       padding: 14px 24px; border-radius: 8px;
       font-size: 14px; font-weight: 700;
       position: relative; z-index: 2;

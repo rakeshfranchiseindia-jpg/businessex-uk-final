@@ -79,6 +79,7 @@ Route::post('/account/set-password/{id}/{hash}', [PasswordResetController::class
 Route::get('/profile-details/{type}/{id}', [ProfileContactController::class, 'show'])
     ->whereIn('type', ['business', 'investor', 'mentor', 'startup'])
     ->whereNumber('id')
+    ->middleware('auth')
     ->name('profile-details');
 Route::post('/profile-details/{type}/{id}/contact', [ProfileContactController::class, 'store'])
     ->whereIn('type', ['business', 'investor', 'mentor', 'startup'])
