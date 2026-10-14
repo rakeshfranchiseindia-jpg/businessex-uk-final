@@ -95,7 +95,7 @@
 <body>
   <header class="profile-header">
     <div class="container">
-      <a class="profile-logo" href="index.php" aria-label="BusinessX home"><img src="assets/img/businessx-logo.png" alt="BusinessX"></a>
+      <a class="profile-logo" href="index.php" aria-label="BusinessX home"><img src="assets/img/businessx-logo-beta.png" alt="BusinessX"></a>
       <nav class="profile-nav" aria-label="Main navigation">
         <a href="index.php">Home</a>
         <a href="business-listing.php" aria-current="page">Bx Listing</a>

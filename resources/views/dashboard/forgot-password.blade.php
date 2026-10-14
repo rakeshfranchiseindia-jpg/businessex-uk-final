@@ -54,7 +54,7 @@ Request a password reset for your BusinessX account.
 
   <header class="auth-header">
     <div class="container">
-      <a class="auth-logo" href="{{ route('home') }}" aria-label="BusinessX home"><img src="{{ asset('assets/img/businessx-logo.png?v=20261008') }}" alt="BusinessX"></a>
+      <a class="auth-logo" href="{{ route('home') }}" aria-label="BusinessX home"><img src="{{ asset('assets/img/businessx-logo-beta.png?v=20261014') }}" alt="BusinessX"></a>
       <a class="auth-login" href="{{ route('login') }}">Login</a>
     </div>
   </header>

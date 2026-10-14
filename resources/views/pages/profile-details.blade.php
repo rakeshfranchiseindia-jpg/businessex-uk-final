@@ -96,7 +96,7 @@ Business profile and investment opportunity for Kreate Technologies pvt ltd.
 
   <header class="profile-header">
     <div class="container">
-      <a class="profile-logo" href="{{ route('home') }}" aria-label="BusinessX home"><img src="{{ asset('assets/img/businessx-logo.png?v=20261008') }}" alt="BusinessX"></a>
+      <a class="profile-logo" href="{{ route('home') }}" aria-label="BusinessX home"><img src="{{ asset('assets/img/businessx-logo-beta.png?v=20261014') }}" alt="BusinessX"></a>
       <nav class="profile-nav" aria-label="Main navigation">
         <a href="{{ route('home') }}">Home</a>
         <a href="{{ route('business-listing') }}" aria-current="page">Bx Listing</a>

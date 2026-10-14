@@ -462,7 +462,7 @@ BusinessX connects businesses, startups, investors and mentors.
       <div class="glow glow-2"></div>
 
       <div class="logo-row">
-        <span class="logo-pill"><img src="{{ asset('assets/img/businessx-logo.png?v=20261008') }}" alt="BusinessX"></span>
+        <span class="logo-pill"><img src="{{ asset('assets/img/businessx-logo-beta.png?v=20261014') }}" alt="BusinessX"></span>
       </div>
 
       <div class="hero-content">

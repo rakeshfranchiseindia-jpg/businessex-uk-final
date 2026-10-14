@@ -9,7 +9,7 @@
   <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="max-width:600px;margin:0 auto;background:#ffffff;border:1px solid #e3e8ef;border-radius:10px;">
     <tr>
       <td style="padding:26px 32px;border-bottom:3px solid #1769D2;">
-        <img src="{{ asset('assets/img/businessx-logo.png?v=20261008') }}" alt="BusinessX" width="211" height="49" style="display:block;width:211px;height:auto;">
+        <img src="{{ asset('assets/img/businessx-logo-beta.png?v=20261014') }}" alt="BusinessX" width="211" height="49" style="display:block;width:211px;height:auto;">
       </td>
     </tr>
     <tr>

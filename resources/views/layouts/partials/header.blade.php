@@ -17,7 +17,7 @@ $registrationRoutes = auth()->check()
 <header class="bx-header">
   <div class="container">
     <a href="{{ route('home') }}" class="bx-logo">
-      <img src="{{ asset('assets/img/businessx-logo.png?v=20261008') }}" alt="BusinessX">
+      <img src="{{ asset('assets/img/businessx-logo-beta.png?v=20261014') }}" alt="BusinessX">
     </a>
     <nav class="bx-nav">
       <div class="nav-item"><a href="{{ route('home') }}" class="<?= $page === 'home' ? 'active' : '' ?>">Home</a></div>

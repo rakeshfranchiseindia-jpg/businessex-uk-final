@@ -56,7 +56,7 @@
 <body>
   <header class="auth-header">
     <div class="container">
-      <a class="auth-logo" href="index.php" aria-label="BusinessX home"><img src="assets/img/businessx-logo.png" alt="BusinessX"></a>
+      <a class="auth-logo" href="index.php" aria-label="BusinessX home"><img src="assets/img/businessx-logo-beta.png" alt="BusinessX"></a>
       <a class="auth-login" href="login.php">Login</a>
     </div>
   </header>

@@ -50,7 +50,7 @@ $interactionLinks = [
 <body>
   <div class="workspace-shell">
     <aside class="workspace-sidebar">
-      <a class="workspace-brand" href="index.php" aria-label="BusinessX home"><img src="assets/img/businessx-logo.png?v=20261008" alt="BusinessX"></a>
+      <a class="workspace-brand" href="index.php" aria-label="BusinessX home"><img src="assets/img/businessx-logo-beta.png?v=20261014" alt="BusinessX"></a>
       <div class="workspace-user"><strong>Jacob</strong><span>Business account</span></div>
       <nav aria-label="Account navigation">
         <a href="dashboard.php">Dashboard</a>

@@ -1,6 +1,6 @@
 <aside class="dash-sidebar">
   <div class="brand">
-    <a href="{{ route('home') }}" class="logo-pill"><img src="{{ asset('assets/img/businessx-logo.png?v=20261008') }}" alt="BusinessX"></a>
+    <a href="{{ route('home') }}" class="logo-pill"><img src="{{ asset('assets/img/businessx-logo-beta.png?v=20261014') }}" alt="BusinessX"></a>
   </div>
 
   <div class="account-identity">

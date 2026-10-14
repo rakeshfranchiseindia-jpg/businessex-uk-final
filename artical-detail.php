@@ -101,7 +101,7 @@
 <body>
   <header class="detail-header">
     <div class="container">
-      <a class="detail-brand" href="index.php" aria-label="BusinessX home"><img src="assets/img/businessx-logo.png" alt="BusinessX"></a>
+      <a class="detail-brand" href="index.php" aria-label="BusinessX home"><img src="assets/img/businessx-logo-beta.png" alt="BusinessX"></a>
       <nav class="detail-nav" aria-label="Main navigation">
         <a href="index.php">Home</a>
         <a href="business-listing.php">Bx Listing</a>

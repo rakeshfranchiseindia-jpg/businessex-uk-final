@@ -4,7 +4,7 @@ $page = $page ?? 'home';
 <header class="bx-header">
   <div class="container">
     <a href="index.php" class="bx-logo">
-      <img src="assets/img/businessx-logo.png?v=20261008" alt="BusinessX">
+      <img src="assets/img/businessx-logo-beta.png?v=20261014" alt="BusinessX">
     </a>
     <nav class="bx-nav">
       <div class="nav-item"><a href="index.php" class="<?= $page === 'home' ? 'active' : '' ?>">Home</a></div>

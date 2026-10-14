@@ -18,7 +18,7 @@
     <!-- Sidebar -->
     <aside class="dash-sidebar">
       <div class="brand">
-        <span class="logo-pill"><img src="assets/img/businessx-logo.png" alt="BusinessX"></span>
+        <span class="logo-pill"><img src="assets/img/businessx-logo-beta.png" alt="BusinessX"></span>
       </div>
 
       <div class="account-identity">

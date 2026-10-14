@@ -379,7 +379,7 @@
       <div class="glow glow-2"></div>
 
       <div class="logo-row">
-        <span class="logo-pill"><img src="assets/img/businessx-logo.png" alt="BusinessX"></span>
+        <span class="logo-pill"><img src="assets/img/businessx-logo-beta.png" alt="BusinessX"></span>
       </div>
 
       <div class="hero-content">
