@@ -29,7 +29,7 @@ Choose a password for your BusinessX account.
     .password-toggle:hover { color: var(--navy-700); }
     .password-toggle svg { width: 18px; height: 18px; }
     .password-hint { margin: -7px 0 16px; color: var(--gray-500); font-size: 11px; line-height: 1.5; }
-    .reset-submit { width: 100%; min-height: 48px; margin-top: 4px; padding: 12px 16px; border-radius: 5px; background: var(--gold-500); color: var(--navy-900); font-size: 14px; font-weight: 700; transition: background .18s ease; }
+    .reset-submit { width: 100%; min-height: 48px; margin-top: 4px; padding: 12px 16px; border-radius: 5px; background: var(--gold-500); color: var(--white); font-size: 14px; font-weight: 700; transition: background .18s ease; }
     .reset-submit:hover { background: var(--gold-400); }
     .reset-submit:focus-visible, .auth-login:focus-visible, .return-login a:focus-visible, .password-toggle:focus-visible, .auth-footer a:focus-visible { outline: 2px solid var(--gold-600); outline-offset: 3px; }
     .form-status { margin-top: 14px; padding: 11px 12px; border-left: 3px solid var(--green-500); border-radius: 3px; background: var(--green-100); color: var(--gray-800); font-size: 13px; line-height: 1.5; }

@@ -108,33 +108,32 @@ BusinessX connects businesses, startups, investors and mentors.
   <section class="pricing-plans" aria-label="Membership plans">
     <div class="container">
       <div class="pricing-cards">
-        <!-- Trial -->
+        <!-- Basic -->
         <div class="plan-card">
-          <div class="plan-name">TRIAL</div>
-          <div class="plan-subtitle">Get started with basic features</div>
+          <div class="plan-name">Basic</div>
+          <div class="plan-subtitle">Asking Price - less than £200K</div>
           <div class="plan-price">
-            <span class="amount">£0</span>
-            <span class="period">/ Forever</span>
+            <span class="amount">£9.99</span>
+            <span class="period">(+20% VAT)</span>
           </div>
-          <div class="plan-note">No credit card required</div>
+          <div class="plan-note">45 Days</div>
           <ul class="plan-features">
             <li><span class="ic ic-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"><polyline points="20 6 9 17 4 12"/></svg></span>Profile Activation</li>
-            <li><span class="ic ic-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"><polyline points="20 6 9 17 4 12"/></svg></span> 5 Business Proposals</li>
-            <li><span class="ic ic-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"><polyline points="20 6 9 17 4 12"/></svg></span>  Receive Unlimited Investment Proposals</li>
+            <li><span class="ic ic-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"><polyline points="20 6 9 17 4 12"/></svg></span>5 Business Proposals</li>
+            <li><span class="ic ic-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"><polyline points="20 6 9 17 4 12"/></svg></span>Receive Unlimited Investment Proposals</li>
           </ul>
           <a href="{{ route('registration') }}" class="plan-btn plan-btn-outline">Buy Now</a>
         </div>
 
         <!-- Premium -->
         <div class="plan-card featured">
-          <div class="plan-badge">Popular</div>
-          <div class="plan-name">PREMIUM</div>
-          <div class="plan-subtitle">Grow your business with premium tools</div>
+          <div class="plan-name">Premium</div>
+          <div class="plan-subtitle">Asking Price - less than £200K</div>
           <div class="plan-price">
-            <span class="amount" data-price-monthly="£69.99" data-price-annual="£699.90">£69.99</span>
-            <span class="period" data-billing-period="/ Month">/ Month</span>
+            <span class="amount">£59.99</span>
+            <span class="period">(+20% VAT)</span>
           </div>
-          <div class="plan-note">Billed annually</div>
+          <div class="plan-note">3 Months</div>
           <ul class="plan-features">
             <li><span class="ic ic-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"><polyline points="20 6 9 17 4 12"/></svg></span>Speedy Profile Activation</li>
             <li><span class="ic ic-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"><polyline points="20 6 9 17 4 12"/></svg></span>Send 50 Business Proposals</li>
@@ -147,14 +146,15 @@ BusinessX connects businesses, startups, investors and mentors.
         </div>
 
         <!-- Gold -->
-        <div class="plan-card">
-          <div class="plan-name">GOLD</div>
-          <div class="plan-subtitle">Greater visibility and support for your business.</div>
+        <div class="plan-card featured">
+          <div class="plan-badge">Most Recommended</div>
+          <div class="plan-name">Gold</div>
+          <div class="plan-subtitle">Asking Price - less than £200K</div>
           <div class="plan-price">
-            <span class="amount" data-price-monthly="£129.99" data-price-annual="£1299.90">£129.99</span>
-            <span class="period" data-billing-period="/ Month">/ Month</span>
+            <span class="amount">£119.99</span>
+            <span class="period">(+20% VAT)</span>
           </div>
-          <div class="plan-note">Billed annually</div>
+          <div class="plan-note">12 Months</div>
           <ul class="plan-features">
             <li><span class="ic ic-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"><polyline points="20 6 9 17 4 12"/></svg></span>Speedy Profile Activation</li>
             <li><span class="ic ic-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"><polyline points="20 6 9 17 4 12"/></svg></span>100 Business Proposals</li>
@@ -163,27 +163,28 @@ BusinessX connects businesses, startups, investors and mentors.
             <li><span class="ic ic-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"><polyline points="20 6 9 17 4 12"/></svg></span>20 Website Visitor Queries</li>
             <li><span class="ic ic-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"><polyline points="20 6 9 17 4 12"/></svg></span>Profile Views</li>
             <li><span class="ic ic-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"><polyline points="20 6 9 17 4 12"/></svg></span>Profile Promotion</li>
+            <li><span class="ic ic-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"><polyline points="20 6 9 17 4 12"/></svg></span>Top Recommendations</li>
           </ul>
           <button type="button" class="plan-btn plan-btn-gold-outline" data-pay-plan="gold">Buy Now</button>
         </div>
 
         <!-- Platinum -->
-        <div class="plan-card featured">
-          <div class="plan-badge">All Features</div>
-          <div class="plan-name">PLATINUM</div>
-          <div class="plan-subtitle">Every membership feature, included.</div>
+        <div class="plan-card">
+          <div class="plan-name">Platinum</div>
+          <div class="plan-subtitle">Asking Price - no limit</div>
           <div class="plan-price">
-            <span class="amount">Custom</span>
+            <span class="amount">£949.99</span>
+            <span class="period">(+Brokerage and VAT)</span>
           </div>
-          <div class="plan-note">Contact us for pricing</div>
+          <div class="plan-note">12 Months</div>
           <ul class="plan-features">
-            <li><span class="ic ic-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"><polyline points="20 6 9 17 4 12"/></svg></span>Everything in Gold Plan</li>
+            <li class="plan-features-heading">Everything in Gold Plan</li>
             <li><span class="ic ic-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"><polyline points="20 6 9 17 4 12"/></svg></span>Key Account Manager</li>
             <li><span class="ic ic-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"><polyline points="20 6 9 17 4 12"/></svg></span>Top Bussinesses/Startups</li>
             <li><span class="ic ic-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"><polyline points="20 6 9 17 4 12"/></svg></span>Acceleration Marketing</li>
-            <li><span class="ic ic-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"><polyline points="20 6 9 17 4 12"/></svg></span>Businesses Valution</li>
+            <li><span class="ic ic-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"><polyline points="20 6 9 17 4 12"/></svg></span>Business Valution</li>
           </ul>
-          <a href="{{ route('registration') }}" class="plan-btn plan-btn-gold">Buy Now</a>
+          <a href="{{ route('contact') }}" class="plan-btn plan-btn-gold">Buy Now</a>
         </div>
       </div>
     </div>
@@ -231,92 +232,95 @@ BusinessX connects businesses, startups, investors and mentors.
   <!-- Comparison + Testimonial -->
   <section class="compare">
     <div class="container">
-      <h2 class="h2 text-center mb-8">Compare All Plans</h2>
+      <h2 class="h2 text-center mb-8">Full Plan Comparison</h2>
       <div class="compare-grid">
         <div class="compare-table-wrap">
           <table class="compare-table">
             <thead>
               <tr>
-                <th>Features</th>
-                <th>
-                  <div class="plan-name" style="color: var(--gray-700);">TRIAL</div>
-                  <div class="plan-price-mini">£0 / Forever</div>
-                </th>
-                <th>
-                  <div class="plan-name" style="color: var(--gold-600);">PREMIUM</div>
-                  <div class="plan-price-mini">£699.90 / Year</div>
-                </th>
-                <th>
-                  <div class="plan-name" style="color: var(--navy-700);">GOLD</div>
-                  <div class="plan-price-mini">£1,299.90 / Year</div>
-                </th>
-                <th>
-                  <div class="plan-name" style="color: var(--gold-600);">PLATINUM</div>
-                  <div class="plan-price-mini">Custom pricing</div>
-                </th>
+                <th>Feature</th>
+                <th><div class="plan-name" style="color: var(--gray-700);">Basic</div></th>
+                <th><div class="plan-name" style="color: var(--gold-600);">Premium</div></th>
+                <th><div class="plan-name" style="color: var(--navy-700);">Gold</div></th>
+                <th><div class="plan-name" style="color: var(--gold-600);">Platinum</div></th>
               </tr>
             </thead>
             <tbody>
               <tr>
-                <td>Business Profile</td>
+                <td>Profile Activation</td>
                 <td><span class="ic ic-yes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"><polyline points="20 6 9 17 4 12"/></svg></span></td>
                 <td><span class="ic ic-yes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"><polyline points="20 6 9 17 4 12"/></svg></span></td>
                 <td><span class="ic ic-yes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"><polyline points="20 6 9 17 4 12"/></svg></span></td>
                 <td><span class="ic ic-yes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"><polyline points="20 6 9 17 4 12"/></svg></span></td>
               </tr>
               <tr>
-                <td>Basic Directory Listing</td>
+                <td>Continuous Email Support</td>
                 <td><span class="ic ic-yes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"><polyline points="20 6 9 17 4 12"/></svg></span></td>
                 <td><span class="ic ic-yes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"><polyline points="20 6 9 17 4 12"/></svg></span></td>
                 <td><span class="ic ic-yes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"><polyline points="20 6 9 17 4 12"/></svg></span></td>
                 <td><span class="ic ic-yes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"><polyline points="20 6 9 17 4 12"/></svg></span></td>
               </tr>
               <tr>
-                <td>Verified Member Badge</td>
-                <td><span class="ic ic-no"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></span></td>
+                <td>Send Business Proposals</td>
+                <td><span class="pvalue">5</span></td>
+                <td><span class="pvalue">50</span></td>
+                <td><span class="pvalue">100</span></td>
+                <td><span class="pvalue">Unlimited</span></td>
+              </tr>
+              <tr>
+                <td>Receive Business Proposals</td>
+                <td><span class="pvalue">Unlimited</span></td>
+                <td><span class="pvalue">Unlimited</span></td>
+                <td><span class="pvalue">Unlimited</span></td>
+                <td><span class="pvalue">Unlimited</span></td>
+              </tr>
+              <tr>
+                <td>Unlock Website Visitor Queries</td>
+                <td><span class="dash">–</span></td>
+                <td><span class="pvalue">10</span></td>
+                <td><span class="pvalue">20</span></td>
+                <td><span class="pvalue">Unlimited</span></td>
+              </tr>
+              <tr>
+                <td>Profile Views</td>
+                <td><span class="dash">–</span></td>
                 <td><span class="ic ic-yes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"><polyline points="20 6 9 17 4 12"/></svg></span></td>
                 <td><span class="ic ic-yes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"><polyline points="20 6 9 17 4 12"/></svg></span></td>
                 <td><span class="ic ic-yes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"><polyline points="20 6 9 17 4 12"/></svg></span></td>
               </tr>
               <tr>
-                <td>Receive Leads & Inquiries</td>
-                <td><span class="ic ic-no"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></span></td>
-                <td><span class="ic ic-yes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"><polyline points="20 6 9 17 4 12"/></svg></span></td>
-                <td><span class="ic ic-yes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"><polyline points="20 6 9 17 4 12"/></svg></span></td>
-                <td><span class="ic ic-yes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"><polyline points="20 6 9 17 4 12"/></svg></span></td>
-              </tr>
-              <tr>
-                <td>Featured Listing</td>
-                <td><span class="ic ic-no"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></span></td>
-                <td><span class="ic ic-yes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"><polyline points="20 6 9 17 4 12"/></svg></span></td>
+                <td>Profile Promotion</td>
+                <td><span class="dash">–</span></td>
+                <td><span class="dash">–</span></td>
                 <td><span class="ic ic-yes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"><polyline points="20 6 9 17 4 12"/></svg></span></td>
                 <td><span class="ic ic-yes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"><polyline points="20 6 9 17 4 12"/></svg></span></td>
               </tr>
               <tr>
-                <td>Homepage Exposure</td>
-                <td><span class="ic ic-no"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></span></td>
-                <td><span class="ic ic-no"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></span></td>
+                <td>Bussiness Plan</td>
+                <td><span class="dash">–</span></td>
+                <td><span class="dash">–</span></td>
+                <td><span class="dash">–</span></td>
+                <td><span class="ic ic-yes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"><polyline points="20 6 9 17 4 12"/></svg></span></td>
+              </tr>
+              <tr>
+                <td>Top Recommendations</td>
+                <td><span class="dash">–</span></td>
+                <td><span class="dash">–</span></td>
                 <td><span class="ic ic-yes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"><polyline points="20 6 9 17 4 12"/></svg></span></td>
                 <td><span class="ic ic-yes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"><polyline points="20 6 9 17 4 12"/></svg></span></td>
               </tr>
               <tr>
-                <td>Priority Support</td>
-                <td><span class="ic ic-no"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></span></td>
-                <td><span class="ic ic-no"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></span></td>
-                <td><span class="ic ic-yes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"><polyline points="20 6 9 17 4 12"/></svg></span></td>
-                <td><span class="ic ic-yes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"><polyline points="20 6 9 17 4 12"/></svg></span></td>
-              </tr>
-              <tr>
-                <td>Dedicated Account Manager</td>
-                <td><span class="ic ic-no"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></span></td>
-                <td><span class="ic ic-no"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></span></td>
-                <td><span class="ic ic-yes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"><polyline points="20 6 9 17 4 12"/></svg></span></td>
+                <td>Accelerated Marketing</td>
+                <td><span class="dash">–</span></td>
+                <td><span class="dash">–</span></td>
+                <td><span class="dash">–</span></td>
                 <td><span class="ic ic-yes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"><polyline points="20 6 9 17 4 12"/></svg></span></td>
               </tr>
               <tr>
-                <td>Custom Business Page</td>
-                <td><span class="ic ic-no"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></span></td>
-                <td><span class="ic ic-no"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></span></td>
+                <td>Business Valuation / Business Plan</td>
+                <td><span class="dash">–</span></td>
+                <td><span class="dash">–</span></td>
+                <td><span class="dash">–</span></td>
                 <td><span class="ic ic-yes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"><polyline points="20 6 9 17 4 12"/></svg></span></td>
               </tr>
             </tbody>

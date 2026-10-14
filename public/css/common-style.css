@@ -163,7 +163,7 @@ input, textarea, select { font-family: inherit; font-size: inherit; }
 .btn svg { width: 16px; height: 16px; }
 .btn-primary {
   background: var(--color-accent);
-  color: var(--navy-900);
+  color: var(--white);
 }
 .btn-primary:hover { background: var(--color-accent-dark); transform: translateY(-1px); }
 .btn-navy {

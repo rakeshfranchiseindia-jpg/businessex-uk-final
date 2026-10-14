@@ -677,7 +677,7 @@ BusinessX - The UK's leading business exchange network. Buy or sell a business, 
     }
     .btn-event {
       display: inline-flex; align-items: center; gap: 6px;
-      background: var(--gold-500); color: var(--navy-900);
+      background: var(--gold-500); color: var(--white);
       font-size: 11.5px; font-weight: 800; letter-spacing: 0.07em; text-transform: uppercase;
       padding: 9px 20px; border-radius: 999px;
       transition: all 0.2s;

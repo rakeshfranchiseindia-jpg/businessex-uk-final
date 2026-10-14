@@ -55,7 +55,7 @@
   .profile-contact-dialog textarea { min-height: 110px; resize: vertical; }
   .profile-contact-dialog .dialog-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 18px; }
   .profile-contact-dialog .dialog-actions button { min-height: 40px; padding: 0 15px; border: 1px solid var(--gray-300); border-radius: 5px; background: var(--white); color: var(--gray-700); font: inherit; font-size: 13px; font-weight: 700; cursor: pointer; }
-  .profile-contact-dialog .dialog-actions button[type=submit] { border-color: var(--gold-500); background: var(--gold-500); color: var(--navy-900); }
+  .profile-contact-dialog .dialog-actions button[type=submit] { border-color: var(--gold-500); background: var(--gold-500); color: var(--white); }
   @media (max-width: 760px) {
     .public-profile-page .profile-detail-grid { grid-template-columns: 1fr; }
     .public-profile-page .profile-contact-card { position: static; }
