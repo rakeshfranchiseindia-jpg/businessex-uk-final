@@ -371,7 +371,7 @@ BusinessX connects businesses, startups, investors and mentors.
     }
     .newsletter-form input::placeholder { color: rgba(255,255,255,0.5); }
     .newsletter-form button {
-      background: var(--gold-500); color: var(--navy-900);
+      background: var(--gold-500); color: var(--white);
       padding: 10px 14px;
       border-radius: 0 6px 6px 0;
       font-weight: 700; display: flex; align-items: center; justify-content: center;

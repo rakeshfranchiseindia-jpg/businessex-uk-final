@@ -25,11 +25,11 @@ class PricingPageTest extends TestCase
                 'id="pricing-payment-mode"',
                 'class="pricing-plans"',
                 'class="pricing-cards"',
-                'TRIAL',
-                'PREMIUM',
-                'GOLD',
-                'PLATINUM',
-                'Every membership feature, included.',
+                'Basic',
+                'Premium',
+                'Gold',
+                'Platinum',
+                'Everything in Gold Plan',
             ], false)
             ->assertDontSee('pricing-promo-code', false)
             ->assertSee('value="+44" selected', false)

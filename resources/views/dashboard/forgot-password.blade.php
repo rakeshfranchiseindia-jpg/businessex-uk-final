@@ -24,7 +24,7 @@ Request a password reset for your BusinessX account.
     .reset-form input { width: 100%; height: 48px; padding: 0 13px; border: 1px solid var(--gray-300); border-radius: 5px; background: var(--white); color: var(--gray-900); font-size: 14px; }
     .reset-form input::placeholder { color: var(--gray-400); }
     .reset-form input:focus { outline: 2px solid rgba(19,141,227,.2); border-color: var(--gold-500); }
-    .reset-submit { width: 100%; min-height: 48px; margin-top: 18px; padding: 12px 16px; border-radius: 5px; background: var(--gold-500); color: var(--navy-900); font-size: 14px; font-weight: 700; transition: background .18s ease; }
+    .reset-submit { width: 100%; min-height: 48px; margin-top: 18px; padding: 12px 16px; border-radius: 5px; background: var(--gold-500); color: var(--white); font-size: 14px; font-weight: 700; transition: background .18s ease; }
     .reset-submit:hover { background: var(--gold-400); }
     .reset-submit:focus-visible, .auth-login:focus-visible, .return-login:focus-visible, .auth-footer a:focus-visible { outline: 2px solid var(--gold-600); outline-offset: 3px; }
     .form-status { margin-top: 14px; padding: 11px 12px; border-left: 3px solid var(--green-500); border-radius: 3px; background: var(--green-100); color: var(--gray-800); font-size: 13px; line-height: 1.5; }

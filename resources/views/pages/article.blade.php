@@ -233,7 +233,7 @@ BusinessX articles, news and international trade insights.
     .newsletter-banner .news-field-error { color: #fecaca; font-size: 12px; }
     .newsletter-banner button {
       grid-column: 1 / -1; justify-self: end;
-      padding: 0 20px; height: 44px; background: var(--gold-500); color: var(--navy-900);
+      padding: 0 20px; height: 44px; background: var(--gold-500); color: var(--white);
       border-radius: 6px; font-weight: 700; font-size: 14px;
       white-space: nowrap;
     }
@@ -444,7 +444,7 @@ BusinessX articles, news and international trade insights.
     }
     .newsletter-form input::placeholder { color: rgba(255,255,255,0.5); }
     .newsletter-form button {
-      background: var(--gold-500); color: var(--navy-900);
+      background: var(--gold-500); color: var(--white);
       padding: 10px 14px;
       border-radius: 0 6px 6px 0;
       font-weight: 700;
