@@ -1,0 +1,311 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>BusinessX Database Guide</title>
+<style>
+  @page {
+    size: A4;
+    margin: 16mm 15mm 18mm 15mm;
+    @bottom-left { content: "BusinessX Database Guide"; font: 8pt 'Segoe UI', Arial, sans-serif; color: #7a8599; }
+    @bottom-right { content: "Page " counter(page) " of " counter(pages); font: 8pt 'Segoe UI', Arial, sans-serif; color: #7a8599; }
+  }
+  :root { --navy: #0a1628; --navy-2: #13294b; --gold: #c9962b; --ink: #1d2433; --muted: #5b6577; --line: #dfe3ea; --soft: #f4f6f9; }
+  * { box-sizing: border-box; }
+  html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; font-size: 9.4pt; line-height: 1.45; color: var(--ink); margin: 0; }
+
+  .head { background: var(--navy); color: #fff; border-radius: 6px; padding: 7mm 8mm; margin-bottom: 6mm; }
+  .head .brand { font-weight: 800; font-size: 13pt; }
+  .head .brand span { color: var(--gold); }
+  .head h1 { margin: 2mm 0 1.5mm; font-size: 22pt; color: #fff; }
+  .head p { margin: 0; color: #c6d0e0; }
+
+  h2 { font-size: 14pt; color: var(--navy); margin: 7mm 0 3mm; padding-bottom: 1.5mm; border-bottom: 2.5px solid var(--gold); break-after: avoid; }
+  h3 { font-size: 10.5pt; color: var(--navy); margin: 5mm 0 2mm; break-after: avoid; }
+  h2 + *, h3 + * { break-before: avoid; }
+  p { margin: 0 0 2.5mm; }
+  ul { margin: 0 0 3mm; padding-left: 5mm; }
+  li { margin-bottom: 1mm; }
+  code { font-family: Consolas, 'Cascadia Mono', monospace; font-size: 8.3pt; background: var(--soft); border: 1px solid var(--line); border-radius: 3px; padding: 0 2.5px; }
+
+  table { width: 100%; border-collapse: collapse; margin: 0 0 4mm; font-size: 8.5pt; }
+  thead { display: table-header-group; }
+  tr { break-inside: avoid; }
+  th { background: var(--navy-2); color: #fff; text-align: left; font-weight: 600; padding: 1.5mm 2mm; }
+  td { border-bottom: 1px solid var(--line); padding: 1.4mm 2mm; vertical-align: top; }
+  tbody tr:nth-child(even) td { background: #fafbfc; }
+  td.t { font-family: Consolas, 'Cascadia Mono', monospace; font-size: 8.2pt; font-weight: 700; color: var(--navy); white-space: nowrap; }
+  td.k { font-family: Consolas, 'Cascadia Mono', monospace; font-size: 7.8pt; color: #33415c; }
+  .grp td { background: #e9edf4 !important; font-weight: 700; color: var(--navy); font-size: 8.6pt; letter-spacing: .2pt; }
+
+  .note { background: #eef3fb; border-left: 4px solid #2f5fa8; border-radius: 3px; padding: 2.5mm 4mm; margin: 0 0 4mm; break-inside: avoid; }
+  .warn { background: #fff6e8; border-left: 4px solid #9a5b00; border-radius: 3px; padding: 2.5mm 4mm; margin: 0 0 4mm; break-inside: avoid; }
+  .note b:first-child, .warn b:first-child { display: block; margin-bottom: .6mm; }
+  .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 3mm; margin: 0 0 5mm; }
+  .stat { border: 1px solid var(--line); border-radius: 5px; padding: 2.5mm 3mm; }
+  .stat b { display: block; font-size: 16pt; color: var(--navy); line-height: 1.1; }
+  .stat span { font-size: 8pt; color: var(--muted); }
+  .diagram { border: 1px solid var(--line); border-radius: 6px; padding: 3mm; margin: 0 0 3mm; break-inside: avoid; }
+  .diagram svg { width: 100%; height: auto; display: block; }
+  .legend { font-size: 8pt; color: var(--muted); margin-bottom: 4mm; }
+  .pagebreak { break-before: page; }
+</style>
+</head>
+<body>
+
+<div class="head">
+  <div class="brand">Business<span>X</span></div>
+  <h1>Database Guide</h1>
+  <p>Tables, relationships, indexes and why each table exists &middot; MySQL &middot; schema as of 13 October 2026 (branch <code style="background:#13294b;border-color:#2c3f60;color:#fff">development</code>)</p>
+</div>
+
+<div class="stats">
+  <div class="stat"><b>102</b><span>tables created by migrations</span></div>
+  <div class="stat"><b>~30</b><span>tables used by the current app</span></div>
+  <div class="stat"><b>0</b><span>database foreign keys (relations enforced in code)</span></div>
+  <div class="stat"><b>4</b><span>member profile types</span></div>
+</div>
+
+<h2>1. How the schema is organised</h2>
+<ul>
+  <li><b>Legacy origin.</b> Most tables come from the previous PHP system and keep their names, keys and tinyint flags. New features
+  (messaging, proposals, media, chatbot, notifications) use newer tables with Laravel conventions (<code>id</code>, <code>created_at</code>, <code>updated_at</code>).</li>
+  <li><b>One account, many profiles.</b> A person has one <code>user_account</code>. Each of the four profile tables links back to it through <code>user_id</code>, so one account can own several profiles of different types.</li>
+  <li><b>Polymorphic profile references.</b> Tables that can point at any profile type store a pair: <b>profile type + profile id</b>. Two encodings exist:</li>
+</ul>
+<table>
+  <thead><tr><th style="width:18%">Profile type</th><th style="width:12%">Numeric code</th><th style="width:12%">String</th><th style="width:24%">Table &middot; primary key</th><th>Status column (1 = active)</th></tr></thead>
+  <tbody>
+    <tr><td>Business</td><td>1</td><td><code>business</code></td><td><code>profile_business.business_id</code></td><td><code>business_profile_status</code></td></tr>
+    <tr><td>Investor</td><td>2</td><td><code>investor</code></td><td><code>profile_investor.investor_id</code></td><td><code>inv_profile_status</code></td></tr>
+    <tr><td>Mentor</td><td>4</td><td><code>mentor</code></td><td><code>profile_mentors.mentor_id</code></td><td><code>mentor_profile_status</code> (+ <code>deleted_at</code>)</td></tr>
+    <tr><td>Startup</td><td>7</td><td><code>startup</code></td><td><code>profile_startups.startup_id</code></td><td><code>startup_profile_status</code></td></tr>
+  </tbody>
+</table>
+<p class="legend">Numeric codes are used by <code>user_profiles</code>, <code>profile_visitors</code>, <code>online_payments</code> and <code>profile_memberships</code>.
+String names are used by <code>profile_contact_conversations</code>, <code>profile_proposals</code> and <code>profile_media</code>.</p>
+
+<div class="warn"><b>No foreign keys</b>The legacy schema has no database-level foreign keys. Every relationship below is <i>logical</i>: the
+application joins on it and checks it in queries (for example, ownership is always filtered by <code>user_id</code>). Deleting rows by hand can
+leave orphans, so delete children first.</div>
+
+<!-- ============================ DIAGRAM ============================ -->
+<h2 class="pagebreak" style="margin-top:0">2. Relationship diagram (active tables)</h2>
+<div class="diagram">
+<svg viewBox="0 0 1000 660" xmlns="http://www.w3.org/2000/svg" font-family="Segoe UI, Arial, sans-serif">
+  <defs>
+    <style>
+      .bx { fill: #fff; stroke: #13294b; stroke-width: 1.6; }
+      .hd { fill: #13294b; }
+      .ttl { fill: #fff; font-size: 13px; font-weight: 700; }
+      .col { fill: #33415c; font-size: 11px; font-family: Consolas, monospace; }
+      .ln { stroke: #c9962b; stroke-width: 2; fill: none; }
+      .card { fill: #8a6414; font-size: 11px; font-weight: 700; }
+      .zone { fill: #f4f6f9; stroke: #dfe3ea; }
+      .zl { fill: #7a8599; font-size: 12px; font-weight: 700; letter-spacing: 1px; }
+    </style>
+  </defs>
+
+  <!-- zones -->
+  <rect class="zone" x="15" y="8" width="240" height="490" rx="8"/><text class="zl" x="27" y="26">PROFILES</text>
+  <rect class="zone" x="545" y="8" width="445" height="530" rx="8"/><text class="zl" x="557" y="26">MESSAGING &amp; PROPOSALS</text>
+  <rect class="zone" x="285" y="548" width="705" height="104" rx="8"/><text class="zl" x="297" y="566">PAYMENTS &amp; MEMBERSHIP</text>
+
+  <!-- links (drawn first, under boxes) -->
+  <line class="ln" x1="240" y1="255" x2="300" y2="255"/>          <!-- profiles - user_account -->
+  <line class="ln" x1="395" y1="104" x2="395" y2="220"/>          <!-- user_profiles - user_account -->
+  <line class="ln" x1="300" y1="90" x2="240" y2="215"/>           <!-- user_profiles - profiles -->
+  <line class="ln" x1="135" y1="104" x2="135" y2="200"/>          <!-- media - profiles -->
+  <line class="ln" x1="135" y1="310" x2="135" y2="400"/>          <!-- visitors - profiles -->
+  <line class="ln" x1="490" y1="250" x2="560" y2="235"/>          <!-- user_account - conversations -->
+  <line class="ln" x1="490" y1="225" x2="560" y2="80"/>           <!-- user_account - instant -->
+  <line class="ln" x1="655" y1="272" x2="655" y2="340"/>          <!-- conversations - messages -->
+  <line class="ln" x1="655" y1="404" x2="655" y2="460"/>          <!-- messages - reads -->
+  <line class="ln" x1="750" y1="236" x2="800" y2="236"/>          <!-- conversations - proposals -->
+  <line class="ln" x1="890" y1="272" x2="890" y2="340"/>          <!-- proposals - attachments -->
+  <line class="ln" x1="395" y1="292" x2="395" y2="580"/>          <!-- user_account - online_payments -->
+  <line class="ln" x1="490" y1="612" x2="560" y2="612"/>          <!-- payments - memberships -->
+  <line class="ln" x1="750" y1="612" x2="800" y2="612"/>          <!-- memberships - plans -->
+
+  <!-- cardinalities -->
+  <text class="card" x="252" y="249">N : 1</text>
+  <text class="card" x="402" y="165">N : 1</text>
+  <text class="card" x="232" y="150">N : 1</text>
+  <text class="card" x="142" y="157">N : 1</text>
+  <text class="card" x="142" y="360">N : 1</text>
+  <text class="card" x="500" y="265">1 : N</text>
+  <text class="card" x="508" y="140">1 : 1</text>
+  <text class="card" x="662" y="312">1 : N</text>
+  <text class="card" x="662" y="436">1 : N</text>
+  <text class="card" x="757" y="229">1 : N</text>
+  <text class="card" x="897" y="312">1 : N</text>
+  <text class="card" x="402" y="440">1 : N</text>
+  <text class="card" x="503" y="605">1 : N</text>
+  <text class="card" x="757" y="605">N : 1</text>
+
+  <!-- boxes -->
+  <g><rect class="bx" x="30" y="40" width="210" height="64" rx="5"/><rect class="hd" x="30" y="40" width="210" height="22" rx="5"/><text class="ttl" x="40" y="56">profile_media</text><text class="col" x="40" y="78">profile_type, profile_id</text><text class="col" x="40" y="94">user_id, object_key, is_public</text></g>
+  <g><rect class="bx" x="30" y="200" width="210" height="110" rx="5"/><rect class="hd" x="30" y="200" width="210" height="22" rx="5"/><text class="ttl" x="40" y="216">profile_* (4 tables)</text><text class="col" x="40" y="240">profile_business</text><text class="col" x="40" y="256">profile_investor</text><text class="col" x="40" y="272">profile_mentors</text><text class="col" x="40" y="288">profile_startups</text><text class="col" x="40" y="304">user_id, *_profile_status</text></g>
+  <g><rect class="bx" x="30" y="400" width="210" height="64" rx="5"/><rect class="hd" x="30" y="400" width="210" height="22" rx="5"/><text class="ttl" x="40" y="416">profile_visitors</text><text class="col" x="40" y="438">profile_type, profile_id</text><text class="col" x="40" y="454">user_id (viewer)</text></g>
+
+  <g><rect class="bx" x="300" y="40" width="190" height="64" rx="5"/><rect class="hd" x="300" y="40" width="190" height="22" rx="5"/><text class="ttl" x="310" y="56">user_profiles</text><text class="col" x="310" y="78">user_id</text><text class="col" x="310" y="94">profile_type, profile_id</text></g>
+  <g><rect class="bx" x="300" y="220" width="190" height="72" rx="5" style="stroke-width:2.6"/><rect class="hd" x="300" y="220" width="190" height="22" rx="5"/><text class="ttl" x="310" y="236">user_account</text><text class="col" x="310" y="258">PK user_id</text><text class="col" x="310" y="274">UQ email, is_active</text><text class="col" x="310" y="288">email_verified_at</text></g>
+
+  <g><rect class="bx" x="560" y="40" width="190" height="64" rx="5"/><rect class="hd" x="560" y="40" width="190" height="22" rx="5"/><text class="ttl" x="570" y="56">profile_instant_responses</text><text class="col" x="570" y="78">PK user_id</text><text class="col" x="570" y="94">enabled, message</text></g>
+  <g><rect class="bx" x="560" y="200" width="190" height="72" rx="5"/><rect class="hd" x="560" y="200" width="190" height="22" rx="5"/><text class="ttl" x="570" y="216">profile_contact_conversations</text><text class="col" x="570" y="238">owner_user_id</text><text class="col" x="570" y="252">sender_user_id</text><text class="col" x="570" y="266">profile_type, profile_id</text></g>
+  <g><rect class="bx" x="560" y="340" width="190" height="64" rx="5"/><rect class="hd" x="560" y="340" width="190" height="22" rx="5"/><text class="ttl" x="570" y="356">profile_contact_messages</text><text class="col" x="570" y="378">conversation_id</text><text class="col" x="570" y="394">sender_user_id, message</text></g>
+  <g><rect class="bx" x="560" y="460" width="190" height="64" rx="5"/><rect class="hd" x="560" y="460" width="190" height="22" rx="5"/><text class="ttl" x="570" y="476">..._conversation_reads</text><text class="col" x="570" y="498">PK conversation_id, user_id</text><text class="col" x="570" y="514">last_read_message_id</text></g>
+  <g><rect class="bx" x="800" y="200" width="180" height="72" rx="5"/><rect class="hd" x="800" y="200" width="180" height="22" rx="5"/><text class="ttl" x="810" y="216">profile_proposals</text><text class="col" x="810" y="238">conversation_id</text><text class="col" x="810" y="252">sender / recipient_user_id</text><text class="col" x="810" y="266">status</text></g>
+  <g><rect class="bx" x="800" y="340" width="180" height="64" rx="5"/><rect class="hd" x="800" y="340" width="180" height="22" rx="5"/><text class="ttl" x="810" y="356">..._proposal_attachments</text><text class="col" x="810" y="378">proposal_id</text><text class="col" x="810" y="394">object_key, original_name</text></g>
+
+  <g><rect class="bx" x="300" y="580" width="190" height="64" rx="5"/><rect class="hd" x="300" y="580" width="190" height="22" rx="5"/><text class="ttl" x="310" y="596">online_payments</text><text class="col" x="310" y="618">UQ order_no, udf (order)</text><text class="col" x="310" y="634">user_id, profile_type/id</text></g>
+  <g><rect class="bx" x="560" y="580" width="190" height="64" rx="5"/><rect class="hd" x="560" y="580" width="190" height="22" rx="5"/><text class="ttl" x="570" y="596">profile_memberships</text><text class="col" x="570" y="618">order_no &#8594; payment_id</text><text class="col" x="570" y="634">expiry_date, is_active</text></g>
+  <g><rect class="bx" x="800" y="580" width="180" height="64" rx="5"/><rect class="hd" x="800" y="580" width="180" height="22" rx="5"/><text class="ttl" x="810" y="596">membership_plans</text><text class="col" x="810" y="618">PK plan_id</text><text class="col" x="810" y="634">plan_name, validity</text></g>
+</svg>
+</div>
+<p class="legend">Gold lines are logical relationships (no database constraint). Not drawn, to keep it readable: reference data
+(<code>industry_categories</code>, <code>ind_pref_business</code>, <code>bx_cities</code>), content (<code>bx_articles</code> &rarr; <code>bx_author</code>,
+<code>articles_comments</code>) and framework tables. They are all listed in section 4.</p>
+
+<!-- ============================ CATALOGUE ============================ -->
+<h2 class="pagebreak" style="margin-top:0">3. Active tables: purpose and indexes</h2>
+<table>
+  <thead><tr><th style="width:25%">Table</th><th style="width:43%">Why it exists</th><th>Keys and indexes</th></tr></thead>
+  <tbody>
+    <tr class="grp"><td colspan="3">Accounts</td></tr>
+    <tr><td class="t">user_account</td><td>One row per person; the login model (<code>UserAccount</code>). Holds credentials, contact details, verification and active flags.</td><td class="k">PK user_id<br>UQ email<br>UQ user_rand_id</td></tr>
+    <tr><td class="t">user_profiles</td><td>Legacy index of which profiles an account owns (type code + profile id + profile key). Written at registration for compatibility with the old system.</td><td class="k">PK user_prof_id</td></tr>
+    <tr><td class="t">password_reset_tokens</td><td>Hashed, single-use password reset tokens (Laravel broker).</td><td class="k">PK email</td></tr>
+    <tr><td class="t">sessions</td><td>Database-backed sessions; lets the app sign a user out everywhere.</td><td class="k">PK id<br>IX user_id<br>IX last_activity</td></tr>
+
+    <tr class="grp"><td colspan="3">Profiles</td></tr>
+    <tr><td class="t">profile_business</td><td>Business listings (for sale, seeking investment or loans): company, financials, location, images, membership flags.</td><td class="k">PK business_id<br>IX user_id<br>IX (status, created_at, business_id)</td></tr>
+    <tr><td class="t">profile_investor</td><td>Investor profiles: investment range, preferences, company details.</td><td class="k">PK investor_id<br>IX user_id<br>IX (status, created_at, investor_id)</td></tr>
+    <tr><td class="t">profile_mentors</td><td>Mentor profiles: expertise, experience, location (soft-deleted via <code>deleted_at</code>).</td><td class="k">PK mentor_id<br>IX user_id<br>IX (status, created_at, mentor_id)</td></tr>
+    <tr><td class="t">profile_startups</td><td>Startup profiles: funding ask, stage, industry (<code>industry_sector</code> = category id).</td><td class="k">PK startup_id<br>UQ startup_profile_str<br>IX user_id<br>IX (status, created_at, startup_id)<br>IX (status, industry_sector)</td></tr>
+    <tr><td class="t">profile_business_mgmt</td><td>Key contact / management person attached to a business profile.</td><td class="k">PK business_mgmt_id</td></tr>
+    <tr><td class="t">profile_media</td><td>Every uploaded image/document with its S3 key, visibility and owner. Lets private documents be served only to their owner via signed URLs.</td><td class="k">PK id<br>IX (user_id, profile_type, profile_id)<br>IX (profile_type, profile_id)</td></tr>
+    <tr><td class="t">profile_visitors</td><td>One row per profile view by a signed-in member; powers the "most searched" view counts on the dashboard.</td><td class="k">PK visitor_id<br>IX (profile_type, profile_id)</td></tr>
+
+    <tr class="grp"><td colspan="3">Reference data</td></tr>
+    <tr><td class="t">industry_categories</td><td>Two-level industry tree (parent &rarr; sub-category) used for filters, footer links and home counters.</td><td class="k">PK cat_id<br>IX (parent_id, category_status)</td></tr>
+    <tr><td class="t">ind_pref_business</td><td>Maps business profiles to industry categories (many-to-many), used by industry filters and home counts.</td><td class="k">PK business_ind_pref_id<br>IX (business_profile_id, profile_status, parent_category_id)<br>IX (business_profile_id, profile_status, sub_category_id)</td></tr>
+    <tr><td class="t">bx_cities</td><td>Allowed UK cities (<code>country = 5</code>); validates city fields and drives autocomplete and the home city section.</td><td class="k">PK id</td></tr>
+    <tr><td class="t">country</td><td>Country list for location fields.</td><td class="k">PK country_id</td></tr>
+
+    <tr class="grp"><td colspan="3">Messaging &amp; proposals</td></tr>
+    <tr><td class="t">profile_contact_conversations</td><td>A thread between a profile's owner and an interested member about one profile.</td><td class="k">PK id<br>IX (owner_user_id, updated_at)<br>IX (sender_user_id, updated_at)<br>IX (profile_type, profile_id)</td></tr>
+    <tr><td class="t">profile_contact_messages</td><td>Messages inside a conversation (also broadcast live).</td><td class="k">PK id<br>IX (conversation_id, created_at)<br>IX (conversation_id, id)</td></tr>
+    <tr><td class="t">profile_contact_conversation_reads</td><td>Per-user "last read message" marker; drives unread counts.</td><td class="k">PK (conversation_id, user_id)<br>IX (user_id, last_read_message_id)</td></tr>
+    <tr><td class="t">profile_instant_responses</td><td>Owner's optional automatic first reply to new contacts (one per user).</td><td class="k">PK user_id</td></tr>
+    <tr><td class="t">profile_proposals</td><td>Formal offers sent by a profile owner to an interested member; pending / accepted / declined.</td><td class="k">PK id<br>IX (conversation_id, created_at)<br>IX (sender_user_id, status, created_at)<br>IX (recipient_user_id, status, created_at)</td></tr>
+    <tr><td class="t">profile_proposal_attachments</td><td>Private files (S3) attached to a proposal.</td><td class="k">PK id<br>IX (proposal_id, created_at)</td></tr>
+    <tr><td class="t">notifications</td><td>Laravel database notifications (header bell, activity page).</td><td class="k">PK id (uuid)<br>IX (notifiable_type, notifiable_id)</td></tr>
+
+    <tr class="grp"><td colspan="3">Payments &amp; membership</td></tr>
+    <tr><td class="t">online_payments</td><td>Every checkout attempt: payer, plan, server-side amount, Razorpay order id (<code>udf</code>) and payment id, status 0/1/2.</td><td class="k">PK payment_id<br>UQ order_no<br>UQ razorpay_payment_id<br>IX udf</td></tr>
+    <tr><td class="t">profile_memberships</td><td>History of paid memberships per profile with activation/expiry; the My Plan page reads it.</td><td class="k">PK membership_id<br>IX (user_id, profile_type, profile_id)</td></tr>
+    <tr><td class="t">membership_plans</td><td>Plan catalogue (names, validity, credits) used to label memberships.</td><td class="k">PK plan_id</td></tr>
+
+    <tr class="grp"><td colspan="3">Content &amp; marketing</td></tr>
+    <tr><td class="t">bx_articles</td><td>Articles / insights (maintained by the admin team).</td><td class="k">PK article_id<br>IX (status, created_at, id)<br>IX (status, views, id)<br>IX (status, comments, id)</td></tr>
+    <tr><td class="t">bx_author</td><td>Article authors.</td><td class="k">PK author_id</td></tr>
+    <tr><td class="t">articles_comments</td><td>Member comments on articles; shown after moderation (<code>comment_status = 1</code>).</td><td class="k">PK comment_id<br>IX (article_id, comment_status, created_at)</td></tr>
+    <tr><td class="t">testimonials</td><td>Client quotes for the home page, ordered and switchable.</td><td class="k">PK id<br>IX (is_active, sort_order)</td></tr>
+    <tr><td class="t">businessex_newsletter</td><td>Newsletter subscribers with double opt-in status (P / S / U).</td><td class="k">PK newsletter_id<br>UQ email</td></tr>
+    <tr><td class="t">businessex_contactus</td><td>Contact-us form submissions.</td><td class="k">PK contact_id</td></tr>
+    <tr><td class="t">chatbot_knowledge_base</td><td>Keyword &rarr; answer pairs for the site chatbot.</td><td class="k">PK id<br>UQ intent</td></tr>
+    <tr><td class="t">chatbot_leads</td><td>Contact details captured by the chatbot.</td><td class="k">PK id<br>IX created_at</td></tr>
+
+    <tr class="grp"><td colspan="3">Framework (Laravel)</td></tr>
+    <tr><td class="t">cache, cache_locks</td><td>Database cache store (home page, schema metadata, chatbot answers).</td><td class="k">PK key<br>IX expiration</td></tr>
+    <tr><td class="t">jobs, job_batches, failed_jobs</td><td>Queue for emails and notifications; failed jobs for inspection.</td><td class="k">PK id<br>IX queue<br>UQ failed_jobs.uuid</td></tr>
+    <tr><td class="t">migrations</td><td>Which migrations have run.</td><td class="k">PK id</td></tr>
+  </tbody>
+</table>
+
+<!-- ============================ RELATIONS ============================ -->
+<h2>4. Relationships</h2>
+<table>
+  <thead><tr><th style="width:37%">Child column</th><th style="width:30%">Refers to</th><th style="width:9%">Type</th><th>Notes</th></tr></thead>
+  <tbody>
+    <tr><td class="k">profile_business / _investor / _mentors / _startups.user_id</td><td class="k">user_account.user_id</td><td>N : 1</td><td>Owner of the profile.</td></tr>
+    <tr><td class="k">user_profiles.user_id, (profile_type, profile_id)</td><td class="k">user_account, profile_*</td><td>N : 1</td><td>Numeric type code.</td></tr>
+    <tr><td class="k">profile_business_mgmt.business_profile_id</td><td class="k">profile_business.business_id</td><td>N : 1</td><td></td></tr>
+    <tr><td class="k">profile_media (profile_type, profile_id), user_id</td><td class="k">profile_*, user_account</td><td>N : 1</td><td>String type; owner check on download.</td></tr>
+    <tr><td class="k">profile_visitors (profile_type, profile_id)</td><td class="k">profile_*</td><td>N : 1</td><td>Numeric type; <code>user_id</code> is the viewer.</td></tr>
+    <tr><td class="k">ind_pref_business.business_profile_id</td><td class="k">profile_business.business_id</td><td>N : 1</td><td>With parent/sub category ids &rarr; <code>industry_categories.cat_id</code>.</td></tr>
+    <tr><td class="k">industry_categories.parent_id</td><td class="k">industry_categories.cat_id</td><td>N : 1</td><td>Self-reference; 0 = top level.</td></tr>
+    <tr><td class="k">profile_startups.industry_sector</td><td class="k">industry_categories.cat_id</td><td>N : 1</td><td>Business uses free-text sector instead.</td></tr>
+    <tr><td class="k">bx_cities.country</td><td class="k">country.country_id</td><td>N : 1</td><td>5 = United Kingdom.</td></tr>
+    <tr><td class="k">profile_contact_conversations.owner_user_id / sender_user_id</td><td class="k">user_account.user_id</td><td>N : 1</td><td>Plus <code>(profile_type, profile_id)</code> of the profile discussed.</td></tr>
+    <tr><td class="k">profile_contact_messages.conversation_id</td><td class="k">profile_contact_conversations.id</td><td>N : 1</td><td><code>sender_user_id</code> &rarr; user_account.</td></tr>
+    <tr><td class="k">profile_contact_conversation_reads (conversation_id, user_id)</td><td class="k">conversations, user_account</td><td>N : 1</td><td><code>last_read_message_id</code> &rarr; messages.id.</td></tr>
+    <tr><td class="k">profile_instant_responses.user_id</td><td class="k">user_account.user_id</td><td>1 : 1</td><td>Primary key is the user.</td></tr>
+    <tr><td class="k">profile_proposals.conversation_id</td><td class="k">profile_contact_conversations.id</td><td>N : 1</td><td>sender/recipient &rarr; user_account.</td></tr>
+    <tr><td class="k">profile_proposal_attachments.proposal_id</td><td class="k">profile_proposals.id</td><td>N : 1</td><td></td></tr>
+    <tr><td class="k">notifications (notifiable_type, notifiable_id)</td><td class="k">user_account.user_id</td><td>N : 1</td><td>Laravel polymorphic.</td></tr>
+    <tr><td class="k">online_payments.user_id, (profile_type, profile_id)</td><td class="k">user_account, profile_*</td><td>N : 1</td><td>0 until a guest payment is claimed at registration.</td></tr>
+    <tr><td class="k">profile_memberships.order_no</td><td class="k">online_payments.payment_id</td><td>N : 1</td><td>Despite its name it stores the payment id.</td></tr>
+    <tr><td class="k">profile_memberships.membership_type</td><td class="k">membership_plans.plan_id</td><td>N : 1</td><td></td></tr>
+    <tr><td class="k">bx_articles.author_id</td><td class="k">bx_author.author_id</td><td>N : 1</td><td></td></tr>
+    <tr><td class="k">articles_comments.article_id</td><td class="k">bx_articles.article_id</td><td>N : 1</td><td></td></tr>
+    <tr><td class="k">sessions.user_id, password_reset_tokens.email</td><td class="k">user_account</td><td>N : 1</td><td>Framework tables.</td></tr>
+  </tbody>
+</table>
+
+<!-- ============================ INDEX RATIONALE ============================ -->
+<h2>5. Why these indexes</h2>
+<table>
+  <thead><tr><th style="width:36%">Index</th><th>Query it serves</th></tr></thead>
+  <tbody>
+    <tr><td class="k">profile_* (status, created_at, id)</td><td>Directory listings and home sliders: "active profiles, newest first", paginated.</td></tr>
+    <tr><td class="k">profile_* (user_id)</td><td>Dashboard: "my profiles", and every ownership check.</td></tr>
+    <tr><td class="k">profile_startups (status, industry_sector)</td><td>Startup listing filtered by industry.</td></tr>
+    <tr><td class="k">ind_pref_business (business_profile_id, profile_status, parent/sub category)</td><td>Business industry filter and home industry counters.</td></tr>
+    <tr><td class="k">industry_categories (parent_id, category_status)</td><td>Building the category tree for filters and the footer.</td></tr>
+    <tr><td class="k">conversations (owner_user_id, updated_at) and (sender_user_id, updated_at)</td><td>Inbox: "my conversations, most recent first" for either side.</td></tr>
+    <tr><td class="k">messages (conversation_id, id) / (conversation_id, created_at)</td><td>Loading a thread, newest messages, latest message per conversation, unread counts.</td></tr>
+    <tr><td class="k">conversation_reads PK (conversation_id, user_id)</td><td>One marker per user per thread; makes the read update an atomic upsert.</td></tr>
+    <tr><td class="k">proposals (sender|recipient_user_id, status, created_at)</td><td>"Proposals sent / received" lists with the status filter, newest first.</td></tr>
+    <tr><td class="k">profile_media (user_id, profile_type, profile_id)</td><td>Media for one owned profile; owner checks on download.</td></tr>
+    <tr><td class="k">profile_visitors (profile_type, profile_id)</td><td>Dashboard view counts. Verified with EXPLAIN: full scan of 5,000 rows &rarr; 2 rows.</td></tr>
+    <tr><td class="k">articles_comments (article_id, comment_status, created_at)</td><td>Approved comments for one article, newest first. EXPLAIN: 5,000-row scan + filesort &rarr; ~25 rows.</td></tr>
+    <tr><td class="k">bx_articles (status, created_at|views|comments, id)</td><td>Article list sorted by newest, most viewed or most commented.</td></tr>
+    <tr><td class="k">online_payments UQ order_no, UQ razorpay_payment_id, IX udf</td><td>Look-ups by order number and Razorpay order id; the unique keys also stop one payment being applied twice.</td></tr>
+    <tr><td class="k">profile_memberships (user_id, profile_type, profile_id)</td><td>Deactivating the previous membership and showing My Plan.</td></tr>
+    <tr><td class="k">UQ user_account.email, businessex_newsletter.email</td><td>Prevent duplicate accounts and subscriptions; fast login look-up.</td></tr>
+  </tbody>
+</table>
+<div class="note"><b>Not indexed on purpose</b>Free-text search uses <code>LIKE '%term%'</code> across several columns, which a normal index cannot
+speed up. If search becomes slow as data grows, add FULLTEXT indexes or a search engine instead of more B-tree indexes.</div>
+
+<!-- ============================ LEGACY ============================ -->
+<h2>6. Legacy tables (kept, not used by the current app)</h2>
+<p>About 70 tables were migrated from the old system for data preservation and possible future features. The current code does not query them:</p>
+<table>
+  <thead><tr><th style="width:28%">Group</th><th>Tables</th></tr></thead>
+  <tbody>
+    <tr><td>Other profile types</td><td class="k">profile_broker, profile_incubators, profile_lenders and their *_prof_exp, *_mgmt, *_fund_raising tables</td></tr>
+    <tr><td>Old preferences</td><td class="k">ind_pref_* (except ind_pref_business), loc_pref_*, mentor_categories, mentor_expertise</td></tr>
+    <tr><td>Old contact system</td><td class="k">contact_* (8 tables), request_contact, conversation_reply, conversation_reply_attachment</td></tr>
+    <tr><td>Old content</td><td class="k">bx_news, news, news_list, news_comments, article_news_images, bex_shorts, bx_industryreports, content_tags, content_tags_assigned, seo, bx_dfp_banner</td></tr>
+    <tr><td>Other legacy</td><td class="k">admin_user, admin_profile_rejected, bookmarks, business_bookmarks, business_images, startup_images, bx_services, bx_coupon, fi_investors, hongkong, mobile_verification, password_resets, businessex_riseconference, users</td></tr>
+  </tbody>
+</table>
+<p class="legend">Before dropping any of them, confirm with the admin team that no external tool (for example an admin panel) still reads them, and take a backup.</p>
+
+<!-- ============================ RECOMMENDATIONS ============================ -->
+<h2>7. Recommendations</h2>
+<ul>
+  <li><b>Add foreign keys gradually</b>, starting with payments, memberships, messaging and proposals, after removing orphaned rows.</li>
+  <li><b>Use one profile-type encoding.</b> New tables use strings (<code>business</code>), older ones numeric codes; pick one for future tables and map the other.</li>
+  <li><b>Store money as <code>DECIMAL</code></b>: <code>online_payments.amount</code>, <code>profile_memberships.amount</code> and <code>membership_plans.plan_amount</code> are strings today.</li>
+  <li><b>Keep <code>profile_visitors</code> small</b>: count one view per viewer per profile per day, or aggregate old rows.</li>
+  <li><b>Archive or drop legacy tables</b> once confirmed unused, to reduce backup size and confusion.</li>
+  <li><b>Every schema change goes through a migration</b> that runs on MySQL and SQLite and has a working rollback; run <code>php artisan migrate</code> (it also refreshes the app's schema cache).</li>
+</ul>
+
+</body>
+</html>
