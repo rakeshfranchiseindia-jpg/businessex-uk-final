@@ -29,10 +29,29 @@
         </div>
       @endforeach
       <div class="view-profile">
-        <a href="{{ route('profile-details', ['type' => $listingType, 'id' => $listing->id]) }}" class="btn-view-profile">View Profile</a>
+        @php
+          $profileUrl = route('profile-details', ['type' => $listingType, 'id' => $listing->id]);
+        @endphp
+        @if (auth()->check())
+          <a href="{{ $profileUrl }}" class="btn-view-profile">View Profile</a>
+        @else
+          <a href="{{ route('login') }}" data-target="{{ $profileUrl }}" class="btn-view-profile js-guest-view-profile">View Profile</a>
+        @endif
       </div>
     </div>
   </article>
 @empty
   <p class="listing-empty">No {{ $listingLabel }} match your search. Try changing or clearing the filters.</p>
 @endforelse
+
+@once
+  <script>
+    document.addEventListener('click', function (event) {
+      var link = event.target.closest('.js-guest-view-profile');
+      if (!link) {
+        return;
+      }
+      document.cookie = 'intended_profile=' + encodeURIComponent(link.dataset.target) + '; path=/; max-age=60; SameSite=Lax';
+    });
+  </script>
+@endonce

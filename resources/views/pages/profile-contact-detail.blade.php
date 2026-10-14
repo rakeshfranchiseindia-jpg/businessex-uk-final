@@ -22,7 +22,7 @@
   .public-profile-page .profile-detail-section .profile-info:last-child,
   .public-profile-page .profile-detail-section .profile-info:nth-last-child(2):nth-child(odd) { border-bottom: none; }
   .public-profile-page .profile-section-heading { display: flex; align-items: center; gap: 10px; margin: 0 0 6px; color: var(--navy-900); font-size: 16px; }
-  .public-profile-page .profile-section-number { display: inline-flex; align-items: center; justify-content: center; width: 26px; height: 26px; border-radius: 50%; background: var(--gold-500); color: var(--navy-900); font-size: 13px; font-weight: 800; flex-shrink: 0; }
+  .public-profile-page .profile-section-number { display: inline-flex; align-items: center; justify-content: center; width: 26px; height: 26px; border-radius: 50%; background: var(--gold-500); color: var(--white); font-size: 13px; font-weight: 800; flex-shrink: 0; }
   .public-profile-page .profile-info-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 22px; }
   .public-profile-page .profile-info { padding: 13px 0; border-bottom: 1px solid var(--gray-100); overflow-wrap: anywhere; }
   .public-profile-page .profile-info dt { color: var(--gray-500); font-size: 12px; }

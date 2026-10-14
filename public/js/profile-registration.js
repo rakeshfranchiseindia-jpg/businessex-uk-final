@@ -33,6 +33,23 @@ document.addEventListener('DOMContentLoaded', () => {
     // reject an oversized file client-side via the native validity API, so
     // validatePanel()'s checkValidity() picks it up like any other field.
     form.querySelectorAll('input[type="file"][data-max-size-mb]').forEach(input => {
+      const control = input.closest('[data-file-upload-control]');
+      const preview = control?.querySelector('[data-file-upload-preview]');
+      const previewImage = control?.querySelector('[data-file-preview-image]');
+      const previewName = control?.querySelector('[data-file-preview-name]');
+      const removeButton = control?.querySelector('[data-file-upload-remove]');
+
+      function clearPreview() {
+        if (!preview) return;
+        preview.hidden = true;
+        if (previewImage) {
+          if (previewImage.src.startsWith('blob:')) URL.revokeObjectURL(previewImage.src);
+          previewImage.src = '';
+          previewImage.hidden = true;
+        }
+        if (previewName) previewName.textContent = '';
+      }
+
       input.addEventListener('change', () => {
         const maxBytes = Number(input.dataset.maxSizeMb) * 1024 * 1024;
         const oversized = [...input.files].find(file => file.size > maxBytes);
@@ -40,9 +57,31 @@ document.addEventListener('DOMContentLoaded', () => {
           input.setCustomValidity(`"${oversized.name}" is ${(oversized.size / 1024 / 1024).toFixed(2)}MB — files must be ${input.dataset.maxSizeMb}MB or smaller.`);
           input.reportValidity();
           input.value = '';
-        } else {
-          input.setCustomValidity('');
+          clearPreview();
+          return;
         }
+
+        input.setCustomValidity('');
+        const file = input.files[0];
+        if (!file || !preview) return;
+
+        preview.hidden = false;
+        if (previewName) previewName.textContent = file.name;
+        if (previewImage) {
+          if (file.type.startsWith('image/')) {
+            if (previewImage.src.startsWith('blob:')) URL.revokeObjectURL(previewImage.src);
+            previewImage.src = URL.createObjectURL(file);
+            previewImage.hidden = false;
+          } else {
+            previewImage.hidden = true;
+          }
+        }
+      });
+
+      removeButton?.addEventListener('click', () => {
+        input.value = '';
+        input.setCustomValidity('');
+        clearPreview();
       });
     });
 

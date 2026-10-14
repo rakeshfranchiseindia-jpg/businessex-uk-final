@@ -255,8 +255,22 @@ class DashboardController extends Controller
     public function updateMyProfile(Request $request, string $type, int $id): RedirectResponse
     {
         [$definition, $profile] = $this->ownedProfile($type, $id);
-        $profileSteps = $this->editableProfileSteps($type, $definition, $profile);
-        $rules = [];
+        $allProfileSteps = $this->editableProfileSteps($type, $definition, $profile);
+
+        // Each tab saves independently: only the fields on the tab the
+        // visitor is currently viewing are validated and written, so an
+        // unrelated required field sitting on another tab (e.g. a phone
+        // number the visitor isn't touching right now) never blocks a
+        // save — most commonly uploading/removing an attachment.
+        $activeStepIndex = (int) $request->input('active_step', 0);
+        $profileSteps = isset($allProfileSteps[$activeStepIndex])
+            ? [$allProfileSteps[$activeStepIndex]]
+            : $allProfileSteps;
+
+        $rules = [
+            'delete_media_ids' => ['sometimes', 'array'],
+            'delete_media_ids.*' => ['integer'],
+        ];
 
         foreach ($profileSteps as $step) {
             foreach ($step['fields'] as $field) {
@@ -406,10 +420,61 @@ class DashboardController extends Controller
                 ];
             }
 
-            DB::transaction(function () use ($definition, $id, $request, $type, $updates, $uploads): void {
+            $deleteMediaIds = array_map('intval', $validated['delete_media_ids'] ?? []);
+
+            DB::transaction(function () use ($definition, $id, $request, $type, $updates, $uploads, $deleteMediaIds): void {
+                $deleteMediaRows = function (Collection $mediaRows): void {
+                    foreach ($mediaRows as $media) {
+                        try {
+                            Storage::disk($media->disk)->delete($media->object_key);
+                        } catch (Throwable $exception) {
+                            // S3 delete can fail independently of the database
+                            // (e.g. a revoked/quarantined key) — the attachment
+                            // must still disappear from the profile either way,
+                            // so log it for manual cleanup rather than blocking
+                            // the rest of the save.
+                            Log::error('Unable to remove a profile attachment from storage.', [
+                                'media_id' => $media->id,
+                                'object_key' => $media->object_key,
+                                'exception' => $exception->getMessage(),
+                            ]);
+                        }
+                    }
+
+                    DB::table('profile_media')->whereIn('id', $mediaRows->pluck('id'))->delete();
+                };
+
+                if ($deleteMediaIds !== [] && Schema::hasTable('profile_media')) {
+                    $mediaToDelete = DB::table('profile_media')
+                        ->where('user_id', $request->user()->user_id)
+                        ->where('profile_type', $type)
+                        ->where('profile_id', $id)
+                        ->whereIn('id', $deleteMediaIds)
+                        ->get();
+
+                    $deleteMediaRows($mediaToDelete);
+                }
+
                 foreach ($uploads as $upload) {
                     $file = $upload['file'];
                     $fieldName = $upload['field_name'];
+
+                    // A new file picked for a field that already has a saved
+                    // attachment replaces it outright — the old one is
+                    // removed so the slot holds exactly the new upload.
+                    if (Schema::hasTable('profile_media')) {
+                        $previousForField = DB::table('profile_media')
+                            ->where('user_id', $request->user()->user_id)
+                            ->where('profile_type', $type)
+                            ->where('profile_id', $id)
+                            ->where('field_name', $fieldName)
+                            ->get();
+
+                        if ($previousForField->isNotEmpty()) {
+                            $deleteMediaRows($previousForField);
+                        }
+                    }
+
                     $mediaId = null;
                     if (SchemaCache::hasTable('profile_media')) {
                         $mediaId = DB::table('profile_media')->insertGetId([
@@ -596,11 +661,13 @@ class DashboardController extends Controller
             if (in_array($column, $hiddenColumns, true) || $value === null || $value === '') {
                 continue;
             }
+            $isUrl = (bool) preg_match('#^https?://#i', (string) $value);
             $items[] = [
                 'name' => $column,
                 'label' => $labels[$column] ?? Str::headline($column),
                 'value' => (string) $value,
-                'is_url' => (bool) preg_match('#^https?://#i', (string) $value),
+                'is_url' => $isUrl,
+                'is_image' => $isUrl && (bool) preg_match('#\.(png|jpe?g|gif|webp|svg)(\?.*)?$#i', (string) $value),
             ];
         }
 

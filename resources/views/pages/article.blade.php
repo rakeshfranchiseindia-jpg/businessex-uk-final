@@ -161,7 +161,7 @@ BusinessX articles, news and international trade insights.
 
     /* Pagination */
     .pagination {
-      display: flex; justify-content: center; gap: 6px;
+      display: flex; justify-content: flex-end; gap: 6px;
       margin-bottom: 32px;
     }
     .pagination a {
@@ -232,7 +232,7 @@ BusinessX articles, news and international trade insights.
     .newsletter-banner .phone-country-code:focus { outline: none; border-color: var(--gold-500); background-color: rgba(255,255,255,0.15); }
     .newsletter-banner .news-field-error { color: #fecaca; font-size: 12px; }
     .newsletter-banner button {
-      grid-column: 1 / -1; justify-self: start;
+      grid-column: 1 / -1; justify-self: end;
       padding: 0 20px; height: 44px; background: var(--gold-500); color: var(--navy-900);
       border-radius: 6px; font-weight: 700; font-size: 14px;
       white-space: nowrap;

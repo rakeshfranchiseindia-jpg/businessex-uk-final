@@ -6,6 +6,8 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cookie;
+use Illuminate\Support\Str;
 use Illuminate\View\View;
 
 class PageController extends Controller
@@ -55,6 +57,19 @@ class PageController extends Controller
             $response = $this->render($view, $activePage, $showHeader);
 
             if ($routeName === 'login') {
+                // "View Profile" links for guests point straight at /login
+                // (so the browser's hover preview and the address bar stay
+                // clean, no ?redirect=... query string) and stash where the
+                // visitor was headed in a short-lived cookie instead. Pick
+                // that up here and store it the same way the `auth`
+                // middleware would, so the normal post-login
+                // redirect()->intended() still lands on that profile.
+                $intended = $request->cookie('intended_profile');
+
+                if (is_string($intended) && Str::startsWith($intended, url('/') . '/')) {
+                    $request->session()->put('url.intended', $intended);
+                }
+
                 // A browser's back/forward cache can replay this exact page
                 // after the user has since logged in elsewhere, so a stale
                 // "logged out" login form stays on screen while every link
@@ -62,7 +77,9 @@ class PageController extends Controller
                 // the now-authenticated user and redirects to the
                 // dashboard — looking like "it skipped login". no-store
                 // keeps the page out of that cache.
-                return response($response)->header('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0');
+                return response($response)
+                    ->header('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0')
+                    ->withCookie(Cookie::forget('intended_profile'));
             }
 
             return $response;

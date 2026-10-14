@@ -15,6 +15,63 @@
       'startup_name', 'startup_designation', 'name_of_entity',
   ];
 ?>
+@once
+  <style>
+    .file-upload-control { position: relative; }
+    .file-upload-preview[hidden] { display: none; }
+    .file-upload-preview {
+      display: flex;
+      flex-wrap: nowrap;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+      padding: 6px 8px;
+      border: 1px solid var(--gray-200, #e5e7eb);
+      border-radius: 8px;
+      background: var(--gray-50, #f9fafb);
+      max-width: 100%;
+    }
+    .file-upload-preview img[hidden] { display: none; }
+    .file-upload-thumb { position: relative; flex-shrink: 0; display: inline-flex; min-width: 28px; min-height: 28px; }
+    .file-upload-preview img {
+      flex-shrink: 0;
+      width: 28px;
+      height: 28px;
+      object-fit: cover;
+      border-radius: 6px;
+      border: 1px solid var(--gray-200, #e5e7eb);
+      background: #fff;
+    }
+    .file-upload-preview-name {
+      flex: 1;
+      min-width: 0;
+      font-size: 13px;
+      color: var(--gray-700, #374151);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .file-upload-remove {
+      position: absolute;
+      top: -6px;
+      right: -6px;
+      flex-shrink: 0;
+      width: 16px;
+      height: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1.5px solid #fff;
+      border-radius: 50%;
+      background: var(--gray-700, #4b5563);
+      color: #fff;
+      font-size: 11px;
+      line-height: 1;
+      cursor: pointer;
+    }
+    .file-upload-remove:hover { background: var(--red-500, #ef4444); color: #fff; }
+  </style>
+@endonce
 @if (session('verification_notice'))
   <p role="status" style="margin-bottom:16px;padding:12px;border-radius:6px;background:#ecfdf5;color:#166534;">{{ session('verification_notice') }}</p>
 @endif
@@ -102,9 +159,20 @@
                   <div class="phone-input-group">
                     @include('components.phone-country-code')
                 <?php endif; ?>
-                <input id="<?= $fieldId ?>" class="<?= $errorClass ?>" name="<?= htmlspecialchars($fieldInputName, ENT_QUOTES, 'UTF-8') ?>" type="<?= htmlspecialchars($fieldType, ENT_QUOTES, 'UTF-8') ?>" value="<?= in_array($fieldType, ['file', 'password'], true) ? '' : e(old($field['name'], $profileDefaults[$field['name']] ?? '')) ?>" placeholder="<?= htmlspecialchars($field['placeholder'] ?? '', ENT_QUOTES, 'UTF-8') ?>" <?= isset($field['accept']) ? 'accept="' . htmlspecialchars($field['accept'], ENT_QUOTES, 'UTF-8') . '"' : '' ?> <?= $fieldType === 'file' ? 'data-max-size-mb="1"' : '' ?> <?= $fieldType === 'number' ? 'min="0" step="any"' : '' ?> <?= ($field['name'] ?? '') === 'inv_stake' ? 'max="100"' : '' ?> <?= $fieldType === 'tel' ? 'pattern="07[0-9]{9}" title="Enter a valid UK mobile number starting with 07 (11 digits)."' : '' ?> <?= ($fieldType === 'text' && in_array($field['name'] ?? '', $nameTypeFields, true)) ? 'pattern="[A-Za-z\s]+" title="Name should only contain letters and spaces"' : '' ?> <?= !empty($field['multiple']) ? 'multiple' : '' ?> <?= $required ? 'required' : '' ?>>
+                <?php if ($fieldType === 'file'): ?>
+                  <div class="file-upload-control" data-file-upload-control>
+                  <div class="file-upload-preview" data-file-upload-preview hidden>
+                    <span class="file-upload-thumb">
+                      <img src="" alt="Selected file preview" data-file-preview-image hidden>
+                      <button type="button" class="file-upload-remove" data-file-upload-remove aria-label="Remove selected file">&times;</button>
+                    </span>
+                    <span class="file-upload-preview-name" data-file-preview-name></span>
+                  </div>
+                <?php endif; ?>
+                <input id="<?= $fieldId ?>" class="<?= $errorClass ?>" name="<?= htmlspecialchars($fieldInputName, ENT_QUOTES, 'UTF-8') ?>" type="<?= htmlspecialchars($fieldType, ENT_QUOTES, 'UTF-8') ?>" value="<?= in_array($fieldType, ['file', 'password'], true) ? '' : e(old($field['name'], $profileDefaults[$field['name']] ?? '')) ?>" placeholder="<?= htmlspecialchars($field['placeholder'] ?? '', ENT_QUOTES, 'UTF-8') ?>" <?= isset($field['accept']) ? 'accept="' . htmlspecialchars($field['accept'], ENT_QUOTES, 'UTF-8') . '"' : '' ?> <?= $fieldType === 'file' ? 'data-max-size-mb="1" data-file-input' : '' ?> <?= $fieldType === 'number' ? 'min="0" step="any"' : '' ?> <?= ($field['name'] ?? '') === 'inv_stake' ? 'max="100"' : '' ?> <?= $fieldType === 'tel' ? 'pattern="07[0-9]{9}" title="Enter a valid UK mobile number starting with 07 (11 digits)."' : '' ?> <?= ($fieldType === 'text' && in_array($field['name'] ?? '', $nameTypeFields, true)) ? 'pattern="[A-Za-z\s]+" title="Name should only contain letters and spaces"' : '' ?> <?= !empty($field['multiple']) ? 'multiple' : '' ?> <?= $required ? 'required' : '' ?>>
                 <?php if ($fieldType === 'file'): ?>
                   <p class="upload-hint">Max 1MB<?= isset($field['accept']) ? ' · ' . htmlspecialchars(strtoupper(str_replace(['.', ','], ['', ', '], $field['accept'])), ENT_QUOTES, 'UTF-8') : '' ?></p>
+                  </div>
                 <?php endif; ?>
                 <?php if ($fieldType === 'tel'): ?>
                   </div>

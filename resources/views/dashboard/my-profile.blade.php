@@ -31,6 +31,78 @@ View and manage your {{ strtolower($profileLabel) }} profile.
   .owned-profile-existing-media { grid-column: 1 / -1; margin-top: 8px; }
   .owned-profile-existing-media a { display: inline-block; margin-right: 12px; color: var(--navy-700); text-decoration: underline; }
   @media (max-width: 700px) { .owned-profile-fields { grid-template-columns: 1fr; } }
+  .owned-profile-image-link { display: inline-block; }
+  .owned-profile-image-preview {
+    width: 96px;
+    height: 96px;
+    object-fit: cover;
+    border-radius: 8px;
+    border: 1px solid var(--gray-200, #e5e7eb);
+    background: #fff;
+  }
+  .file-upload-control { position: relative; }
+  .file-upload-preview[hidden] { display: none; }
+  .file-upload-preview {
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+    padding: 6px 8px;
+    border: 1px solid var(--gray-200, #e5e7eb);
+    border-radius: 8px;
+    background: var(--gray-50, #f9fafb);
+    max-width: 100%;
+  }
+  .file-upload-thumb { position: relative; flex-shrink: 0; display: inline-flex; min-width: 36px; min-height: 36px; }
+  .file-upload-preview img[hidden],
+  .file-upload-thumb-fallback[hidden] { display: none; }
+  .file-upload-preview img,
+  .file-upload-thumb-fallback {
+    width: 36px;
+    height: 36px;
+    object-fit: cover;
+    border-radius: 6px;
+    border: 1px solid var(--gray-200, #e5e7eb);
+    background: #fff;
+  }
+  .file-upload-thumb-fallback {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 9px;
+    color: var(--gray-500, #6b7280);
+    text-align: center;
+    padding: 2px;
+  }
+  .file-upload-preview-name {
+    flex: 1;
+    min-width: 0;
+    font-size: 13px;
+    color: var(--gray-700, #374151);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .file-upload-remove {
+    position: absolute;
+    top: -6px;
+    right: -6px;
+    flex-shrink: 0;
+    width: 16px;
+    height: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1.5px solid #fff;
+    border-radius: 50%;
+    background: var(--gray-700, #4b5563);
+    color: #fff;
+    font-size: 11px;
+    line-height: 1;
+    cursor: pointer;
+  }
+  .file-upload-remove:hover { background: var(--red-500, #ef4444); color: #fff; }
 </style>
 @endsection
 
@@ -65,6 +137,7 @@ View and manage your {{ strtolower($profileLabel) }} profile.
           <form method="post" action="{{ route('dashboard.profiles.update', ['type' => $profileType, 'id' => $profileId]) }}" enctype="multipart/form-data" data-owned-profile-form novalidate>
             @csrf
             @method('put')
+            <input type="hidden" name="active_step" value="{{ old('active_step', 0) }}" data-active-step-input>
             @php
               $activeProfileTab = 0;
               foreach ($profileSteps as $stepIndex => $step) {
@@ -108,18 +181,28 @@ View and manage your {{ strtolower($profileLabel) }} profile.
                       @endforeach
                     </fieldset>
                   @elseif ($fieldType === 'file')
+                    @php
+                      $existingMedia = $profileMedia->has($fieldName) ? $profileMedia->get($fieldName)->last() : null;
+                      $existingIsImage = $existingMedia && str_starts_with($existingMedia->mime_type, 'image/');
+                      $existingUrl = $existingMedia
+                          ? ($existingMedia->is_public ? ($existingMedia->url ?: Storage::disk($existingMedia->disk)->url($existingMedia->object_key)) : route('profile-media.download', ['media' => $existingMedia->id]))
+                          : null;
+                    @endphp
                     <div class="workspace-field {{ $wide ? 'full' : '' }}">
                       <label for="{{ $fieldId }}">{{ $field['label'] }}</label>
-                      <input id="{{ $fieldId }}" name="{{ $fieldName }}{{ !empty($field['multiple']) ? '[]' : '' }}" type="file" accept="{{ $field['accept'] ?? '' }}" data-max-size-mb="1" @if (!empty($field['multiple'])) multiple @endif>
-                      <p class="upload-hint">Max 1MB · {{ strtoupper(str_replace(['.', ','], ['', ', '], $field['accept'] ?? '')) }}</p>
-                      @if ($profileMedia->has($fieldName))
-                        <div class="owned-profile-existing-media">
-                          <span>Current files:</span>
-                          @foreach ($profileMedia->get($fieldName) as $media)
-                            <a href="{{ $media->is_public ? ($media->url ?: Storage::disk($media->disk)->url($media->object_key)) : route('profile-media.download', ['media' => $media->id]) }}" target="_blank" rel="noopener noreferrer">{{ $media->original_name }}</a>
-                          @endforeach
+                      <div class="file-upload-control" data-file-upload-control data-field-label="{{ $field['label'] }}" @if ($existingMedia) data-existing-media-id="{{ $existingMedia->id }}" @endif>
+                        <div class="file-upload-preview" data-file-upload-preview data-state="{{ $existingMedia ? 'existing' : 'empty' }}" @if (!$existingMedia) hidden @endif>
+                          <span class="file-upload-thumb">
+                            <img src="{{ $existingUrl }}" alt="{{ $existingMedia->original_name ?? '' }}" data-file-preview-image @if (!$existingIsImage) hidden @endif>
+                            <span class="file-upload-thumb-fallback" data-file-preview-fallback @if (!$existingMedia || $existingIsImage) hidden @endif>{{ $existingMedia ? strtoupper(pathinfo($existingMedia->original_name, PATHINFO_EXTENSION)) : '' }}</span>
+                            <button type="button" class="file-upload-remove" data-file-upload-remove aria-label="Remove {{ $field['label'] }}">&times;</button>
+                          </span>
+                          <span class="file-upload-preview-name" data-file-preview-name>{{ $existingMedia->original_name ?? '' }}</span>
                         </div>
-                      @elseif ($profile->{$fieldName} ?? null)
+                        <input id="{{ $fieldId }}" name="{{ $fieldName }}{{ !empty($field['multiple']) ? '[]' : '' }}" type="file" accept="{{ $field['accept'] ?? '' }}" data-max-size-mb="1" data-file-input @if (!empty($field['multiple'])) multiple @endif>
+                        <p class="upload-hint">Max 1MB · {{ strtoupper(str_replace(['.', ','], ['', ', '], $field['accept'] ?? '')) }}</p>
+                      </div>
+                      @if (!$existingMedia && ($profile->{$fieldName} ?? null))
                         <div class="owned-profile-existing-media">A previously uploaded file is attached to this profile.</div>
                       @endif
                       @error($fieldName)<span class="password-error" role="alert">{{ $message }}</span>@enderror
@@ -165,7 +248,11 @@ View and manage your {{ strtolower($profileLabel) }} profile.
               <div class="owned-profile-field">
                 <dt>{{ $item['label'] }}</dt>
                 <dd>
-                  @if ($item['is_url'])
+                  @if (!empty($item['is_image']))
+                    <a href="{{ $item['value'] }}" target="_blank" rel="noopener noreferrer" class="owned-profile-image-link">
+                      <img src="{{ $item['value'] }}" alt="{{ $item['label'] }}" class="owned-profile-image-preview">
+                    </a>
+                  @elseif ($item['is_url'])
                     <a href="{{ $item['value'] }}" target="_blank" rel="noopener noreferrer">{{ $item['value'] }}</a>
                   @else
                     {{ $item['value'] }}
@@ -189,6 +276,7 @@ View and manage your {{ strtolower($profileLabel) }} profile.
   const ownedProfileTabs = [...document.querySelectorAll('[data-owned-profile-tab]')];
   const ownedProfilePanels = [...document.querySelectorAll('[data-owned-profile-panel]')];
   const ownedProfileForm = document.querySelector('[data-owned-profile-form]');
+  const activeStepInput = document.querySelector('[data-active-step-input]');
 
   function activateOwnedProfileTab(tab, focus = false) {
     ownedProfileTabs.forEach(item => {
@@ -199,6 +287,7 @@ View and manage your {{ strtolower($profileLabel) }} profile.
     ownedProfilePanels.forEach(panel => {
       panel.hidden = panel.dataset.ownedProfilePanel !== tab.dataset.ownedProfileTab;
     });
+    if (activeStepInput) activeStepInput.value = tab.dataset.ownedProfileTab;
     if (focus) tab.focus();
   }
 
@@ -217,17 +306,68 @@ View and manage your {{ strtolower($profileLabel) }} profile.
     });
   });
 
+  // Save only ever touches the section (tab) the visitor is currently on —
+  // each tab's required fields are validated and submitted independently,
+  // so switching to Attachments and saving a photo never gets blocked by
+  // an unrelated field (e.g. a missing phone number) sitting on another
+  // tab the visitor isn't even looking at right now.
   ownedProfileForm?.addEventListener('submit', event => {
-    const invalidField = [...ownedProfileForm.querySelectorAll(':invalid')][0];
+    const activePanel = ownedProfilePanels.find(panel => !panel.hidden);
+    const invalidField = activePanel && [...activePanel.querySelectorAll(':invalid')][0];
     if (!invalidField) return;
     event.preventDefault();
-    const panel = invalidField.closest('[data-owned-profile-panel]');
-    const tab = panel && ownedProfileTabs.find(item => item.dataset.ownedProfileTab === panel.dataset.ownedProfilePanel);
-    if (tab) activateOwnedProfileTab(tab);
     invalidField.reportValidity();
   });
 
+  // Each file field shows one preview at a time, directly above its own
+  // "Choose File" control: the already-saved image (state="existing") by
+  // default, or the just-picked pending file (state="pending") once the
+  // visitor selects something new in that same box — the new one visually
+  // replaces the old one immediately, and the actual swap/delete on the
+  // server happens together when "Save Profile" is submitted.
   ownedProfileForm?.querySelectorAll('input[type="file"][data-max-size-mb]').forEach(input => {
+    const control = input.closest('[data-file-upload-control]');
+    const preview = control?.querySelector('[data-file-upload-preview]');
+    const previewImage = preview?.querySelector('[data-file-preview-image]');
+    const previewFallback = preview?.querySelector('[data-file-preview-fallback]');
+    const previewName = preview?.querySelector('[data-file-preview-name]');
+    const removeButton = preview?.querySelector('[data-file-upload-remove]');
+    const existingMediaId = control?.dataset.existingMediaId || null;
+    const fieldLabel = control?.dataset.fieldLabel || 'File';
+    if (!control || !preview) return;
+
+    function showPending(file) {
+      preview.dataset.state = 'pending';
+      preview.hidden = false;
+      if (previewName) previewName.textContent = file.name;
+      if (file.type.startsWith('image/')) {
+        if (previewImage) {
+          if (previewImage.src.startsWith('blob:')) URL.revokeObjectURL(previewImage.src);
+          previewImage.src = URL.createObjectURL(file);
+          previewImage.hidden = false;
+        }
+        if (previewFallback) previewFallback.hidden = true;
+      } else {
+        if (previewImage) previewImage.hidden = true;
+        if (previewFallback) {
+          previewFallback.textContent = file.name.split('.').pop()?.toUpperCase() || 'FILE';
+          previewFallback.hidden = false;
+        }
+      }
+    }
+
+    function revertToEmpty() {
+      preview.dataset.state = 'empty';
+      preview.hidden = true;
+      if (previewImage) {
+        if (previewImage.src.startsWith('blob:')) URL.revokeObjectURL(previewImage.src);
+        previewImage.src = '';
+        previewImage.hidden = true;
+      }
+      if (previewFallback) previewFallback.hidden = true;
+      if (previewName) previewName.textContent = '';
+    }
+
     input.addEventListener('change', () => {
       const maxBytes = Number(input.dataset.maxSizeMb) * 1024 * 1024;
       const oversized = [...input.files].find(file => file.size > maxBytes);
@@ -235,9 +375,34 @@ View and manage your {{ strtolower($profileLabel) }} profile.
         input.setCustomValidity(`"${oversized.name}" is ${(oversized.size / 1024 / 1024).toFixed(2)}MB — files must be ${input.dataset.maxSizeMb}MB or smaller.`);
         input.reportValidity();
         input.value = '';
-      } else {
-        input.setCustomValidity('');
+        return;
       }
+
+      input.setCustomValidity('');
+      const file = input.files[0];
+      if (!file) return;
+      showPending(file);
+    });
+
+    removeButton?.addEventListener('click', () => {
+      if (preview.dataset.state === 'pending') {
+        // Just cancels the pending selection — nothing saved changes yet.
+        input.value = '';
+        input.setCustomValidity('');
+        revertToEmpty();
+        return;
+      }
+
+      // Removing the already-saved file: stage it for deletion (actually
+      // deleted server-side on Save), then clear the box for a fresh pick.
+      if (existingMediaId && ownedProfileForm) {
+        const marker = document.createElement('input');
+        marker.type = 'hidden';
+        marker.name = 'delete_media_ids[]';
+        marker.value = existingMediaId;
+        ownedProfileForm.appendChild(marker);
+      }
+      revertToEmpty();
     });
   });
 </script>
