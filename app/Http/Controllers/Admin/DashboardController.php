@@ -34,6 +34,12 @@ class DashboardController extends Controller
         // Profile counts per type, split by status.
         $profiles = [];
         foreach (ProfileTypes::all() as $slug => $type) {
+            // Lender, Incubator and Broker are temporarily hidden from the
+            // dashboard (and the sidebar nav) only — their routes/data are untouched.
+            if (in_array($slug, ['lender', 'incubator', 'broker'], true)) {
+                continue;
+            }
+
             $counts = $dateFilter(ProfileTypes::query($slug))
                 ->selectRaw("{$type['status']} as status, COUNT(*) as total")
                 ->groupBy($type['status'])

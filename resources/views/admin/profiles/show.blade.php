@@ -74,6 +74,65 @@
                 </div>
             </div>
 
+            @if (array_key_exists($config['slug'], \App\Services\Payments\MembershipPaymentService::PROFILE_TABLES))
+                @php
+                    $planLabels = array_flip(\App\Services\Payments\MembershipPaymentService::PLAN_CODES);
+                    $currentPlanCode = (int) ($profile->membership_plan ?? 0);
+                    $currentPlanLabel = $planLabels[$currentPlanCode] ?? null;
+                @endphp
+                <div class="card mb-3">
+                    <div class="card-header">Membership plan</div>
+                    <div class="card-body small">
+                        <div class="mb-3">
+                            <span class="text-muted">Current:</span>
+                            @if ($profile->membership_paid && $currentPlanLabel)
+                                <span class="badge bg-success">{{ ucfirst($currentPlanLabel) }}</span>
+                            @else
+                                <span class="badge bg-secondary">No active plan</span>
+                            @endif
+                        </div>
+                        @if ($profile->membership_paid && $membership)
+                            <div class="mb-3">
+                                <span class="text-muted">Assigned by:</span>
+                                @if ($membership->assignedByAdmin)
+                                    {{ $membership->assignedByAdmin->admin_name }} ({{ $membership->assignedByAdmin->admin_email }})
+                                @else
+                                    Self
+                                @endif
+                            </div>
+                        @endif
+                        <form method="POST" action="{{ route('admin.profiles.plan.store', [$config['slug'], $id]) }}" class="d-flex gap-2" data-confirm="Grant this plan to the profile owner?">
+                            @csrf
+                            <select name="plan" class="form-select form-select-sm" required>
+                                <option value="">Select plan…</option>
+                                @foreach (array_keys(\App\Services\Payments\MembershipPaymentService::PLAN_CODES) as $planKey)
+                                    <option value="{{ $planKey }}" @selected($currentPlanLabel === $planKey)>{{ ucfirst($planKey) }}</option>
+                                @endforeach
+                            </select>
+                            <button class="btn btn-sm btn-outline-primary">Assign</button>
+                        </form>
+                        @error('plan')
+                            <div class="text-danger mt-2">{{ $message }}</div>
+                        @enderror
+                    </div>
+                </div>
+            @endif
+
+            @if (isset($config['management']) && $management->isNotEmpty())
+                <div class="card mb-3">
+                    <div class="card-header">Management team</div>
+                    <ul class="list-group list-group-flush small">
+                        @foreach ($management as $member)
+                            <li class="list-group-item">
+                                <div class="fw-semibold">{{ $member->mgmt_name }}</div>
+                                <div class="text-muted">{{ $member->mgmt_designation }}</div>
+                                <div class="text-muted">{{ $member->mgmt_email }}</div>
+                            </li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
+
             @if ($rejections->isNotEmpty())
                 <div class="card">
                     <div class="card-header text-danger">Rejection history</div>
@@ -90,6 +149,62 @@
         </div>
 
         <div class="col-lg-8">
+            @if (isset($config['images']))
+                <div class="card mb-3">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <span>Gallery &amp; documents</span>
+                        <div class="d-flex gap-2">
+                            <form method="POST" action="{{ route('admin.profiles.images.store', [$config['slug'], $id]) }}" enctype="multipart/form-data" class="d-flex align-items-center gap-2">
+                                @csrf
+                                <select name="kind" class="form-select form-select-sm" style="width:auto">
+                                    <option value="image">Image</option>
+                                    <option value="document">Document</option>
+                                </select>
+                                <input type="file" name="file" class="form-control form-control-sm" style="width:auto" required>
+                                <button class="btn btn-sm btn-outline-primary">Upload</button>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        @if ($images->isEmpty())
+                            <span class="text-muted small">No images or documents uploaded.</span>
+                        @else
+                            <div class="row g-2">
+                                @foreach ($images as $image)
+                                    @php
+                                        $isDocument = (int) $image->type === $config['images']['model']::TYPE_DOCUMENT;
+                                        $path = $image->{$config['images']['path_column']};
+                                        $url = $path ? (preg_match('#^https?://#', $path) ? $path : asset($path)) : null;
+                                    @endphp
+                                    <div class="col-6 col-md-4 col-lg-3">
+                                        <div class="border rounded p-2 h-100 d-flex flex-column">
+                                            @if ($isDocument)
+                                                <a href="{{ $url }}" target="_blank" rel="noopener" class="small text-break mb-2"><i class="bi bi-file-earmark-text me-1"></i>{{ $image->{$config['images']['name_column']} ?: 'Document' }}</a>
+                                            @else
+                                                <a href="{{ $url }}" target="_blank" rel="noopener">
+                                                    <img src="{{ $url }}" alt="" class="w-100 mb-2" style="height:90px;object-fit:cover;border-radius:4px">
+                                                </a>
+                                            @endif
+                                            <div class="d-flex justify-content-between align-items-center mt-auto">
+                                                <form method="POST" action="{{ route('admin.profiles.images.toggle', [$config['slug'], $id, $image->getKey()]) }}">
+                                                    @csrf
+                                                    <button class="btn btn-sm {{ $image->is_active ? 'btn-outline-success' : 'btn-outline-secondary' }}">{{ $image->is_active ? 'Active' : 'Inactive' }}</button>
+                                                </form>
+                                                <form method="POST" action="{{ route('admin.profiles.images.destroy', [$config['slug'], $id, $image->getKey()]) }}" data-confirm="Remove this file?">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                @endforeach
+                            </div>
+                        @endif
+                    </div>
+                </div>
+            @endif
+
             <div class="card">
                 <div class="card-header">All profile details</div>
                 <div class="card-body">

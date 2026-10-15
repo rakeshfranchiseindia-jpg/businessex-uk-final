@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="robots" content="noindex, nofollow">
-    <title>@yield('title', 'Dashboard') | BusinessEx Admin</title>
+    <title>@yield('title', 'Dashboard') | BusinessX Admin</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -57,7 +57,7 @@
             @yield('content')
         </main>
 
-        <footer class="admin-footer">&copy; {{ date('Y') }} BusinessEx. All rights reserved.</footer>
+        <footer class="admin-footer">&copy; {{ date('Y') }} BusinessX. All rights reserved.</footer>
     </div>
 </div>
 

@@ -23,7 +23,11 @@ use App\Http\Controllers\Admin\EnquiryController;
 use App\Http\Controllers\Admin\IndustryReportController;
 use App\Http\Controllers\Admin\NewsController;
 use App\Http\Controllers\Admin\PaymentController;
+use App\Http\Controllers\Admin\ProfileCommentController;
 use App\Http\Controllers\Admin\ProfileController;
+use App\Http\Controllers\Admin\ProfileImageController;
+use App\Http\Controllers\Admin\ProfilePlanController;
+use App\Http\Controllers\Admin\InstantResponseController;
 use App\Http\Controllers\Admin\ProposalController;
 use App\Http\Controllers\Admin\SeoController;
 use App\Http\Controllers\Admin\TagController;
@@ -65,6 +69,38 @@ Route::prefix('admin')->name('admin.')->group(function (): void {
                 Route::post('/{id}/approve', 'approve')->whereNumber('id')->name('approve');
                 Route::post('/{id}/deactivate', 'deactivate')->whereNumber('id')->name('deactivate');
                 Route::post('/{id}/reject', 'reject')->whereNumber('id')->name('reject');
+            });
+
+        Route::middleware('admin.role:profiles')
+            ->prefix('profiles/{type}/{id}/images')
+            ->whereIn('type', ProfileTypes::slugs())
+            ->whereNumber('id')
+            ->name('profiles.images.')
+            ->controller(ProfileImageController::class)
+            ->group(function (): void {
+                Route::post('/', 'store')->name('store');
+                Route::post('/{image}/toggle', 'toggle')->whereNumber('image')->name('toggle');
+                Route::delete('/{image}', 'destroy')->whereNumber('image')->name('destroy');
+            });
+
+        Route::middleware('admin.role:profiles')
+            ->prefix('profiles/{type}/{id}/comments')
+            ->whereIn('type', ProfileTypes::slugs())
+            ->whereNumber('id')
+            ->name('profiles.comments.')
+            ->controller(ProfileCommentController::class)
+            ->group(function (): void {
+                Route::post('/', 'store')->name('store');
+            });
+
+        Route::middleware('admin.role:profiles')
+            ->prefix('profiles/{type}/{id}/plan')
+            ->whereIn('type', ProfileTypes::slugs())
+            ->whereNumber('id')
+            ->name('profiles.plan.')
+            ->controller(ProfilePlanController::class)
+            ->group(function (): void {
+                Route::post('/', 'store')->name('store');
             });
 
         // ---------------------------------------------------------------------
@@ -119,6 +155,8 @@ Route::prefix('admin')->name('admin.')->group(function (): void {
             Route::get('/conversations/{conversation}', [ConversationController::class, 'show'])->whereNumber('conversation')->name('conversations.show');
             Route::get('/proposals', [ProposalController::class, 'index'])->name('proposals.index');
             Route::get('/proposals/{proposal}', [ProposalController::class, 'show'])->whereNumber('proposal')->name('proposals.show');
+            Route::get('/instant-responses', [InstantResponseController::class, 'index'])->name('instant-responses.index');
+            Route::post('/instant-responses/{instantResponse}/toggle', [InstantResponseController::class, 'toggle'])->whereNumber('instantResponse')->name('instant-responses.toggle');
         });
 
         // ---------------------------------------------------------------------

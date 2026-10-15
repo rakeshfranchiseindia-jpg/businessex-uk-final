@@ -105,6 +105,7 @@ class ProfileContactFlowTest extends TestCase
         Schema::create('profile_instant_responses', function (Blueprint $table): void {
             $table->unsignedInteger('user_id')->primary();
             $table->boolean('enabled')->default(false);
+            $table->boolean('locked_by_admin')->default(false);
             $table->string('message', 500);
             $table->timestamps();
         });

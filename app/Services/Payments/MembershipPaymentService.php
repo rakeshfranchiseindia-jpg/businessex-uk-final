@@ -29,9 +29,31 @@ class MembershipPaymentService
     ];
 
     // tinyint code stored in profile_business.membership_plan etc.
+    // 'basic' and 'platinum' are only ever set by an admin (see grantPlan());
+    // the public pricing page only self-serves premium/gold via Razorpay.
     public const PLAN_CODES = [
         'premium' => 1,
         'gold' => 2,
+        'basic' => 3,
+        'platinum' => 4,
+    ];
+
+    // smallint stored in profile_memberships.membership_type, joined against
+    // membership_plans.plan_id purely to display a plan name on My Plan.
+    public const PLAN_MEMBERSHIP_TYPE = [
+        'premium' => 2,
+        'gold' => 3,
+        'basic' => 1,
+        'platinum' => 4,
+    ];
+
+    // Validity used when an admin manually grants a plan (pricing page
+    // "45 Days" / "3 Months" / "12 Months" / "12 Months" terms).
+    public const PLAN_VALIDITY_DAYS = [
+        'basic' => 45,
+        'premium' => 90,
+        'gold' => 365,
+        'platinum' => 365,
     ];
 
     public const PROFILE_TYPE_LEGACY_CODES = [
@@ -170,6 +192,62 @@ class MembershipPaymentService
         return (int) round(((float) $payment->amount) * 100);
     }
 
+    /**
+     * Admin-side equivalent of a successful Razorpay payment: activates a
+     * membership plan on a profile without any payment ever taking place.
+     * Supports all four pricing-page tiers (basic/premium/gold/platinum),
+     * not just the two the public "My Plan" checkout can sell.
+     */
+    public function grantPlan(string $profileType, int $profileId, int $userId, string $plan, int $adminId): bool
+    {
+        $profileTable = self::PROFILE_TABLES[$profileType] ?? null;
+        $legacyType = self::PROFILE_TYPE_LEGACY_CODES[$profileType] ?? null;
+        $planCode = self::PLAN_CODES[$plan] ?? null;
+
+        if ($profileTable === null || $legacyType === null || $planCode === null) {
+            return false;
+        }
+
+        DB::transaction(function () use ($profileTable, $legacyType, $profileType, $profileId, $userId, $plan, $planCode, $adminId): void {
+            DB::table($profileTable['table'])->where($profileTable['id'], $profileId)->update([
+                'membership_paid' => 1,
+                'membership_plan' => $planCode,
+                'updated_at' => now(),
+            ]);
+
+            DB::table('profile_memberships')
+                ->where('user_id', $userId)
+                ->where('profile_type', $legacyType)
+                ->where('profile_id', $profileId)
+                ->where('is_active', 1)
+                ->update(['is_active' => 0, 'updated_at' => now()]);
+
+            DB::table('profile_memberships')->insert([
+                'user_id' => $userId,
+                'profile_type' => $legacyType,
+                'profile_id' => $profileId,
+                'order_no' => 0,
+                'amount' => '0',
+                'membership_type' => self::PLAN_MEMBERSHIP_TYPE[$plan] ?? 1,
+                'payment_source' => 2,
+                'payment_comments' => ucfirst($plan).' Plan (granted by admin #'.$adminId.')',
+                'interaction_credits' => 0,
+                'instant_responses' => 0,
+                'activation_date' => now(),
+                'expiry_date' => now()->addDays(self::PLAN_VALIDITY_DAYS[$plan] ?? 30),
+                'is_active' => 1,
+                'upg_source' => 2,
+                'assigned_by' => $adminId,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+
+            PublicContentCache::forgetProfileContent();
+        });
+
+        return true;
+    }
+
     private function activateProfile(object $payment): void
     {
         $profileType = $this->profileTypeFor($payment);
@@ -210,7 +288,7 @@ class MembershipPaymentService
         // membership_plans.plan_id, joined by the My Plan page purely to
         // display a plan_name — plan 2/3 happen to be named "Premium
         // Plan"/"Gold Plan" there, which is what we want shown either way.
-        $membershipPlanId = $payment->membership_plan === 'gold' ? 3 : 2;
+        $membershipPlanId = self::PLAN_MEMBERSHIP_TYPE[$payment->membership_plan] ?? 2;
 
         DB::table('profile_memberships')->insert([
             'user_id' => $payment->user_id,
@@ -233,6 +311,7 @@ class MembershipPaymentService
             'expiry_date' => $isAnnual ? now()->addYear() : now()->addMonth(),
             'is_active' => 1,
             'upg_source' => 1,
+            'assigned_by' => null,
             'created_at' => now(),
             'updated_at' => now(),
         ]);

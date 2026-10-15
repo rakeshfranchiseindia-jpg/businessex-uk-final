@@ -30,6 +30,12 @@ abstract class AbstractListingController extends Controller
         return $request->validate($rules);
     }
 
+    /**
+     * Matches if every word of the search term appears somewhere across the
+     * given columns (not necessarily the same column, not necessarily in
+     * order) — so "Frenchise India" still finds a listing whose headline is
+     * "India Frenchise Pvt Ltd — testing headline", not just an exact phrase.
+     */
     protected function applySearch(Builder $query, Request $request, array $columns): void
     {
         $term = trim((string) $request->query('q', ''));
@@ -37,11 +43,27 @@ abstract class AbstractListingController extends Controller
             return;
         }
 
-        $query->where(function (Builder $nested) use ($columns, $term): void {
-            foreach ($columns as $column) {
-                if (SchemaCache::hasColumn($this->tableName($nested), $column)) {
-                    $nested->orWhere($column, 'like', '%'.$term.'%');
-                }
+        $table = $this->tableName($query);
+        $searchableColumns = array_values(array_filter(
+            $columns,
+            fn (string $column): bool => SchemaCache::hasColumn($table, $column)
+        ));
+        if ($searchableColumns === []) {
+            return;
+        }
+
+        $words = array_slice(array_values(array_filter(preg_split('/\s+/', $term))), 0, 8);
+        if ($words === []) {
+            return;
+        }
+
+        $query->where(function (Builder $nested) use ($searchableColumns, $words): void {
+            foreach ($words as $word) {
+                $nested->where(function (Builder $perWord) use ($searchableColumns, $word): void {
+                    foreach ($searchableColumns as $column) {
+                        $perWord->orWhere($column, 'like', '%'.$word.'%');
+                    }
+                });
             }
         });
     }

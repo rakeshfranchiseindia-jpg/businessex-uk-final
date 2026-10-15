@@ -69,18 +69,22 @@ Manage your BusinessX interactions.
         <?php if ($interactionPageKey === 'instant-response'): ?>
           <section class="workspace-panel" aria-labelledby="instant-response-title">
             <h2 id="instant-response-title">Automatic reply</h2>
+            @if ($instantResponseLocked)
+              <p class="inbox-validation-error" role="alert">This feature has been disabled by an admin and cannot be re-enabled from here. Contact support if you believe this is a mistake.</p>
+            @endif
+            @error('enabled')<p class="inbox-validation-error" role="alert">{{ $message }}</p>@enderror
             <form id="instant-response-form" method="post" action="{{ route('dashboard.instant-response.save') }}">
               @csrf
               <label class="interaction-toggle-row" for="instant-response-enabled">
                 <span><strong>Enable instant response</strong><span>Automatically reply to new messages.</span></span>
-                <input id="instant-response-enabled" name="enabled" type="checkbox" value="1" @checked($instantResponseEnabled)>
+                <input id="instant-response-enabled" name="enabled" type="checkbox" value="1" @checked($instantResponseEnabled) @disabled($instantResponseLocked)>
               </label>
               <div class="workspace-field" style="margin-top:18px;">
                 <label for="instant-response-message">Response message</label>
-                <textarea class="interaction-textarea" id="instant-response-message" name="message" rows="5" maxlength="500" required>{{ old('message', $instantResponseMessage) }}</textarea>
+                <textarea class="interaction-textarea" id="instant-response-message" name="message" rows="5" maxlength="500" required @disabled($instantResponseLocked)>{{ old('message', $instantResponseMessage) }}</textarea>
                 @error('message')<p class="inbox-validation-error" role="alert">{{ $message }}</p>@enderror
               </div>
-              <button class="workspace-submit" type="submit">Save response</button>
+              <button class="workspace-submit" type="submit" @disabled($instantResponseLocked)>Save response</button>
               @if (session('status'))<p class="workspace-status interaction-status" role="status" aria-live="polite">{{ session('status') }}</p>@endif
             </form>
           </section>

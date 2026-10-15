@@ -1399,6 +1399,7 @@ class DashboardController extends Controller
 
         return $this->interaction('instant-response', 'Instant Response')->with([
             'instantResponseEnabled' => (bool) ($settings->enabled ?? false),
+            'instantResponseLocked' => (bool) ($settings->locked_by_admin ?? false),
             'instantResponseMessage' => $settings->message
                 ?? 'Thank you for your message. We have received it and will get back to you as soon as possible.',
         ]);
@@ -1410,6 +1411,16 @@ class DashboardController extends Controller
             'enabled' => ['nullable', 'boolean'],
             'message' => ['required', 'string', 'max:500'],
         ]);
+
+        $locked = (bool) DB::table('profile_instant_responses')
+            ->where('user_id', $request->user()->user_id)
+            ->value('locked_by_admin');
+
+        if ($locked) {
+            return redirect()->route('dashboard.instant-response')
+                ->withErrors(['enabled' => 'An admin has disabled instant response on your account. Contact support to have it re-enabled.']);
+        }
+
         $now = now();
         DB::table('profile_instant_responses')->upsert([
             'user_id' => $request->user()->user_id,

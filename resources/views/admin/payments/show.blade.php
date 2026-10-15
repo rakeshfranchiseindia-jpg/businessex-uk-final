@@ -50,6 +50,14 @@
                             <dt>Plan</dt><dd>{{ config('admin.membership')[$membership->membership_type] ?? $membership->membership_type }}</dd>
                             <dt>Validity</dt><dd>{{ $membership->activation_date ? \Illuminate\Support\Carbon::parse($membership->activation_date)->format('d M Y') : '—' }} &rarr; {{ $membership->expiry_date ? \Illuminate\Support\Carbon::parse($membership->expiry_date)->format('d M Y') : '—' }}</dd>
                             <dt>Interaction credits</dt><dd>{{ $membership->interaction_credits ?: '—' }}</dd>
+                            <dt>Assigned by</dt>
+                            <dd>
+                                @if ($membership->assignedByAdmin)
+                                    {{ $membership->assignedByAdmin->admin_name }} ({{ $membership->assignedByAdmin->admin_email }})
+                                @else
+                                    Self
+                                @endif
+                            </dd>
                             <dt>Active</dt><dd class="mb-0">@include('admin.partials.active-badge', ['active' => $membership->is_active, 'on' => 'Yes', 'off' => 'No'])</dd>
                         </dl>
                     @else

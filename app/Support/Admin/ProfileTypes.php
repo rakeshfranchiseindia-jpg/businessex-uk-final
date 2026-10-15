@@ -9,6 +9,10 @@ use App\Models\Admin\InvestorProfile;
 use App\Models\Admin\LenderProfile;
 use App\Models\Admin\MentorProfile;
 use App\Models\Admin\StartupProfile;
+use App\Models\BusinessImage;
+use App\Models\ProfileBusinessMgmt;
+use App\Models\ProfileStartupMgmt;
+use App\Models\StartupImage;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -54,6 +58,17 @@ class ProfileTypes
                     'business_website' => 'Website', 'ofc_city' => 'City', 'ofc_state' => 'State',
                     'ofc_country' => 'Country', 'company_summary' => 'Company Summary',
                 ],
+                'images' => [
+                    'model' => BusinessImage::class,
+                    'foreign_key' => 'business_id',
+                    'path_column' => 'business_img_path',
+                    'name_column' => 'business_img_name',
+                    'folder' => 'business-profiles',
+                ],
+                'management' => [
+                    'model' => ProfileBusinessMgmt::class,
+                    'foreign_key' => 'business_profile_id',
+                ],
             ],
             'startup' => [
                 'id' => 7,
@@ -75,6 +90,17 @@ class ProfileTypes
                     'advmt_headline' => 'Headline', 'startup_intro' => 'Introduction',
                     'business_website' => 'Website', 'ofc_city' => 'City', 'ofc_state' => 'State',
                     'ofc_country' => 'Country', 'company_summary' => 'Company Summary',
+                ],
+                'images' => [
+                    'model' => StartupImage::class,
+                    'foreign_key' => 'startup_id',
+                    'path_column' => 'startup_img_path',
+                    'name_column' => 'startup_img_name',
+                    'folder' => 'startup-profiles',
+                ],
+                'management' => [
+                    'model' => ProfileStartupMgmt::class,
+                    'foreign_key' => 'startup_profile_id',
                 ],
             ],
             'investor' => [

@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Admin;
 
 use App\Models\Admin\ProfileRejection;
 use App\Models\Admin\UserProfile;
+use App\Models\Admin\AdminUser;
+use App\Models\ContactComment;
 use App\Support\Admin\ProfileTypes;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\RedirectResponse;
@@ -72,7 +74,49 @@ class ProfileController extends Controller
             ->latest('created_at')
             ->get();
 
-        return view('admin.profiles.show', compact('config', 'profile', 'rejections'));
+        $images = collect();
+        if ($imagesConfig = $config['images'] ?? null) {
+            $images = $imagesConfig['model']::query()
+                ->where($imagesConfig['foreign_key'], $id)
+                ->latest('created_at')
+                ->get();
+        }
+
+        $management = collect();
+        if ($managementConfig = $config['management'] ?? null) {
+            $management = $managementConfig['model']::query()
+                ->where($managementConfig['foreign_key'], $id)
+                ->get();
+        }
+
+        $comments = collect();
+        if ($profile->user_id) {
+            $comments = ContactComment::query()
+                ->where('contact_id', $profile->user_id)
+                ->where('contact_type', $config['id'])
+                ->latest('comment_date')
+                ->get();
+
+            $admins = AdminUser::query()
+                ->whereIn('admin_id', $comments->pluck('commented_by')->unique())
+                ->pluck('admin_email', 'admin_id');
+
+            $comments->each(fn ($comment) => $comment->admin_email = $admins[$comment->commented_by] ?? null);
+        }
+
+        $membership = null;
+        if ($profile->user_id) {
+            $membership = \App\Models\Admin\Membership::query()
+                ->with('assignedByAdmin')
+                ->where('user_id', $profile->user_id)
+                ->where('profile_type', $config['id'])
+                ->where('profile_id', $id)
+                ->where('is_active', 1)
+                ->latest('membership_id')
+                ->first();
+        }
+
+        return view('admin.profiles.show', compact('config', 'profile', 'rejections', 'images', 'management', 'comments', 'membership'));
     }
 
     public function edit(string $type, int $id): View

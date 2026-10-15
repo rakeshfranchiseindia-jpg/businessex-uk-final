@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class ContactComment extends Model
 {
+    public $timestamps = false;
+
     protected $table = 'contact_comment';
 
     protected $fillable = [

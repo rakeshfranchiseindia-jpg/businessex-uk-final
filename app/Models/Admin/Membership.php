@@ -17,4 +17,9 @@ class Membership extends Model
     {
         return $this->belongsTo(UserAccount::class, 'user_id', 'user_id');
     }
+
+    public function assignedByAdmin(): BelongsTo
+    {
+        return $this->belongsTo(AdminUser::class, 'assigned_by', 'admin_id');
+    }
 }
