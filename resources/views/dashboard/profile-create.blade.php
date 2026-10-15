@@ -10,7 +10,7 @@ Choose the kind of profile you want to create.
 
 @section('head')
 <link rel="stylesheet" href="{{ asset('css/dashboard.css') }}">
-<link rel="stylesheet" href="{{ asset('css/account-dashboard.css') }}">
+<link rel="stylesheet" href="{{ asset('css/account-dashboard.css?v=20261014') }}">
 <style>
   .profile-create-options { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; margin-top: 22px; }
   .profile-create-option { display: grid; gap: 8px; padding: 22px; border: 1px solid var(--gray-200); border-radius: 8px; background: var(--white); color: var(--navy-800); }

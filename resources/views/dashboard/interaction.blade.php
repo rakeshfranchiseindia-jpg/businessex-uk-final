@@ -46,7 +46,7 @@ Manage your BusinessX interactions.
 
 @section('head')
 <link rel="stylesheet" href="{{ asset('css/dashboard.css') }}">
-<link rel="stylesheet" href="{{ asset('css/account-dashboard.css') }}">
+<link rel="stylesheet" href="{{ asset('css/account-dashboard.css?v=20261014') }}">
 @endsection
 
 @section('content')

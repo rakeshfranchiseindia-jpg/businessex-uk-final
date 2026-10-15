@@ -10,7 +10,7 @@ View and manage your {{ strtolower($profileLabel) }} profile.
 
 @section('head')
 <link rel="stylesheet" href="{{ asset('css/dashboard.css') }}">
-<link rel="stylesheet" href="{{ asset('css/account-dashboard.css') }}">
+<link rel="stylesheet" href="{{ asset('css/account-dashboard.css?v=20261014') }}">
 <style>
   .owned-profile-fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 24px; }
   .owned-profile-field { min-width: 0; padding: 14px 0; border-bottom: 1px solid var(--gray-100); }

@@ -9,7 +9,7 @@ Change your BusinessX account password.
 
 @section('head')
 <link rel="stylesheet" href="{{ asset('css/dashboard.css') }}">
-<link rel="stylesheet" href="{{ asset('css/account-dashboard.css') }}">
+<link rel="stylesheet" href="{{ asset('css/account-dashboard.css?v=20261014') }}">
   <style>
     .password-field-wrap { position: relative; }
     .password-field-wrap input { padding-right: 46px; }

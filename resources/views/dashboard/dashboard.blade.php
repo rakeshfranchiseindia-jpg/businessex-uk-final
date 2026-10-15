@@ -9,7 +9,7 @@ BusinessX connects businesses, startups, investors and mentors.
 
 @section('head')
 <link rel="stylesheet" href="{{ asset('css/dashboard.css') }}">
-  <link rel="stylesheet" href="{{ asset('css/account-dashboard.css') }}">
+  <link rel="stylesheet" href="{{ asset('css/account-dashboard.css?v=20261014') }}">
 @endsection
 
 @section('content')

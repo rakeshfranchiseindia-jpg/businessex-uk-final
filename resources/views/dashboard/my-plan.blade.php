@@ -9,7 +9,7 @@ View your active BusinessX membership or explore available plans.
 
 @section('head')
 <link rel="stylesheet" href="{{ asset('css/dashboard.css') }}">
-<link rel="stylesheet" href="{{ asset('css/account-dashboard.css') }}">
+<link rel="stylesheet" href="{{ asset('css/account-dashboard.css?v=20261014') }}">
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 <script>
   window.BX_MY_PLAN_PAYMENT = {

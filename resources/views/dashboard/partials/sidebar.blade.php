@@ -8,7 +8,7 @@
     <div class="identity-name">{{ auth()->user()->name }}</div>
     <div class="identity-role">{{ \Illuminate\Support\Str::title(auth()->user()->reg_profile ?: 'member') }} account</div>
     <div class="identity-contact">
-      <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>
+      <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>
       @if (auth()->user()->email)
         <a href="mailto:{{ auth()->user()->email }}">{{ auth()->user()->email }}</a>
       @else
@@ -16,7 +16,7 @@
       @endif
     </div>
     <div class="identity-contact">
-      <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 3h4l2 5-2.5 1.5a15 15 0 0 0 6 6L16 13l5 2v4a2 2 0 0 1-2 2C10 21 3 14 3 5a2 2 0 0 1 2-2Z"/></svg>
+      <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 3h4l2 5-2.5 1.5a15 15 0 0 0 6 6L16 13l5 2v4a2 2 0 0 1-2 2C10 21 3 14 3 5a2 2 0 0 1 2-2Z"/></svg>
       @if (auth()->user()->mobile)
         <a href="tel:{{ preg_replace('/[^0-9+]/', '', auth()->user()->mobile) }}">{{ auth()->user()->mobile }}</a>
       @else
@@ -24,7 +24,7 @@
       @endif
     </div>
     <div class="identity-contact">
-      <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 10c0 5-8 12-8 12S4 15 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="2.5"/></svg>
+      <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 10c0 5-8 12-8 12S4 15 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="2.5"/></svg>
       <span>{{ filled(auth()->user()->location) ? auth()->user()->location : 'N/A' }}</span>
     </div>
     <a class="identity-edit" href="{{ route('dashboard.profile') }}">Edit profile</a>

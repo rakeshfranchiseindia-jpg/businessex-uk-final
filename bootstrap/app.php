@@ -3,6 +3,7 @@
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use Illuminate\Support\Facades\Route;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -10,8 +11,19 @@ return Application::configure(basePath: dirname(__DIR__))
         commands: __DIR__.'/../routes/console.php',
         channels: __DIR__.'/../routes/channels.php',
         health: '/up',
+        // Admin panel routes live in their own file, isolated from the
+        // public site and the user dashboard.
+        then: function (): void {
+            Route::middleware('web')->group(base_path('routes/admin.php'));
+        },
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        $middleware->alias([
+            'admin.auth' => \App\Http\Middleware\Admin\AuthenticateAdmin::class,
+            'admin.guest' => \App\Http\Middleware\Admin\RedirectIfAdminAuthenticated::class,
+            'admin.role' => \App\Http\Middleware\Admin\EnsureAdminRole::class,
+        ]);
+
         // Razorpay cannot send a CSRF token; the webhook authenticates
         // requests by HMAC signature instead (RazorpayWebhookController).
         $middleware->validateCsrfTokens(except: ['webhooks/razorpay']);
